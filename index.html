@@ -1106,98 +1106,88 @@
 
       const { PDFDocument, rgb, StandardFonts } = PDFLib;
 
-      // Load embedded template
       const pdfBytes = Uint8Array.from(atob(PDF_TEMPLATE), c => c.charCodeAt(0));
-      const pdfDoc = await PDFDocument.load(pdfBytes);
-      const page = pdfDoc.getPages()[0];
-      const { width, height } = page.getSize(); // 905.38 x 639.78
 
-      const font     = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       const BLACK = rgb(0, 0, 0);
-      const WHITE = rgb(1, 1, 1);
       const FS = 8;
-
-      const draw = (text, x, y, f, sz) => {
-        if (text == null || text === '') return;
-        page.drawText(String(text), { x, y, size: sz || FS, font: f || font, color: BLACK });
-      };
-
-      // Employee name: x=75-230, y0=531.3, baseline=534
-      const empName = localStorage.getItem(EMP_KEY) || '';
-      if (empName) draw(empName, 78, 534, font, 8);
-
-      // Week Ending Date box: x=787-896, baseline=534
-      const weekVal = localStorage.getItem(getWeekKey());
-      if (weekVal) {
-        const d = new Date(weekVal + 'T00:00:00');
-        const ds = d.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' });
-        draw(ds, 790, 534, boldFont, 8);
-      }
-
-      // Column x positions — left edge of each cell + 3pt padding
-      // (from rectangle extraction: Date x=0-75, Job x=75-151, etc.)
       const C = {
-        date:  3,    // x=0-75
-        job:   78,   // x=75-151
-        veh:   154,  // x=151-230
-        drv:   233,  // x=230-317
-        start: 320,  // x=317-379
-        on:    382,  // x=379-440
-        off:   443,  // x=440-508
-        end:   511,  // x=508-574
-        tot:   577,  // x=574-629
-        food:  648,  // x=629-685 (checkbox centre)
-        hol:   703,  // x=685-735 (checkbox centre)
+        date:  3, job: 78, veh: 154, drv: 233,
+        start: 320, on: 382, off: 443, end: 511,
+        tot:   577, food: 648, hol: 703,
       };
-
-      // Data row y positions (pdf-lib bottom-left).
-      // Row 1 cell: y0=457.3, h=22.5. Baseline = y0 + (22.5-8)/2 = y0 + 7.25 ≈ 464
-      // Each subsequent row is 22.5 pts lower.
-      const BASE = 457.3 + 7.25; // = 464.55
+      const BASE = 457.3 + 7.25;
       const STEP = 22.5;
       const ROWS = Array.from({length: 17}, (_, i) => Math.round(BASE - i * STEP));
 
-      entries.slice(0, 17).forEach((e, i) => {
-        const y = ROWS[i];
+      const empName = localStorage.getItem(EMP_KEY) || '';
+      const weekVal = localStorage.getItem(getWeekKey());
+      const weekDs  = weekVal
+        ? new Date(weekVal + 'T00:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' })
+        : '';
 
-        if (e.date) {
-          const d = new Date(e.date + 'T00:00:00');
-          draw(d.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' }), C.date, y);
-        }
-        draw(e.jobNumber,   C.job,   y);
-        draw(e.vehicleReg,  C.veh,   y);
-        draw(e.driverName,  C.drv,   y);
-        draw(e.startTime,   C.start, y);
-        draw(e.timeOnSite,  C.on,    y);
-        draw(e.timeOffSite, C.off,   y);
-        draw(e.endTime,     C.end,   y);
-        draw(e.totalHours,  C.tot,   y);
+      // Split entries into pages of 17
+      const chunks = [];
+      for (let i = 0; i < entries.length; i += 17) chunks.push(entries.slice(i, i + 17));
 
-        // Draw a tick (✓) using two lines
+      // Build output doc by copying a fresh template page per chunk
+      const outDoc = await PDFDocument.create();
+      const font     = await outDoc.embedFont(StandardFonts.Helvetica);
+      const boldFont = await outDoc.embedFont(StandardFonts.HelveticaBold);
+
+      for (let ci = 0; ci < chunks.length; ci++) {
+        const templateDoc = await PDFDocument.load(pdfBytes);
+        const [templatePage] = await outDoc.copyPages(templateDoc, [0]);
+        outDoc.addPage(templatePage);
+        const page = outDoc.getPages()[ci];
+
+        const draw = (text, x, y, f, sz) => {
+          if (text == null || text === '') return;
+          page.drawText(String(text), { x, y, size: sz || FS, font: f || font, color: BLACK });
+        };
         const tick = (x, y) => {
           const o = { thickness: 1.5, color: BLACK };
           page.drawLine({ start: {x: x,   y: y+3}, end: {x: x+3, y: y},   ...o });
           page.drawLine({ start: {x: x+3, y: y},   end: {x: x+9, y: y+8}, ...o });
         };
-        if (e.food) tick(C.food, ROWS[i]);
-        if (e.hol)  tick(C.hol,  ROWS[i]);
-      });
 
-      // Signature name (abbreviated): x=78, y=81
-      if (empName) draw(abbreviateName(empName), 78, 81, font, 10);
+        // Header
+        if (empName) draw(empName, 78, 534, font, 8);
+        if (weekDs)  draw(weekDs,  790, 534, boldFont, 8);
 
-      // Footer total hours
-      const days_pdf = getDailyBreaks();
-      const totalGross = days_pdf.reduce((s, d) => s + d.totalMins, 0);
-      if (totalGross > 0) draw(minsToStr(totalGross), C.tot, 81, boldFont);
+        // Entries
+        chunks[ci].forEach((e, i) => {
+          const y = ROWS[i];
+          if (e.date) {
+            const d = new Date(e.date + 'T00:00:00');
+            draw(d.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' }), C.date, y);
+          }
+          draw(e.jobNumber,   C.job,   y);
+          draw(e.vehicleReg,  C.veh,   y);
+          draw(e.driverName,  C.drv,   y);
+          draw(e.startTime,   C.start, y);
+          draw(e.timeOnSite,  C.on,    y);
+          draw(e.timeOffSite, C.off,   y);
+          draw(e.endTime,     C.end,   y);
+          draw(e.totalHours,  C.tot,   y);
+          if (e.food) tick(C.food, y);
+          if (e.hol)  tick(C.hol,  y);
+        });
+
+        // Footer — signature + total only on last page
+        if (ci === chunks.length - 1) {
+          if (empName) draw(abbreviateName(empName), 78, 81, font, 10);
+          const days_pdf  = getDailyBreaks();
+          const totalGross = days_pdf.reduce((s, d) => s + d.totalMins, 0);
+          if (totalGross > 0) draw(minsToStr(totalGross), C.tot, 81, boldFont);
+        }
+      }
 
       // Save + open in Safari PDF viewer (iOS share to save/email)
       const PDF_CTR_KEY = 'ts_pdf_count' + empSuffix();
       const pdfNum = (parseInt(localStorage.getItem(PDF_CTR_KEY) || '0')) + 1;
       localStorage.setItem(PDF_CTR_KEY, pdfNum);
 
-      const outBytes = await pdfDoc.save();
+      const outBytes = await outDoc.save();
       const blob = new Blob([outBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
 
