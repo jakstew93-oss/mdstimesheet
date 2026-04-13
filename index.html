@@ -209,41 +209,56 @@
     .break-hours-box.deduct .bh-value { color: var(--warning); }
     .break-hours-box.net    .bh-value { color: var(--success); }
 
-    /* ── SHEET TAB ── */
+    /* ── SHEET / PREVIEW TAB ── */
     .sheet-wrapper {
-      position: relative; background: white;
-      border-radius: var(--radius); overflow: hidden;
-      border: 1px solid var(--border); margin-bottom: 16px;
+      background: white; border-radius: var(--radius);
+      border: 1px solid #ccc; margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     }
     .sheet-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .sheet-address {
-      position: absolute; top: 8px; right: 8px;
-      font-size: 9px; font-family: 'Arial Narrow', Arial, sans-serif;
-      color: #000; text-align: right; line-height: 1.5;
-      pointer-events: none; max-width: 180px;
+    .sheet-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 10px 12px 6px; border-bottom: 2px solid #222;
+      font-family: 'Arial Narrow', Arial, sans-serif;
     }
+    .sheet-header-left { display: flex; align-items: center; gap: 10px; }
+    .sheet-header-logo { height: 52px; width: auto; }
+    .sheet-header-address {
+      font-size: 9px; color: #333; line-height: 1.6;
+    }
+    .sheet-header-right { text-align: right; font-size: 9px; color: #333; line-height: 1.8; }
+    .sheet-header-right strong { font-size: 11px; color: #000; }
     table.xlsx-sheet {
       border-collapse: collapse;
       font-family: 'Arial Narrow', Arial, sans-serif;
-      font-size: 10px; table-layout: fixed; min-width: 761px;
+      font-size: 10px; table-layout: fixed; min-width: 761px; width: 100%;
     }
     table.xlsx-sheet td, table.xlsx-sheet th {
-      border: 1px solid #aaa; padding: 2px 4px;
+      border: 1px solid #999; padding: 3px 4px;
       vertical-align: middle; overflow: hidden; white-space: nowrap;
     }
-    .logo-cell { padding: 0; border: 1px solid #aaa; background: white; vertical-align: top; }
-    .xred-bg   { background: #ff0000; border-color: #cc0000; }
-    .xred-big  { background: #ff0000; border-color: #cc0000; }
-    .xgreen-bg { background: #00ff00; border-color: #00cc00; }
-    .xtitle    { font-weight: 700; font-size: 14px; color: #ff0000; text-align: center; background: #00ff00; border-color: #00cc00; letter-spacing: 1px; }
-    .xlabel    { font-weight: 700; font-size: 10px; color: #ff0000; text-align: center; padding: 3px 4px; }
-    .xhdr      { background: #00ff00; color: #ff0000; font-weight: 700; font-size: 9px; text-align: center; border: 1px solid #00cc00; vertical-align: middle; padding: 3px 2px; line-height: 1.3; white-space: normal; }
-    .xdata-cell { background: white; text-align: center; font-size: 10px; color: #ffff00; font-family: 'Arial Narrow', Arial, sans-serif; }
-    .xdata-date { color: #000; }
-    .xdata-total { color: #ffff00; font-weight: 600; }
-    .xdata-check { font-size: 14px; color: #000; text-align: center; }
-    .xdata-afterbrk { color: #ff9500; font-size: 9px; display: block; }
-    .xsig-cell { font-family: 'Courgette', cursive, serif; font-size: 13px; color: #ffff00; text-align: left; padding-left: 6px; }
+    .logo-cell { padding: 0; border: 1px solid #999; background: white; vertical-align: top; display: none; }
+    .xred-bg   { background: #f0f0f0; }
+    .xred-big  { background: #f0f0f0; }
+    .xgreen-bg { background: #e8e8e8; }
+    .xtitle    { font-weight: 700; font-size: 13px; color: #111; text-align: center; background: #e8e8e8; letter-spacing: 1px; }
+    .xlabel    { font-weight: 700; font-size: 10px; color: #111; text-align: center; padding: 3px 4px; }
+    .xhdr      { background: #222; color: #fff; font-weight: 700; font-size: 9px; text-align: center;
+                 vertical-align: middle; padding: 4px 2px; line-height: 1.3; white-space: normal; }
+    .xdata-cell { background: white; text-align: center; font-size: 10px; color: #111; font-family: 'Arial Narrow', Arial, sans-serif; }
+    .xdata-date { color: #111; }
+    .xdata-total { color: #111; font-weight: 600; }
+    .xdata-check { font-size: 13px; color: #111; text-align: center; }
+    .xdata-afterbrk { color: #888; font-size: 8px; display: block; }
+    .sheet-footer {
+      display: flex; justify-content: flex-end; align-items: center;
+      padding: 8px 12px; border-top: 2px solid #222;
+      font-family: 'Arial Narrow', Arial, sans-serif; font-size: 10px; color: #111;
+      gap: 16px;
+    }
+    .sheet-footer-sig { font-size: 10px; color: #555; }
+    .sheet-footer-total { font-weight: 700; font-size: 11px; }
+    .xsig-cell { font-family: 'Courgette', cursive, serif; font-size: 13px; color: #111; text-align: left; padding-left: 6px; }
     .xnote     { font-weight: 700; font-style: italic; font-size: 10px; color: #000; text-align: left; white-space: normal; padding: 5px 6px; background: white; border: 1px solid #aaa; }
     .xempty { color: #e0e0e0; }
     .tick  { color: #22c55e; font-size: 14px; }
@@ -400,7 +415,7 @@
   <button class="tab active" onclick="showPage('log',this)">Log</button>
   <button class="tab" onclick="showPage('entries',this)">Entries</button>
   <button class="tab" onclick="showPage('breaks',this)">Breaks</button>
-  <button class="tab" onclick="showPage('sheet',this)">Sheet</button>
+  <button class="tab" onclick="showPage('sheet',this)">Preview</button>
   <button class="tab" onclick="showPage('export',this)">Export</button>
 </div>
 
@@ -423,7 +438,15 @@
     </div>
     <div class="field-row">
       <div class="field"><label>Vehicle Reg</label><input type="text" id="vehicleReg" placeholder="e.g. AB12 CDE" autocapitalize="characters" /></div>
-      <div class="field"><label>Driver Name</label><input type="text" id="driverName" placeholder="Name" /></div>
+      <div class="field"><label>Driver Name</label><input type="text" id="driverName" placeholder="Name" list="driverList" autocomplete="off" /></div>
+      <datalist id="driverList">
+        <option value="Jak Stewart">
+        <option value="Cody Slack">
+        <option value="Ash Kemp">
+        <option value="Matthew Heath">
+        <option value="Cameron Simpson">
+        <option value="Martyn Evans">
+      </datalist>
     </div>
     <div class="field-row">
       <div class="field"><label>Start Time</label><input type="time" id="startTime" /></div>
@@ -516,7 +539,7 @@
         <!-- ROW 4: Employee + Week Ending -->
         <tr style="height:22px;">
           <td class="xgreen-bg xlabel">Employee Name:</td>
-          <td colspan="2" class="xdata-cell xdata-date" style="font-weight:600;">Jak Stewart</td>
+          <td colspan="2" class="xdata-cell xdata-date" style="font-weight:600;" id="sh_empName">—</td>
           <td class="xgreen-bg xlabel">Week Ending Date:</td>
           <td colspan="3" class="xdata-cell xdata-date" id="sh_weekDate">—</td>
         </tr>
@@ -542,7 +565,7 @@
         <!-- ROW 25: Totals/Signature -->
         <tr style="height:24px;">
           <td class="xgreen-bg xlabel">Signature</td>
-          <td colspan="5" class="xsig-cell">J Stewart</td>
+          <td colspan="5" class="xsig-cell" id="sh_sigName"></td>
           <td></td>
           <td class="xgreen-bg xlabel">Total Hours</td>
           <td class="xdata-cell xdata-total" id="sh_totalHrs"></td>
@@ -724,7 +747,7 @@
                     timeOnSite, timeOffSite, food, hol, totalHours, breakMins, id: Date.now() };
     const entries = getEntries();
     entries.push(entry);
-    entries.sort((a,b) => a.date.localeCompare(b.date));
+    entries.sort((a,b) => a.date.localeCompare(b.date) || (a.startTime||'').localeCompare(b.startTime||''));
     saveEntries(entries);
 
     ['jobNumber','vehicleReg','driverName','startTime','endTime','timeOnSite','timeOffSite']
@@ -948,6 +971,13 @@
     const entries = getEntries();
     const body    = document.getElementById('sheetBody');
     const weekVal = localStorage.getItem(getWeekKey());
+    const empName = localStorage.getItem(EMP_KEY) || '—';
+
+    const sh_emp  = document.getElementById('sh_empName');
+    if (sh_emp) sh_emp.textContent = empName;
+
+    const sh_sig  = document.getElementById('sh_sigName');
+    if (sh_sig) sh_sig.textContent = abbreviateName(empName);
 
     // Update week ending date in sheet header
     const sh_week = document.getElementById('sh_weekDate');
@@ -955,36 +985,29 @@
       ? new Date(weekVal+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'})
       : '—';
 
-    // Fill 17 data rows (rows 8-24 in xlsx)
+    // Fill all data rows
     let rows = '';
-    for (let i = 0; i < TOTAL_ROWS; i++) {
-      const e = entries[i];
-      if (e) {
-        const ab  = afterBreakStr(e.totalHours);
-        const brk = e.breakMins || 0;
-        const brkStr = brk > 0 ? `<span class="xdata-afterbrk">after brk: ${ab}</span>` : '';
-        rows += `<tr style="height:22px;">
-          <td class="xdata-cell xdata-date">${shortDate(e.date)}</td>
-          <td class="xdata-cell">${e.jobNumber||''}</td>
-          <td class="xdata-cell xdata-date">${e.vehicleReg||''}</td>
-          <td class="xdata-cell">${e.driverName||''}</td>
-          <td class="xdata-cell xdata-date">${e.startTime||''}</td>
-          <td class="xdata-cell">${e.timeOnSite||''}</td>
-          <td class="xdata-cell">${e.timeOffSite||''}</td>
-          <td class="xdata-cell">${e.endTime||''}</td>
-          <td class="xdata-cell xdata-total">${e.totalHours||''}${brkStr}</td>
-          <td class="xdata-check">${e.food ? '&#10003;' : ''}</td>
-          <td class="xdata-check">${e.hol  ? '&#10003;' : ''}</td>
-        </tr>`;
-      } else {
-        rows += `<tr style="height:22px;">
-          <td class="xempty"></td><td class="xempty"></td><td class="xempty"></td>
-          <td class="xempty"></td><td class="xempty"></td><td class="xempty"></td>
-          <td class="xempty"></td><td class="xempty"></td><td class="xempty"></td>
-          <td class="xempty"></td><td class="xempty"></td>
-        </tr>`;
-      }
-    }
+    entries.forEach(e => {
+      const ab  = afterBreakStr(e.totalHours);
+      const brk = e.breakMins || 0;
+      const brkStr = brk > 0 ? `<span class="xdata-afterbrk">after brk: ${ab}</span>` : '';
+      const dateStr = e.date
+        ? new Date(e.date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'})
+        : '';
+      rows += `<tr style="height:22px;">
+        <td class="xdata-cell xdata-date">${dateStr}</td>
+        <td class="xdata-cell">${e.jobNumber||''}</td>
+        <td class="xdata-cell xdata-date">${e.vehicleReg||''}</td>
+        <td class="xdata-cell">${e.driverName||''}</td>
+        <td class="xdata-cell xdata-date">${e.startTime||''}</td>
+        <td class="xdata-cell">${e.timeOnSite||''}</td>
+        <td class="xdata-cell">${e.timeOffSite||''}</td>
+        <td class="xdata-cell">${e.endTime||''}</td>
+        <td class="xdata-cell xdata-total">${e.totalHours||''}${brkStr}</td>
+        <td class="xdata-check">${e.food ? '&#10003;' : ''}</td>
+        <td class="xdata-check">${e.hol  ? '&#10003;' : ''}</td>
+      </tr>`;
+    });
     body.innerHTML = rows;
 
     // Update total hours in footer
@@ -1144,6 +1167,12 @@
           if (text == null || text === '') return;
           page.drawText(String(text), { x, y, size: sz || FS, font: f || font, color: BLACK });
         };
+        const fmtHours = str => {
+          const mins = hoursToMins(str);
+          if (!mins) return '';
+          const h = Math.floor(mins / 60), m = mins % 60;
+          return h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+        };
         const tick = (x, y) => {
           const o = { thickness: 1.5, color: BLACK };
           page.drawLine({ start: {x: x,   y: y+3}, end: {x: x+3, y: y},   ...o });
@@ -1168,7 +1197,7 @@
           draw(e.timeOnSite,  C.on,    y);
           draw(e.timeOffSite, C.off,   y);
           draw(e.endTime,     C.end,   y);
-          draw(e.totalHours,  C.tot,   y);
+          draw(fmtHours(e.totalHours), C.tot, y);
           if (e.food) tick(C.food, y);
           if (e.hol)  tick(C.hol,  y);
         });
@@ -1178,7 +1207,7 @@
           if (empName) draw(abbreviateName(empName), 78, 81, font, 10);
           const days_pdf  = getDailyBreaks();
           const totalGross = days_pdf.reduce((s, d) => s + d.totalMins, 0);
-          if (totalGross > 0) draw(minsToStr(totalGross), C.tot, 81, boldFont);
+          if (totalGross > 0) { const h=Math.floor(totalGross/60),m=totalGross%60; draw(h>0?(m>0?`${h}h ${m}m`:`${h}h`):`${m}m`, C.tot, 81, boldFont); }
         }
       }
 
@@ -1291,7 +1320,7 @@
     </div>
     <div class="field-row">
       <div class="field"><label>Vehicle Reg</label><input type="text" id="editVehicleReg" placeholder="e.g. AB12 CDE" autocapitalize="characters" /></div>
-      <div class="field"><label>Driver Name</label><input type="text" id="editDriverName" placeholder="Name" /></div>
+      <div class="field"><label>Driver Name</label><input type="text" id="editDriverName" placeholder="Name" list="driverList" autocomplete="off" /></div>
     </div>
     <div class="field-row">
       <div class="field"><label>Start Time</label><input type="time" id="editStartTime" /></div>
