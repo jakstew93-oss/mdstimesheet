@@ -377,6 +377,7 @@
         <option value="Ash Kemp">Ash Kemp</option>
         <option value="Matthew Heath">Matthew Heath</option>
         <option value="Cameron Simpson">Cameron Simpson</option>
+        <option value="Martyn Evans">Martyn Evans</option>
       </select>
     </div>
     <div class="field">
@@ -715,10 +716,9 @@
     const hol         = document.getElementById('holiday').checked;
 
     if (!date) { showToast('Please enter a date'); return; }
-    if (!startTime || !endTime) { showToast('Please enter start and end times'); return; }
 
-    const totalHours = calcHours(startTime, endTime);
-    const breakMins  = getBreakMins(totalHours);
+    const totalHours = (startTime && endTime) ? calcHours(startTime, endTime) : '';
+    const breakMins  = totalHours ? getBreakMins(totalHours) : 0;
 
     const entry = { date, jobNumber, vehicleReg, driverName, startTime, endTime,
                     timeOnSite, timeOffSite, food, hol, totalHours, breakMins, id: Date.now() };
@@ -777,9 +777,8 @@
     const startTime = document.getElementById('editStartTime').value;
     const endTime   = document.getElementById('editEndTime').value;
     if (!date) { showToast('Please enter a date'); return; }
-    if (!startTime || !endTime) { showToast('Please enter start and end times'); return; }
-    const totalHours = calcHours(startTime, endTime);
-    const breakMins  = getBreakMins(totalHours);
+    const totalHours = (startTime && endTime) ? calcHours(startTime, endTime) : '';
+    const breakMins  = totalHours ? getBreakMins(totalHours) : 0;
     const updated = getEntries().map(e => {
       if (e.id !== id) return e;
       return {
@@ -1164,7 +1163,7 @@
 
         if (e.date) {
           const d = new Date(e.date + 'T00:00:00');
-          draw(d.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit' }), C.date, y);
+          draw(d.toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' }), C.date, y);
         }
         draw(e.jobNumber,   C.job,   y);
         draw(e.vehicleReg,  C.veh,   y);
@@ -1238,6 +1237,7 @@
     'Ash Kemp':     'ak516',
     'Matthew Heath':'mh738',
     'Cameron Simpson':'cs461',
+    'Martyn Evans':   'me392',
   };
 
   function doLogin() {
