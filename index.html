@@ -438,15 +438,19 @@
     </div>
     <div class="field-row">
       <div class="field"><label>Vehicle Reg</label><input type="text" id="vehicleReg" placeholder="e.g. AB12 CDE" autocapitalize="characters" /></div>
-      <div class="field"><label>Driver Name</label><input type="text" id="driverName" placeholder="Name" list="driverList" autocomplete="off" /></div>
-      <datalist id="driverList">
-        <option value="Jak Stewart">
-        <option value="Cody Slack">
-        <option value="Ash Kemp">
-        <option value="Matthew Heath">
-        <option value="Cameron Simpson">
-        <option value="Martyn Evans">
-      </datalist>
+      <div class="field"><label>Driver Name</label>
+        <select id="driverNameSelect" onchange="handleDriverSelect('driverNameSelect','driverName')">
+          <option value="">— Select name —</option>
+          <option value="Jak Stewart">Jak Stewart</option>
+          <option value="Cody Slack">Cody Slack</option>
+          <option value="Ash Kemp">Ash Kemp</option>
+          <option value="Matthew Heath">Matthew Heath</option>
+          <option value="Cameron Simpson">Cameron Simpson</option>
+          <option value="Martyn Evans">Martyn Evans</option>
+          <option value="__other__">Other (type below)...</option>
+        </select>
+        <input type="text" id="driverName" placeholder="Type name" style="display:none;margin-top:6px;" />
+      </div>
     </div>
     <div class="field-row">
       <div class="field"><label>Start Time</label><input type="time" id="startTime" /></div>
@@ -726,11 +730,47 @@
     if (sw) sw.textContent = numLabel;
   }
 
+  function handleDriverSelect(selectId, inputId) {
+    const sel = document.getElementById(selectId);
+    const inp = document.getElementById(inputId);
+    if (sel.value === '__other__') {
+      inp.style.display = '';
+      inp.value = '';
+      inp.focus();
+    } else {
+      inp.style.display = 'none';
+      inp.value = sel.value;
+    }
+  }
+
+  function getDriverName(selectId, inputId) {
+    const sel = document.getElementById(selectId);
+    if (sel.value === '__other__' || sel.value === '') {
+      return document.getElementById(inputId).value.trim();
+    }
+    return sel.value;
+  }
+
+  function setDriverName(selectId, inputId, name) {
+    const sel = document.getElementById(selectId);
+    const inp = document.getElementById(inputId);
+    const opt = Array.from(sel.options).find(o => o.value === name);
+    if (opt) {
+      sel.value = name;
+      inp.style.display = 'none';
+      inp.value = name;
+    } else {
+      sel.value = '__other__';
+      inp.style.display = name ? '' : 'none';
+      inp.value = name;
+    }
+  }
+
   function addEntry() {
     const date        = document.getElementById('entryDate').value;
     const jobNumber   = document.getElementById('jobNumber').value.trim();
     const vehicleReg  = document.getElementById('vehicleReg').value.trim();
-    const driverName  = document.getElementById('driverName').value.trim();
+    const driverName  = getDriverName('driverNameSelect', 'driverName');
     const startTime   = document.getElementById('startTime').value;
     const endTime     = document.getElementById('endTime').value;
     const timeOnSite  = document.getElementById('timeOnSite').value;
@@ -750,8 +790,9 @@
     entries.sort((a,b) => a.date.localeCompare(b.date) || (a.startTime||'').localeCompare(b.startTime||''));
     saveEntries(entries);
 
-    ['jobNumber','vehicleReg','driverName','startTime','endTime','timeOnSite','timeOffSite']
+    ['jobNumber','vehicleReg','startTime','endTime','timeOnSite','timeOffSite']
       .forEach(id => document.getElementById(id).value = '');
+    setDriverName('driverNameSelect', 'driverName', '');
     document.getElementById('foodAllowance').checked = false;
     document.getElementById('holiday').checked = false;
 
@@ -776,7 +817,7 @@
     document.getElementById('editDate').value = e.date || '';
     document.getElementById('editJobNumber').value = e.jobNumber || '';
     document.getElementById('editVehicleReg').value = e.vehicleReg || '';
-    document.getElementById('editDriverName').value = e.driverName || '';
+    setDriverName('editDriverNameSelect', 'editDriverName', e.driverName || '');
     document.getElementById('editStartTime').value = e.startTime || '';
     document.getElementById('editEndTime').value = e.endTime || '';
     document.getElementById('editTimeOnSite').value = e.timeOnSite || '';
@@ -809,7 +850,7 @@
         date,
         jobNumber:   document.getElementById('editJobNumber').value.trim(),
         vehicleReg:  document.getElementById('editVehicleReg').value.trim(),
-        driverName:  document.getElementById('editDriverName').value.trim(),
+        driverName:  getDriverName('editDriverNameSelect', 'editDriverName'),
         startTime,
         endTime,
         timeOnSite:  document.getElementById('editTimeOnSite').value,
@@ -1320,7 +1361,19 @@
     </div>
     <div class="field-row">
       <div class="field"><label>Vehicle Reg</label><input type="text" id="editVehicleReg" placeholder="e.g. AB12 CDE" autocapitalize="characters" /></div>
-      <div class="field"><label>Driver Name</label><input type="text" id="editDriverName" placeholder="Name" list="driverList" autocomplete="off" /></div>
+      <div class="field"><label>Driver Name</label>
+        <select id="editDriverNameSelect" onchange="handleDriverSelect('editDriverNameSelect','editDriverName')">
+          <option value="">— Select name —</option>
+          <option value="Jak Stewart">Jak Stewart</option>
+          <option value="Cody Slack">Cody Slack</option>
+          <option value="Ash Kemp">Ash Kemp</option>
+          <option value="Matthew Heath">Matthew Heath</option>
+          <option value="Cameron Simpson">Cameron Simpson</option>
+          <option value="Martyn Evans">Martyn Evans</option>
+          <option value="__other__">Other (type below)...</option>
+        </select>
+        <input type="text" id="editDriverName" placeholder="Type name" style="display:none;margin-top:6px;" />
+      </div>
     </div>
     <div class="field-row">
       <div class="field"><label>Start Time</label><input type="time" id="editStartTime" /></div>
