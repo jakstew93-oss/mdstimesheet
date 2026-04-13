@@ -208,6 +208,14 @@
     .break-hours-box.gross  .bh-value { color: var(--text); }
     .break-hours-box.deduct .bh-value { color: var(--warning); }
     .break-hours-box.net    .bh-value { color: var(--success); }
+    .pay-hist-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 6px;
+    }
+    .pay-hist-row:last-child { border-bottom: none; }
+    .pay-hist-week { font-weight: 600; font-size: 13px; color: var(--text); }
+    .pay-hist-vals { display: flex; gap: 14px; font-size: 13px; color: var(--subtext); flex-wrap: wrap; }
+    .pay-hist-after strong { color: var(--success); font-size: 14px; }
 
     /* ── SHEET / PREVIEW TAB ── */
     .sheet-wrapper {
@@ -502,6 +510,11 @@
         <tr><td class="hrs">19 hrs</td><td class="ded">1 hr 45 mins</td></tr>
       </tbody>
     </table>
+  </div>
+  <div class="card">
+    <h2>Pay History</h2>
+    <p style="font-size:12px;color:var(--subtext);margin-bottom:10px;">Saved automatically each time you clear entries at the end of a week.</p>
+    <div id="payHistoryList"></div>
   </div>
 </div>
 
@@ -871,6 +884,7 @@
   function renderAll() {
     renderEntries();
     renderBreaks();
+    renderPayHistory();
     renderSheet();
     renderSummary();
   }
@@ -1128,9 +1142,46 @@
 
   function clearAll() {
     if (!confirm('Clear ALL entries? Cannot be undone.')) return;
+
+    // Save this week's after-break total to history before clearing
+    const entries = getEntries();
+    if (entries.length) {
+      const days       = getDailyBreaks();
+      const totalGross = days.reduce((s, d) => s + d.totalMins, 0);
+      const totalBreak = days.reduce((s, d) => s + d.breakMins, 0);
+      const afterMins  = Math.max(0, totalGross - totalBreak);
+      const weekVal    = localStorage.getItem(getWeekKey()) || '';
+      const histKey    = 'ts_payhist' + empSuffix();
+      const hist       = JSON.parse(localStorage.getItem(histKey) || '[]');
+      hist.unshift({ week: weekVal, grossMins: totalGross, breakMins: totalBreak, afterMins });
+      localStorage.setItem(histKey, JSON.stringify(hist));
+    }
+
     saveEntries([]);
     renderAll();
+    renderPayHistory();
     showToast('All entries cleared');
+  }
+
+  function renderPayHistory() {
+    const histKey = 'ts_payhist' + empSuffix();
+    const hist    = JSON.parse(localStorage.getItem(histKey) || '[]');
+    const el      = document.getElementById('payHistoryList');
+    if (!el) return;
+    if (!hist.length) { el.innerHTML = '<p style="color:var(--subtext);font-size:13px;text-align:center;">No history yet — totals are saved here each time you clear entries.</p>'; return; }
+    el.innerHTML = hist.map(h => {
+      const weekLabel = h.week
+        ? new Date(h.week+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
+        : 'Unknown week';
+      const fmtMins = m => { const hh=Math.floor(m/60),mm=m%60; return hh>0?(mm>0?`${hh}h ${mm}m`:`${hh}h`):`${mm}m`; };
+      return `<div class="pay-hist-row">
+        <span class="pay-hist-week">w/e ${weekLabel}</span>
+        <span class="pay-hist-vals">
+          <span class="pay-hist-gross">Gross: ${fmtMins(h.grossMins)}</span>
+          <span class="pay-hist-after">After breaks: <strong>${fmtMins(h.afterMins)}</strong></span>
+        </span>
+      </div>`;
+    }).join('');
   }
 
   function showPage(name, btn) {
@@ -1139,7 +1190,7 @@
     document.getElementById('page-'+name).classList.add('active');
     btn.classList.add('active');
     if (name === 'entries') renderEntries();
-    if (name === 'breaks')  renderBreaks();
+    if (name === 'breaks')  { renderBreaks(); renderPayHistory(); }
     if (name === 'sheet')   renderSheet();
     if (name === 'export')  renderSummary();
   }
