@@ -729,7 +729,10 @@
     <div class="card">
       <h2>Exterior &amp; Mechanical</h2>
       <div class="van-check-item rating-item">
-        <span class="van-item-label">Cleanliness of exterior</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <span class="van-item-label">Cleanliness of exterior</span>
+          <button class="check-toggle" id="chk_exterior_clean" onclick="toggleCheck(this)">✓</button>
+        </div>
         <div class="rating-group" id="r_exterior_clean">
           <span class="rating-label">Poor</span>
           <button class="rating-btn" onclick="setRating('r_exterior_clean',this)">1</button>
@@ -763,7 +766,10 @@
     <div class="card">
       <h2>Interior &amp; Equipment</h2>
       <div class="van-check-item rating-item">
-        <span class="van-item-label">Cleanliness of interior</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <span class="van-item-label">Cleanliness of interior</span>
+          <button class="check-toggle" id="chk_interior_clean" onclick="toggleCheck(this)">✓</button>
+        </div>
         <div class="rating-group" id="r_interior_clean">
           <span class="rating-label">Poor</span>
           <button class="rating-btn" onclick="setRating('r_interior_clean',this)">1</button>
@@ -784,14 +790,20 @@
       <div class="van-check-item"><span class="van-item-label">First Aid Kit</span><button class="check-toggle" onclick="toggleCheck(this)">✓</button></div>
       <div class="van-check-item"><span class="van-item-label">Vacuum Cleaner</span><button class="check-toggle" onclick="toggleCheck(this)">✓</button></div>
       <div class="van-check-item qty-item">
-        <span class="van-item-label">Dust Sheets</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <span class="van-item-label">Dust Sheets</span>
+          <button class="check-toggle" id="chk_dust_sheets" onclick="toggleCheck(this)">✓</button>
+        </div>
         <div class="qty-row">
           <input type="number" id="vanDustQty" placeholder="Qty" min="0" style="width:60px;" />
           <input type="text" id="vanDustCond" placeholder="Condition" style="flex:1;" />
         </div>
       </div>
       <div class="van-check-item qty-item">
-        <span class="van-item-label">Protective Floor Covering</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <span class="van-item-label">Protective Floor Covering</span>
+          <button class="check-toggle" id="chk_floor_cov" onclick="toggleCheck(this)">✓</button>
+        </div>
         <input type="number" id="vanFloorQty" placeholder="Qty" min="0" style="width:60px;margin-top:4px;" />
       </div>
       <div class="van-check-item"><span class="van-item-label">Dustpan &amp; Brush</span><button class="check-toggle" onclick="toggleCheck(this)">✓</button></div>
@@ -1549,6 +1561,12 @@
       });
     }
 
+    // Special tick boxes
+    document.getElementById('chk_exterior_clean').classList.toggle('ticked', !!c.exteriorCleanTick);
+    document.getElementById('chk_interior_clean').classList.toggle('ticked', !!c.interiorCleanTick);
+    document.getElementById('chk_dust_sheets').classList.toggle('ticked',    !!c.dustSheetsTick);
+    document.getElementById('chk_floor_cov').classList.toggle('ticked',      !!c.floorCovTick);
+
     // Cleanliness ratings
     document.querySelectorAll('#r_exterior_clean .rating-btn').forEach(b => {
       b.classList.toggle('selected', b.textContent.trim() === c.exteriorClean);
@@ -1614,12 +1632,16 @@
       driver,
       reg,
       mileage:        document.getElementById('vanMileage').value,
-      exteriorClean:  getRating('r_exterior_clean'),
-      interiorClean:  getRating('r_interior_clean'),
+      exteriorClean:     getRating('r_exterior_clean'),
+      exteriorCleanTick: document.getElementById('chk_exterior_clean').classList.contains('ticked'),
+      interiorClean:     getRating('r_interior_clean'),
+      interiorCleanTick: document.getElementById('chk_interior_clean').classList.contains('ticked'),
       checks,
-      dustQty:        document.getElementById('vanDustQty').value,
-      dustCond:       document.getElementById('vanDustCond').value,
-      floorQty:       document.getElementById('vanFloorQty').value,
+      dustQty:           document.getElementById('vanDustQty').value,
+      dustCond:          document.getElementById('vanDustCond').value,
+      dustSheetsTick:    document.getElementById('chk_dust_sheets').classList.contains('ticked'),
+      floorQty:          document.getElementById('vanFloorQty').value,
+      floorCovTick:      document.getElementById('chk_floor_cov').classList.contains('ticked'),
       lastServiced:   document.getElementById('vanLastServiced').value,
       serviceDue:     document.getElementById('vanServiceDue').value,
       signatureImg:   getSigDataUrl(),
@@ -1954,12 +1976,16 @@
       driver:        getDriverName('vanDriver', 'vanDriverOther'),
       reg:           document.getElementById('vanReg').value.trim().toUpperCase(),
       mileage:       document.getElementById('vanMileage').value,
-      checks:        getChecks(),
-      exteriorClean: getRating('r_exterior_clean'),
-      interiorClean: getRating('r_interior_clean'),
-      dustQty:       document.getElementById('vanDustQty').value,
-      dustCond:      document.getElementById('vanDustCond').value,
-      floorQty:      document.getElementById('vanFloorQty').value,
+      checks:           getChecks(),
+      exteriorClean:    getRating('r_exterior_clean'),
+      exteriorCleanTick:document.getElementById('chk_exterior_clean').classList.contains('ticked'),
+      interiorClean:    getRating('r_interior_clean'),
+      interiorCleanTick:document.getElementById('chk_interior_clean').classList.contains('ticked'),
+      dustQty:          document.getElementById('vanDustQty').value,
+      dustCond:         document.getElementById('vanDustCond').value,
+      dustSheetsTick:   document.getElementById('chk_dust_sheets').classList.contains('ticked'),
+      floorQty:         document.getElementById('vanFloorQty').value,
+      floorCovTick:     document.getElementById('chk_floor_cov').classList.contains('ticked'),
       lastServiced:  document.getElementById('vanLastServiced').value,
       serviceDue:    document.getElementById('vanServiceDue').value,
       signatureImg:  getSigDataUrl(),
@@ -1972,8 +1998,11 @@
     if (!c) return;
     await _doVanPDF({
       date: c.date, driver: c.driver, reg: c.reg, mileage: c.mileage,
-      checks: c.checks, exteriorClean: c.exteriorClean, interiorClean: c.interiorClean,
-      dustQty: c.dustQty, dustCond: c.dustCond, floorQty: c.floorQty,
+      checks: c.checks,
+      exteriorClean: c.exteriorClean, exteriorCleanTick: c.exteriorCleanTick,
+      interiorClean: c.interiorClean, interiorCleanTick: c.interiorCleanTick,
+      dustQty: c.dustQty, dustCond: c.dustCond, dustSheetsTick: c.dustSheetsTick,
+      floorQty: c.floorQty, floorCovTick: c.floorCovTick,
       lastServiced: c.lastServiced, serviceDue: c.serviceDue, signatureImg: c.signatureImg, sigName: c.sigName,
     });
   }
@@ -2037,6 +2066,19 @@
       if (d.interiorClean && RATING_X[d.interiorClean] !== undefined) {
         page.drawEllipse({ x:RATING_X[d.interiorClean], y:ROW_Y[19], xScale:RATING_W[d.interiorClean], yScale:7, borderColor:BLACK, borderWidth:1.2 });
       }
+
+      // Special tick boxes (cleanliness rows + qty rows)
+      [
+        { ticked: d.exteriorCleanTick, rowIdx: 0  },
+        { ticked: d.interiorCleanTick, rowIdx: 19 },
+        { ticked: d.dustSheetsTick,    rowIdx: 29 },
+        { ticked: d.floorCovTick,      rowIdx: 30 },
+      ].forEach(({ ticked, rowIdx }) => {
+        if (!ticked) return;
+        const ry = ROW_Y[rowIdx], cx = TICK_X;
+        page.drawLine({ start:{x:cx-4,y:ry+1}, end:{x:cx-1,y:ry-3}, thickness:1.8, color:BLACK });
+        page.drawLine({ start:{x:cx-1,y:ry-3}, end:{x:cx+5,y:ry+5}, thickness:1.8, color:BLACK });
+      });
 
       // Dust Sheets and Floor Covering (qty/condition in comments column)
       if (d.dustQty)  draw(String(d.dustQty),  331, ROW_Y[29]-5, font, 8);
