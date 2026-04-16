@@ -366,7 +366,7 @@
       border: 1px solid rgba(239,68,68,0.2); border-radius: 8px;
       padding: 5px 12px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: inherit;
-      position: absolute; top: 58px; right: 16px;
+      position: absolute; top: 12px; right: 16px;
     }
 
     /* ── DAY GROUP (multi-entry days) ── */
@@ -424,14 +424,57 @@
       padding:0 2px; font-style:italic;
     }
     .qty-row { display:flex; gap:8px; margin-top:4px; width:100%; }
+    .qty-stepper { display:flex; align-items:center; gap:0; }
+    .qty-stepper button {
+      width:34px; height:34px; border:1.5px solid var(--border2); background:var(--bg);
+      color:var(--text); font-size:20px; line-height:1; cursor:pointer; flex-shrink:0;
+    }
+    .qty-stepper button:first-child { border-radius:8px 0 0 8px; }
+    .qty-stepper button:last-child  { border-radius:0 8px 8px 0; }
+    .qty-stepper input {
+      width:44px; text-align:center; border:1.5px solid var(--border2); border-left:none; border-right:none;
+      background:var(--bg); color:var(--text); font-size:15px; height:34px; padding:0;
+      -moz-appearance:textfield;
+    }
+    .qty-stepper input::-webkit-outer-spin-button,
+    .qty-stepper input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
     .sig-pad-wrap { display:flex; flex-direction:column; gap:6px; }
     .sig-canvas {
       width:100%; height:110px; border:1.5px solid var(--border2); border-radius:8px;
       background:#fff; touch-action:none; cursor:crosshair; display:block;
     }
+    .sig-canvas-tap {
+      width:100%; height:110px; border:1.5px solid var(--border2); border-radius:8px;
+      background:#fff; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; position:relative; overflow:hidden;
+    }
+    .sig-canvas-tap canvas {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      touch-action:none; pointer-events:none;
+    }
+    .sig-canvas-tap .sig-tap-hint {
+      font-size:13px; color:#aaa; pointer-events:none; z-index:1;
+    }
     .sig-clear-btn {
       align-self:flex-end; padding:5px 14px; border-radius:6px; border:1.5px solid var(--border2);
       background:var(--bg); color:var(--subtext); font-size:13px; cursor:pointer;
+    }
+    /* Full-screen signature modal */
+    .sig-modal {
+      display:none; position:fixed; inset:0; z-index:9999;
+      background:#fff; flex-direction:column;
+    }
+    .sig-modal.open { display:flex; }
+    .sig-modal-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; border-bottom:1px solid #e5e7eb; flex-shrink:0;
+    }
+    .sig-modal-title { font-size:17px; font-weight:700; color:#111; }
+    .sig-modal-canvas {
+      flex:1; display:block; width:100%; touch-action:none; cursor:crosshair; background:#fff;
+    }
+    .sig-modal-footer {
+      display:flex; gap:10px; padding:14px 16px; border-top:1px solid #e5e7eb; flex-shrink:0;
     }
     .van-hist-card {
       background:var(--card); border-radius:var(--radius); border:1px solid var(--border);
@@ -709,19 +752,6 @@
     <div class="card">
       <h2>Vehicle Details</h2>
       <div class="field"><label>Date</label><input type="date" id="vanDate" /></div>
-      <div class="field"><label>Driver Name</label>
-        <select id="vanDriver" onchange="handleDriverSelect('vanDriver','vanDriverOther')">
-          <option value="">— Select name —</option>
-          <option value="Jak Stewart">Jak Stewart</option>
-          <option value="Cody Slack">Cody Slack</option>
-          <option value="Ash Kemp">Ash Kemp</option>
-          <option value="Matthew Heath">Matthew Heath</option>
-          <option value="Cameron Simpson">Cameron Simpson</option>
-          <option value="Martyn Evans">Martyn Evans</option>
-          <option value="__other__">Other (type below)...</option>
-        </select>
-        <input type="text" id="vanDriverOther" placeholder="Type name" style="display:none;margin-top:6px;" />
-      </div>
       <div class="field"><label>Vehicle Reg</label><input type="text" id="vanReg" placeholder="e.g. AB12 CDE" style="text-transform:uppercase;" /></div>
       <div class="field"><label>Mileage</label><input type="number" id="vanMileage" placeholder="Current mileage" /></div>
     </div>
@@ -795,7 +825,11 @@
           <button class="check-toggle" id="chk_dust_sheets" onclick="toggleCheck(this)">✓</button>
         </div>
         <div class="qty-row">
-          <input type="number" id="vanDustQty" placeholder="Qty" min="0" style="width:60px;" />
+          <div class="qty-stepper">
+            <button type="button" onclick="stepQty('vanDustQty',-1)">−</button>
+            <input type="number" id="vanDustQty" value="0" min="0" />
+            <button type="button" onclick="stepQty('vanDustQty',1)">+</button>
+          </div>
           <input type="text" id="vanDustCond" placeholder="Condition" style="flex:1;" />
         </div>
       </div>
@@ -804,7 +838,11 @@
           <span class="van-item-label">Protective Floor Covering</span>
           <button class="check-toggle" id="chk_floor_cov" onclick="toggleCheck(this)">✓</button>
         </div>
-        <input type="number" id="vanFloorQty" placeholder="Qty" min="0" style="width:60px;margin-top:4px;" />
+        <div class="qty-stepper" style="margin-top:6px;">
+          <button type="button" onclick="stepQty('vanFloorQty',-1)">−</button>
+          <input type="number" id="vanFloorQty" value="0" min="0" />
+          <button type="button" onclick="stepQty('vanFloorQty',1)">+</button>
+        </div>
       </div>
       <div class="van-check-item"><span class="van-item-label">Dustpan &amp; Brush</span><button class="check-toggle" onclick="toggleCheck(this)">✓</button></div>
     </div>
@@ -816,7 +854,10 @@
       <div class="field">
         <label>Signature</label>
         <div class="sig-pad-wrap">
-          <canvas id="sigCanvas" class="sig-canvas"></canvas>
+          <div class="sig-canvas-tap" onclick="openSigModal()">
+            <canvas id="sigCanvas"></canvas>
+            <span class="sig-tap-hint" id="sigTapHint">Tap to sign</span>
+          </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <input type="text" id="vanSigName" placeholder="Or type name e.g. J. Stewart"
                    style="flex:1;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:14px;" />
@@ -1431,6 +1472,12 @@
     if (name === 'export')  renderSummary();
   }
 
+  function stepQty(id, delta) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = Math.max(0, (parseInt(el.value) || 0) + delta);
+  }
+
   /* ---- VAN COMMENT INPUTS ---- */
   function initVanCommentInputs(rowComments) {
     document.querySelectorAll('#van-check .van-check-item:not(.rating-item):not(.qty-item)').forEach((row, i) => {
@@ -1454,24 +1501,70 @@
 
   /* ---- SIGNATURE PAD ---- */
   let _sigDrawing = false;
+  let _sigModalDrawing = false;
+  // Stored signature as data URL (source of truth)
+  let _sigDataUrl = '';
 
   function initSigPad() {
-    const canvas = document.getElementById('sigCanvas');
-    if (!canvas) return;
     // Auto-fill typed name with logged-in user if blank
     const nameInput = document.getElementById('vanSigName');
     if (nameInput && !nameInput.value) {
       nameInput.value = localStorage.getItem(EMP_KEY) || '';
     }
-    // Match internal resolution to display size
-    const rect = canvas.getBoundingClientRect();
+    _renderSigPreview();
+  }
+
+  function _renderSigPreview() {
+    const canvas = document.getElementById('sigCanvas');
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    const rect = wrap.getBoundingClientRect();
     canvas.width  = rect.width  || 320;
     canvas.height = rect.height || 110;
     const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#111';
-    ctx.lineWidth   = 2;
-    ctx.lineCap     = 'round';
-    ctx.lineJoin    = 'round';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const hint = document.getElementById('sigTapHint');
+    if (_sigDataUrl) {
+      if (hint) hint.style.display = 'none';
+      const img = new window.Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = _sigDataUrl;
+    } else {
+      if (hint) hint.style.display = '';
+    }
+  }
+
+  function _sigModalCanvasSize(modal, canvas) {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight
+                  - modal.querySelector('.sig-modal-header').offsetHeight
+                  - modal.querySelector('.sig-modal-footer').offsetHeight;
+  }
+
+  function _sigModalApplyStyle(ctx) {
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  }
+
+  function _sigModalRedraw(canvas, dataUrl) {
+    const ctx = canvas.getContext('2d');
+    _sigModalApplyStyle(ctx);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (dataUrl) {
+      const img = new window.Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = dataUrl;
+    }
+  }
+
+  function openSigModal() {
+    const modal  = document.getElementById('sigModal');
+    const canvas = document.getElementById('sigModalCanvas');
+    modal.classList.add('open');
+
+    _sigModalCanvasSize(modal, canvas);
+    _sigModalRedraw(canvas, _sigDataUrl);
+
+    const ctx = canvas.getContext('2d');
 
     function pos(e) {
       const r = canvas.getBoundingClientRect();
@@ -1479,10 +1572,11 @@
       return { x: (src.clientX - r.left) * (canvas.width / r.width),
                y: (src.clientY - r.top)  * (canvas.height / r.height) };
     }
-    function start(e) { e.preventDefault(); _sigDrawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
-    function move(e)  { e.preventDefault(); if (!_sigDrawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
-    function end(e)   { e.preventDefault(); _sigDrawing = false; }
+    function start(e) { e.preventDefault(); _sigModalDrawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+    function move(e)  { e.preventDefault(); if (!_sigModalDrawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function end(e)   { e.preventDefault(); _sigModalDrawing = false; }
 
+    canvas._start = start; canvas._move = move; canvas._end = end;
     canvas.addEventListener('mousedown',  start);
     canvas.addEventListener('mousemove',  move);
     canvas.addEventListener('mouseup',    end);
@@ -1490,21 +1584,60 @@
     canvas.addEventListener('touchstart', start, { passive: false });
     canvas.addEventListener('touchmove',  move,  { passive: false });
     canvas.addEventListener('touchend',   end,   { passive: false });
+
+    // Handle orientation/resize — save current drawing, resize, redraw
+    function onResize() {
+      if (!modal.classList.contains('open')) return;
+      // Snapshot whatever is drawn so far
+      const snapshot = canvas.toDataURL('image/png');
+      _sigModalCanvasSize(modal, canvas);
+      _sigModalRedraw(canvas, snapshot);
+    }
+    canvas._onResize = onResize;
+    window.addEventListener('resize',            onResize);
+    window.addEventListener('orientationchange', onResize);
   }
 
-  function clearSigPad() {
-    const canvas = document.getElementById('sigCanvas');
+  function clearSigModal() {
+    const canvas = document.getElementById('sigModalCanvas');
     if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  function getSigDataUrl() {
-    const canvas = document.getElementById('sigCanvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
+  function closeSigModal(save) {
+    const modal  = document.getElementById('sigModal');
+    const canvas = document.getElementById('sigModalCanvas');
+    if (save) {
+      // Check if anything was drawn
+      const ctx  = canvas.getContext('2d');
       const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      for (let i = 3; i < data.length; i += 4) { if (data[i] > 0) return canvas.toDataURL('image/png'); }
+      let hasInk = false;
+      for (let i = 3; i < data.length; i += 4) { if (data[i] > 0) { hasInk = true; break; } }
+      _sigDataUrl = hasInk ? canvas.toDataURL('image/png') : '';
+      _renderSigPreview();
     }
-    return '';
+    // Remove listeners
+    canvas.removeEventListener('mousedown',  canvas._start);
+    canvas.removeEventListener('mousemove',  canvas._move);
+    canvas.removeEventListener('mouseup',    canvas._end);
+    canvas.removeEventListener('mouseleave', canvas._end);
+    canvas.removeEventListener('touchstart', canvas._start);
+    canvas.removeEventListener('touchmove',  canvas._move);
+    canvas.removeEventListener('touchend',   canvas._end);
+    if (canvas._onResize) {
+      window.removeEventListener('resize',            canvas._onResize);
+      window.removeEventListener('orientationchange', canvas._onResize);
+      canvas._onResize = null;
+    }
+    modal.classList.remove('open');
+  }
+
+  function clearSigPad() {
+    _sigDataUrl = '';
+    _renderSigPreview();
+  }
+
+  function getSigDataUrl() {
+    return _sigDataUrl;
   }
 
   function getSigName() {
@@ -1539,7 +1672,6 @@
 
     // Basic fields
     document.getElementById('vanDate').value          = c.date || '';
-    setDriverName('vanDriver', 'vanDriverOther', c.driver || '');
     document.getElementById('vanReg').value           = c.reg || '';
     document.getElementById('vanMileage').value       = c.mileage || '';
     document.getElementById('vanDustQty').value       = c.dustQty || '';
@@ -1578,15 +1710,8 @@
     // Signature
     const sn = document.getElementById('vanSigName');
     if (sn) sn.value = c.sigName || '';
-    clearSigPad();
-    if (c.signatureImg) {
-      const canvas = document.getElementById('sigCanvas');
-      if (canvas) {
-        const img = new window.Image();
-        img.onload = () => canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        img.src = c.signatureImg;
-      }
-    }
+    _sigDataUrl = c.signatureImg || '';
+    _renderSigPreview();
 
     // Update button label
     document.getElementById('vanSaveBtn').textContent = 'Update Check Sheet';
@@ -1621,7 +1746,7 @@
     const date = document.getElementById('vanDate').value;
     if (!date) { showToast('Please enter a date'); return; }
 
-    const driver = getDriverName('vanDriver', 'vanDriverOther');
+    const driver = localStorage.getItem(EMP_KEY) || '';  // logged-in user
     const reg    = document.getElementById('vanReg').value.trim().toUpperCase();
     if (!reg) { showToast('Please enter the vehicle reg'); return; }
 
@@ -1646,6 +1771,8 @@
       serviceDue:     document.getElementById('vanServiceDue').value,
       signatureImg:   getSigDataUrl(),
       sigName:        getSigName(),
+      signerName:     abbreviateName(localStorage.getItem(EMP_KEY) || ''),
+      signerFullName: localStorage.getItem(EMP_KEY) || '',
     };
 
     const all = getVanChecks();
@@ -1667,12 +1794,11 @@
 
   function resetVanForm() {
     document.getElementById('vanDate').value = '';
-    setDriverName('vanDriver', 'vanDriverOther', '');
     document.getElementById('vanReg').value = '';
     document.getElementById('vanMileage').value = '';
-    document.getElementById('vanDustQty').value = '';
+    document.getElementById('vanDustQty').value = '0';
     document.getElementById('vanDustCond').value = '';
-    document.getElementById('vanFloorQty').value = '';
+    document.getElementById('vanFloorQty').value = '0';
     document.getElementById('vanLastServiced').value = '';
     document.getElementById('vanServiceDue').value = '';
     clearSigPad();
@@ -1973,7 +2099,7 @@
   async function exportVanPDF() {
     await _doVanPDF({
       date:          document.getElementById('vanDate').value,
-      driver:        getDriverName('vanDriver', 'vanDriverOther'),
+      driver:        localStorage.getItem(EMP_KEY) || '',
       reg:           document.getElementById('vanReg').value.trim().toUpperCase(),
       mileage:       document.getElementById('vanMileage').value,
       checks:           getChecks(),
@@ -1990,6 +2116,8 @@
       serviceDue:    document.getElementById('vanServiceDue').value,
       signatureImg:  getSigDataUrl(),
       sigName:       getSigName(),
+      signerName:    abbreviateName(localStorage.getItem(EMP_KEY) || ''),
+      signerFullName:localStorage.getItem(EMP_KEY) || '',
     });
   }
 
@@ -2004,6 +2132,7 @@
       dustQty: c.dustQty, dustCond: c.dustCond, dustSheetsTick: c.dustSheetsTick,
       floorQty: c.floorQty, floorCovTick: c.floorCovTick,
       lastServiced: c.lastServiced, serviceDue: c.serviceDue, signatureImg: c.signatureImg, sigName: c.sigName,
+      signerName: c.signerName, signerFullName: c.signerFullName,
     });
   }
 
@@ -2090,7 +2219,7 @@
       draw(d.serviceDue,   370, 76, font, 8);
 
       // Footer: Checked By row (Name / Signature / Date)
-      draw(d.driver, 100, 36, font, 8);
+      draw(d.signerFullName || d.driver, 100, 36, font, 8);
       draw(dateStr,  455, 36, font, 8);
       if (d.signatureImg) {
         const sigBase64 = d.signatureImg.replace(/^data:image\/png;base64,/, '');
@@ -2098,8 +2227,8 @@
         const sigImg    = await pdfDoc.embedPng(sigBytes);
         // Fit into Signature column, offset past the "Signature:" label text
         page.drawImage(sigImg, { x:305, y:22, width:98, height:26 });
-      } else if (d.sigName) {
-        draw(d.sigName, 230, 36, font, 9);
+      } else if (d.signerName || d.sigName) {
+        draw(d.signerName || d.sigName, 305, 32, font, 9);
       }
 
       const outBytes = await pdfDoc.save();
@@ -2163,6 +2292,19 @@
     </div>
     <button class="btn btn-primary" onclick="saveEdit()" style="margin-bottom:10px">Save Changes</button>
     <button class="btn btn-outline" onclick="closeEdit()">Cancel</button>
+  </div>
+</div>
+
+<!-- FULL-SCREEN SIGNATURE MODAL -->
+<div class="sig-modal" id="sigModal">
+  <div class="sig-modal-header">
+    <span class="sig-modal-title">Draw Signature</span>
+    <button class="sig-clear-btn" onclick="clearSigModal()">Clear</button>
+  </div>
+  <canvas class="sig-modal-canvas" id="sigModalCanvas"></canvas>
+  <div class="sig-modal-footer">
+    <button class="btn" style="flex:1;" onclick="closeSigModal(false)">Cancel</button>
+    <button class="btn btn-primary" style="flex:2;" onclick="closeSigModal(true)">Use Signature</button>
   </div>
 </div>
 
