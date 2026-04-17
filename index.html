@@ -1894,6 +1894,11 @@
         ? new Date(weekVal + 'T00:00:00').toLocaleDateString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric' })
         : '';
 
+      // Sort by date then start time before paginating
+      entries.sort((a, b) =>
+        a.date.localeCompare(b.date) || (a.startTime || '').localeCompare(b.startTime || '')
+      );
+
       // Split entries into pages of 17
       const chunks = [];
       for (let i = 0; i < entries.length; i += 17) chunks.push(entries.slice(i, i + 17));
