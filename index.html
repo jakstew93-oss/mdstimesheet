@@ -8,23 +8,32 @@
   <meta name="apple-mobile-web-app-title" content="Timesheet" />
   <title>MDSmiths Timesheet</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #111111;
-      --surface: #1c1c1c;
-      --surface2: #242424;
-      --card: #1c1c1c;
-      --border: #2e2e2e;
-      --border2: #383838;
-      --accent: #5b8dee;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --card: #141414;
+      --border: #2a2a2a;
+      --border2: #3a3a3a;
+      --accent: #00c853;
+      --accent-dim: rgba(0,200,83,0.08);
+      --accent-border: rgba(0,200,83,0.25);
+      --accent-glow: rgba(0,200,83,0.35);
       --danger: #ef4444;
-      --success: #22c55e;
+      --success: #00c853;
       --warning: #f59e0b;
-      --text: #ffffff;
-      --text2: #c8c8c8;
-      --subtext: #666666;
+      --text: #f5f5f5;
+      --text2: #a0a0a0;
+      --subtext: #9a9a9a;
       --radius: 14px;
+      --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+    }
+    .mono {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -35,21 +44,40 @@
     /* ── HEADER ── */
     header {
       background: var(--bg); color: var(--text);
-      padding: 14px 20px 14px; text-align: center;
-      border-bottom: 1px solid var(--border); position: relative;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; gap: 10px;
     }
-    header p {
-      font-size: 11px; color: var(--subtext); margin-top: 4px;
-      font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    .header-brand {
+      display: flex; flex-direction: column; flex: 1; min-width: 0;
     }
-    .section-select-wrap { display:inline-block; margin-bottom:4px; }
+    .header-company {
+      font-size: 9px; font-weight: 700; color: var(--accent);
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .section-select-wrap { display: flex; align-items: center; }
     .section-select-wrap select {
-      font-size: 20px; font-weight: 900; font-family: inherit;
+      font-size: 16px; font-weight: 800; font-family: inherit;
       color: var(--text); background: transparent; border: none;
       outline: none; cursor: pointer; -webkit-appearance: none; appearance: none;
-      padding-right: 24px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      padding-right: 22px; max-width: 200px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c853' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 2px center;
+    }
+    .header-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--subtext);
+      text-transform: uppercase; letter-spacing: 0.1em; flex-shrink: 0;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      flex-shrink: 0;
+    }
+    header p#weekLabel {
+      display: none;
     }
 
     /* ── TABS ── */
@@ -57,16 +85,18 @@
       display: flex; background: var(--bg);
       border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 10;
-      padding: 8px 10px 10px; gap: 4px;
+      padding: 8px 10px 0; gap: 4px;
     }
     .tab {
-      flex: 1; padding: 9px 2px; text-align: center;
+      flex: 1; padding: 9px 2px 11px; text-align: center;
       font-size: 11px; font-weight: 700; color: var(--subtext);
       border: none; background: transparent; cursor: pointer;
-      border-radius: 9px; transition: all 0.18s;
-      letter-spacing: 0.4px; font-family: inherit;
+      border-radius: 0; transition: all 0.18s;
+      letter-spacing: 0.5px; font-family: inherit;
+      border-bottom: 2px solid transparent;
+      text-transform: uppercase;
     }
-    .tab.active { color: var(--text); background: var(--surface2); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
     /* ── PAGES ── */
     .page { display: none; padding: 16px; }
@@ -102,7 +132,7 @@
     }
     .field input:focus, .field select:focus {
       outline: none; border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(91,141,238,0.2);
+      box-shadow: 0 0 0 3px rgba(0,200,83,0.15);
     }
     .field input::placeholder { color: var(--subtext); }
     .field select option { background: var(--surface2); }
@@ -129,10 +159,11 @@
       font-family: inherit; transition: all 0.15s;
     }
     .btn:active { opacity: 0.75; transform: scale(0.98); }
-    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary { background: var(--accent); color: #000; font-weight: 700; box-shadow: 0 4px 14px -4px var(--accent-glow); }
+    .btn-primary:hover { filter: brightness(1.08); }
     .btn-danger  { background: var(--danger); color: white; }
-    .btn-success { background: var(--success); color: white; }
-    .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-success { background: var(--accent); color: #000; font-weight: 700; }
+    .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent-border); }
 
     /* ── ENTRY CARDS ── */
     .entry {
@@ -140,7 +171,9 @@
       padding: 16px; margin-bottom: 10px;
       border: 1px solid var(--border);
       border-left: 3px solid var(--accent);
+      transition: border-color .15s ease;
     }
+    .entry:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-border); }
     .entry-header {
       display: flex; justify-content: space-between;
       align-items: flex-start; margin-bottom: 12px;
@@ -156,20 +189,20 @@
     }
     .delete-btn:active { background: rgba(239,68,68,0.2); }
     .edit-btn {
-      background: rgba(91,141,238,0.1); color: var(--accent);
-      border: 1px solid rgba(91,141,238,0.2); border-radius: 8px;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid var(--accent-border); border-radius: 8px;
       padding: 6px 12px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: inherit; margin-right: 0; transition: all 0.15s;
     }
-    .edit-btn:active { background: rgba(91,141,238,0.2); }
+    .edit-btn:active { background: var(--accent-border); }
     .entry-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 6px 16px; font-size: 13px;
       background: var(--surface2); border-radius: 10px; padding: 12px;
     }
     .entry-grid .lbl { color: var(--subtext); font-weight: 500; }
-    .entry-grid .val { font-weight: 700; color: var(--text); }
-    .entry-grid .val.info { color: var(--warning); font-weight: 800; }
+    .entry-grid .val { font-weight: 700; color: var(--text); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .entry-grid .val.info { color: var(--success); font-weight: 800; }
     .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
     .badge-food    { background: rgba(245,158,11,0.12); color: #f59e0b; }
@@ -209,7 +242,7 @@
       font-size: 10px; color: var(--subtext); margin-bottom: 4px;
       font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .break-hours-box .bh-value { font-size: 17px; font-weight: 800; }
+    .break-hours-box .bh-value { font-size: 17px; font-weight: 800; font-family: var(--mono); font-variant-numeric: tabular-nums; }
     .break-hours-box.gross  .bh-value { color: var(--text); }
     .break-hours-box.deduct .bh-value { color: var(--warning); }
     .break-hours-box.net    .bh-value { color: var(--success); }
@@ -278,6 +311,13 @@
     .cross { color: #555; font-size: 12px; }
 
     /* ── SUMMARY ── */
+    .summary-card {
+      background: var(--surface); border-radius: var(--radius);
+      padding: 18px; margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--accent);
+      box-shadow: 0 0 24px -8px var(--accent-glow);
+    }
     .summary-row {
       display: flex; justify-content: space-between;
       align-items: center; padding: 14px 0;
@@ -285,8 +325,8 @@
     }
     .summary-row:last-child { border-bottom: none; }
     .summary-row .label { color: var(--subtext); font-weight: 500; }
-    .summary-row .value { font-weight: 800; font-size: 18px; }
-    .summary-row .value.info { color: var(--warning); }
+    .summary-row .value { font-weight: 800; font-size: 18px; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .summary-row .value.info { color: var(--success); }
 
     /* ── EMPTY STATE ── */
     .empty-state { text-align: center; padding: 60px 20px; color: var(--subtext); }
@@ -327,8 +367,8 @@
       font-size: 18px; font-weight: 800; margin-bottom: 20px; text-align: center;
     }
     .edit-btn {
-      background: rgba(91,141,238,0.1); color: var(--accent);
-      border: 1px solid rgba(91,141,238,0.2); border-radius: 8px;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid var(--accent-border); border-radius: 8px;
       padding: 6px 12px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: inherit; margin-right: 0;
     }
@@ -341,8 +381,8 @@
     }
     #loginScreen.hidden { display: none; }
     .login-logo {
-      font-size: 12px; font-weight: 800; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--subtext); margin-bottom: 10px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
     }
     .login-title {
       font-size: 32px; font-weight: 900; letter-spacing: -0.8px;
@@ -391,7 +431,7 @@
       flex:1; padding:10px; border-radius:var(--radius); border:1.5px solid var(--border2);
       background:var(--card); color:var(--subtext); font-size:14px; font-weight:600; cursor:pointer;
     }
-    .van-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .van-tab.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
     .van-check-item {
       display:flex; align-items:center; justify-content:space-between;
       flex-wrap:wrap;
@@ -491,7 +531,10 @@
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
-  <div class="login-logo">MDSmiths</div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);flex-shrink:0;"></span>
+    <div class="login-logo" style="margin-bottom:0;">MDSmiths</div>
+  </div>
   <div class="login-title">Timesheet</div>
   <div class="login-sub">Sign in to your account</div>
   <div class="login-card">
@@ -518,14 +561,21 @@
 </div>
 
 <header>
-  <div class="section-select-wrap">
-    <select id="sectionSelect" onchange="switchSection(this.value)">
-      <option value="timesheet">Timesheet</option>
-      <option value="van">Vehicle Check Sheet</option>
-      <option value="holiday">Holiday</option>
-    </select>
+  <div class="header-brand">
+    <span class="header-company">M D Smiths</span>
+    <div class="section-select-wrap">
+      <select id="sectionSelect" onchange="switchSection(this.value)">
+        <option value="timesheet">Timesheet</option>
+        <option value="van">Vehicle Check Sheet</option>
+        <option value="holiday">Holiday</option>
+      </select>
+    </div>
   </div>
-  <p id="weekLabel">Week ending: —</p>
+  <div class="header-status">
+    <span class="status-dot"></span>
+    <span id="headerEngineer"></span>
+  </div>
+  <p id="weekLabel" style="display:none">Week ending: —</p>
   <button class="logout-btn" onclick="doLogout()">Sign Out</button>
 </header>
 
@@ -714,8 +764,8 @@
 
 <!-- EXPORT -->
 <div id="page-export" class="page">
-  <div class="card">
-    <h2>Summary</h2>
+  <div class="summary-card">
+    <h2 style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;text-align:center;">Summary</h2>
     <div id="summaryContent"></div>
   </div>
   <div class="card">
@@ -1233,7 +1283,7 @@
     const totalAfter = days.reduce((s,d) => s + d.afterMins, 0);
 
     const summary = `
-      <div class="card">
+      <div class="card" style="border-top:2px solid var(--accent);box-shadow:0 0 24px -8px var(--accent-glow);">
         <h2>Week Break Summary</h2>
         <div class="break-hours-grid">
           <div class="break-hours-box gross">
@@ -2023,9 +2073,14 @@
     }
     localStorage.setItem(AUTH_KEY, name);
     localStorage.setItem(EMP_KEY, name);
+    localStorage.setItem(AUTH_KEY, name);
+    localStorage.setItem(EMP_KEY, name);
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('loginPassword').value = '';
     err.textContent = '';
+    // Show abbreviated name in header
+    const he = document.getElementById('headerEngineer');
+    if (he) he.textContent = abbreviateName(name);
     // Sync employee dropdown and reload data
     document.getElementById('employeeName').value = name; // hidden input
     const w = localStorage.getItem(getWeekKey());
@@ -2051,6 +2106,8 @@
       return; // don't render app until logged in
     }
     document.getElementById('loginScreen').classList.add('hidden');
+    const he = document.getElementById('headerEngineer');
+    if (he) he.textContent = abbreviateName(authed);
 
     document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
     // Employee set from login; no dropdown to populate
