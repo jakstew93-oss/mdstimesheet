@@ -1,10 +1,11 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v3';
+const CACHE_NAME = 'mdsmiths-timesheet-v4';
 const APP_SHELL = [
   './',
   './Index.html',
   './index.html',
   './recent-regs.js',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js'
 ];
 
 self.addEventListener('install', event => {
@@ -32,6 +33,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
+  const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
+  const isNavigation = event.request.mode === 'navigate';
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
@@ -39,6 +44,10 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached => cached || caches.match('./Index.html')))
+      .catch(() => caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        if (isSameOrigin && isNavigation) return caches.match('./index.html');
+        throw new Error('Offline cache miss: ' + event.request.url);
+      }))
   );
 });
