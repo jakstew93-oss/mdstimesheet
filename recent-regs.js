@@ -97,6 +97,21 @@
     input.value = reg;
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.dispatchEvent(new Event('change', { bubbles: true }));
+    if (input.id === 'qsReg') {
+      try {
+        const draft = JSON.parse(localStorage.getItem('mds_qs_draft') || '{}') || {};
+        if (reg) {
+          draft.vehicleReg = reg;
+          draft._savedAt = new Date().toISOString();
+          localStorage.setItem('mds_qs_draft', JSON.stringify(draft));
+          const status = document.getElementById('qsDraftStatus');
+          if (status) {
+            status.classList.add('has-draft');
+            status.innerHTML = '<span>Draft saved · ' + reg + '</span>';
+          }
+        }
+      } catch (_) {}
+    }
     rememberReg(reg);
     renderRecentRegs();
   }
