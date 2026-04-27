@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v4';
+const CACHE_NAME = 'mdsmiths-timesheet-v5';
 const APP_SHELL = [
   './',
   './Index.html',
