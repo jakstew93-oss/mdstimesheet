@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v11';
+const CACHE_NAME = 'mdsmiths-timesheet-v12';
 const APP_SHELL = [
   './',
   './Index.html',
@@ -6,7 +6,9 @@ const APP_SHELL = [
   './recent-regs.js',
   './manifest.webmanifest',
   './annual-leave-request-form.pdf',
-  'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js'
+  'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
 ];
 
 self.addEventListener('install', event => {
