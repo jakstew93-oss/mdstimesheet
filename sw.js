@@ -1,9 +1,10 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v14';
+const CACHE_NAME = 'mdsmiths-timesheet-v15';
 const APP_SHELL = [
   './',
   './Index.html',
   './index.html',
   './recent-regs.js',
+  './recent-regs.js?v=15',
   './manifest.webmanifest',
   './annual-leave-request-form.pdf',
   'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',

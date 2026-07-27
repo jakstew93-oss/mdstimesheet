@@ -1,5 +1,7 @@
 (function () {
   const STORAGE_KEY = 'mds_recent_vehicle_regs';
+  const HOLIDAY_STORAGE_KEY = 'mds_holiday_forms_sent';
+  const HOLIDAY_ALLOWANCE_DAYS = 21;
   const MAX_REGS = 8;
 
   function normaliseReg(value) {
@@ -86,6 +88,63 @@
       .recent-reg-btn.selected {
         border-color: #00c853;
         box-shadow: 0 0 0 1px rgba(0,200,83,.22) inset;
+      }
+      .holiday-allowance-card {
+        border: 1px solid rgba(0,200,83,.34);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(0,200,83,.14), rgba(255,255,255,.04));
+        padding: 16px;
+        margin-bottom: 14px;
+      }
+      .holiday-allowance-title {
+        color: #00c853;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: .16em;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+      }
+      .holiday-allowance-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .holiday-allowance-box {
+        background: rgba(0,0,0,.18);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 14px;
+        padding: 12px;
+      }
+      .holiday-allowance-label {
+        color: var(--subtext, rgba(255,255,255,.58));
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+      }
+      .holiday-allowance-value {
+        color: var(--text, #fff);
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+      }
+      .holiday-allowance-value span {
+        color: var(--subtext, rgba(255,255,255,.58));
+        font-size: 13px;
+        font-weight: 800;
+      }
+      .holiday-allowance-note {
+        color: var(--subtext, rgba(255,255,255,.58));
+        font-size: 12px;
+        line-height: 1.35;
+        margin-top: 10px;
+      }
+      @media (max-width: 360px) {
+        .holiday-allowance-grid {
+          grid-template-columns: 1fr;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -176,9 +235,141 @@
     });
   }
 
+  function readHolidayForms() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(HOLIDAY_STORAGE_KEY) || '[]');
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .map(item => ({
+          id: String(item.id || ''),
+          signature: String(item.signature || ''),
+          days: Number(item.days || 0),
+          date: String(item.date || ''),
+          from: String(item.from || ''),
+          to: String(item.to || ''),
+          name: String(item.name || '')
+        }))
+        .filter(item => item.id && item.days > 0);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeHolidayForms(forms) {
+    localStorage.setItem(HOLIDAY_STORAGE_KEY, JSON.stringify(forms));
+  }
+
+  function formatHolidayDays(days) {
+    return String(Math.round(Number(days || 0) * 10) / 10).replace(/\.0$/, '');
+  }
+
+  function getHolidayFormDays() {
+    const value = (document.getElementById('holidayDays')?.value || '').match(/\d+(?:\.\d+)?/);
+    return value ? Number(value[0]) : 0;
+  }
+
+  function getHolidayFormSignature() {
+    const name = (document.getElementById('holidayName')?.value || '').trim();
+    const from = document.getElementById('holidayFrom')?.value || '';
+    const to = document.getElementById('holidayTo')?.value || '';
+    const days = getHolidayFormDays();
+    return { name, from, to, days, signature: [name, from, to, days].join('|') };
+  }
+
+  function showNotice(message) {
+    if (typeof window.showToast === 'function') window.showToast(message);
+  }
+
+  function logCurrentHolidayForm() {
+    const current = getHolidayFormSignature();
+    if (!Number.isFinite(current.days) || current.days <= 0) {
+      showNotice('Pick holiday dates first');
+      return false;
+    }
+
+    const forms = readHolidayForms();
+    if (forms.some(form => form.signature === current.signature)) {
+      showNotice('Holiday form already deducted');
+      renderHolidayAllowance();
+      return false;
+    }
+
+    forms.push({
+      id: String(Date.now()),
+      signature: current.signature,
+      days: current.days,
+      date: new Date().toISOString().slice(0, 10),
+      from: current.from,
+      to: current.to,
+      name: current.name
+    });
+    writeHolidayForms(forms);
+    renderHolidayAllowance();
+    showNotice('Holiday allowance updated');
+    return true;
+  }
+
+  function renderHolidayAllowance() {
+    ensureStyles();
+    const holidayCard = document.querySelector('#section-holiday .holiday-form-card');
+    if (!holidayCard) return;
+
+    let panel = document.getElementById('holidayAllowanceCard');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'holidayAllowanceCard';
+      panel.className = 'holiday-allowance-card';
+      holidayCard.insertAdjacentElement('afterbegin', panel);
+    }
+
+    const forms = readHolidayForms();
+    const used = forms.reduce((total, form) => total + form.days, 0);
+    const remaining = Math.max(0, HOLIDAY_ALLOWANCE_DAYS - used);
+    const currentDays = getHolidayFormDays();
+
+    panel.innerHTML =
+      '<div class="holiday-allowance-title">Annual leave allowance</div>' +
+      '<div class="holiday-allowance-grid">' +
+        '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days left</div><div class="holiday-allowance-value">' + formatHolidayDays(remaining) + ' <span>of 21</span></div></div>' +
+        '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days used</div><div class="holiday-allowance-value">' + formatHolidayDays(used) + ' <span>days</span></div></div>' +
+      '</div>' +
+      '<button class="btn btn-success" type="button" id="holidayLogAllowanceBtn">Log this form: ' + formatHolidayDays(currentDays) + ' working day' + (currentDays === 1 ? '' : 's') + '</button>' +
+      '<div class="holiday-allowance-note">Weekends are excluded by the form. Generating the same form twice will not deduct twice.</div>';
+
+    const logButton = document.getElementById('holidayLogAllowanceBtn');
+    if (logButton) logButton.onclick = logCurrentHolidayForm;
+  }
+
+  function hookHolidayForm() {
+    const section = document.getElementById('section-holiday');
+    if (!section) return;
+
+    renderHolidayAllowance();
+    ['holidayFrom', 'holidayTo', 'holidayDays', 'holidayName'].forEach(id => {
+      const input = document.getElementById(id);
+      if (input && input.dataset.holidayAllowanceHooked !== 'true') {
+        input.dataset.holidayAllowanceHooked = 'true';
+        input.addEventListener('input', () => setTimeout(renderHolidayAllowance, 0));
+        input.addEventListener('change', () => setTimeout(renderHolidayAllowance, 0));
+      }
+    });
+
+    const pdfButton = document.getElementById('holidayPdfBtn');
+    if (pdfButton && pdfButton.dataset.holidayAllowanceHooked !== 'true') {
+      pdfButton.dataset.holidayAllowanceHooked = 'true';
+      pdfButton.textContent = 'Generate Filled PDF & Deduct Days';
+      pdfButton.addEventListener('click', () => setTimeout(logCurrentHolidayForm, 0));
+    }
+  }
+
   function bootRecentRegs() {
-    hookVehicleRegInput();
-    renderRecentRegs();
+    try {
+      hookVehicleRegInput();
+      renderRecentRegs();
+      hookHolidayForm();
+    } catch (err) {
+      console.warn('Timesheet enhancement failed:', err);
+    }
   }
 
   const observer = new MutationObserver(bootRecentRegs);
