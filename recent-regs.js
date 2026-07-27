@@ -459,7 +459,7 @@
         pdfButton.click();
         setTimeout(() => logCurrentHolidayForm({ silent: true }), 1200);
       });
-      pdfButton.insertAdjacentElement('afterend', deductButton);
+      pdfButton.insertAdjacentElement('beforebegin', deductButton);
     }
   }
 
