@@ -340,16 +340,17 @@
     if (typeof window.showToast === 'function') window.showToast(message);
   }
 
-  function logCurrentHolidayForm() {
+  function logCurrentHolidayForm(options = {}) {
+    const silent = options && options.silent === true;
     const current = getHolidayFormSignature();
     if (!Number.isFinite(current.days) || current.days <= 0) {
-      showNotice('Pick holiday dates first');
+      if (!silent) showNotice('Pick holiday dates first');
       return false;
     }
 
     const forms = readHolidayForms();
     if (forms.some(form => form.signature === current.signature)) {
-      showNotice('Holiday form already deducted');
+      if (!silent) showNotice('Holiday form already deducted');
       renderHolidayAllowance();
       return false;
     }
@@ -365,7 +366,7 @@
     });
     writeHolidayForms(forms);
     renderHolidayAllowance();
-    showNotice('Holiday allowance updated');
+    if (!silent) showNotice('Holiday allowance updated');
     return true;
   }
 
@@ -450,7 +451,7 @@
     const pdfButton = document.getElementById('holidayPdfBtn');
     if (pdfButton && pdfButton.dataset.holidayAllowanceHooked !== 'true') {
       pdfButton.dataset.holidayAllowanceHooked = 'true';
-      pdfButton.addEventListener('click', () => setTimeout(logCurrentHolidayForm, 600));
+      pdfButton.addEventListener('click', () => setTimeout(() => logCurrentHolidayForm({ silent: true }), 1200));
     }
   }
 
