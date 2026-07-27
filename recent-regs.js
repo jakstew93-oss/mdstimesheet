@@ -381,6 +381,13 @@
       panel.className = 'holiday-allowance-card';
       holidayCard.insertAdjacentElement('afterbegin', panel);
     }
+    if (
+      panel.dataset.editingUsedDays === 'true' &&
+      document.activeElement &&
+      document.activeElement.id === 'holidayUsedInput'
+    ) {
+      return;
+    }
 
     const used = getHolidayUsedDays();
     const allowance = HOLIDAY_ALLOWANCE_DAYS;
