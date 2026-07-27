@@ -448,6 +448,13 @@
       }
     });
 
+    const pdfButton = document.getElementById('holidayPdfBtn');
+    if (pdfButton && pdfButton.dataset.holidayCounterHooked !== 'true') {
+      pdfButton.dataset.holidayCounterHooked = 'true';
+      pdfButton.addEventListener('click', () => {
+        setTimeout(() => logCurrentHolidayForm({ silent: true }), 1200);
+      });
+    }
   }
 
   function bootRecentRegs() {
