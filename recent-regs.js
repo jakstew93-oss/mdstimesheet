@@ -1,7 +1,7 @@
 (function () {
   const STORAGE_KEY = 'mds_recent_vehicle_regs';
   const HOLIDAY_STORAGE_KEY = 'mds_holiday_forms_sent';
-  const HOLIDAY_ALLOWANCE_STORAGE_KEY = 'mds_holiday_allowance_days';
+  const HOLIDAY_USED_ADJUSTMENT_STORAGE_KEY = 'mds_holiday_used_adjustment_days';
   const HOLIDAY_ALLOWANCE_DAYS = 21;
   const MAX_REGS = 8;
 
@@ -299,15 +299,24 @@
     localStorage.setItem(HOLIDAY_STORAGE_KEY, JSON.stringify(forms));
   }
 
-  function readHolidayAllowance() {
-    const stored = Number(localStorage.getItem(HOLIDAY_ALLOWANCE_STORAGE_KEY));
-    return Number.isFinite(stored) && stored >= 0 ? stored : HOLIDAY_ALLOWANCE_DAYS;
+  function getLoggedHolidayDays() {
+    return readHolidayForms().reduce((total, form) => total + form.days, 0);
   }
 
-  function writeHolidayAllowance(days) {
+  function readHolidayUsedAdjustment() {
+    const stored = Number(localStorage.getItem(HOLIDAY_USED_ADJUSTMENT_STORAGE_KEY));
+    return Number.isFinite(stored) ? stored : 0;
+  }
+
+  function getHolidayUsedDays() {
+    return Math.max(0, getLoggedHolidayDays() + readHolidayUsedAdjustment());
+  }
+
+  function writeHolidayUsedDays(days) {
     const parsed = Number(days);
     if (!Number.isFinite(parsed) || parsed < 0) return;
-    localStorage.setItem(HOLIDAY_ALLOWANCE_STORAGE_KEY, String(Math.round(parsed * 10) / 10));
+    const adjustment = Math.round((parsed - getLoggedHolidayDays()) * 10) / 10;
+    localStorage.setItem(HOLIDAY_USED_ADJUSTMENT_STORAGE_KEY, String(adjustment));
   }
 
   function formatHolidayDays(days) {
@@ -373,12 +382,11 @@
       holidayCard.insertAdjacentElement('afterbegin', panel);
     }
 
-    const forms = readHolidayForms();
-    const used = forms.reduce((total, form) => total + form.days, 0);
-    const allowance = readHolidayAllowance();
+    const used = getHolidayUsedDays();
+    const allowance = HOLIDAY_ALLOWANCE_DAYS;
     const remaining = Math.max(0, allowance - used);
     const currentDays = getHolidayFormDays();
-    const isEditing = panel.dataset.editingAllowance === 'true';
+    const isEditing = panel.dataset.editingUsedDays === 'true';
 
     panel.innerHTML =
       '<div class="holiday-allowance-title">Annual leave allowance</div>' +
@@ -388,8 +396,8 @@
       '</div>' +
       '<div class="holiday-allowance-actions">' +
         (isEditing
-          ? '<input class="holiday-allowance-input" id="holidayAllowanceInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(allowance) + '" aria-label="Annual leave allowance days"><button class="holiday-allowance-edit" type="button" id="holidaySaveAllowanceBtn">Save</button>'
-          : '<button class="holiday-allowance-edit" type="button" id="holidayEditAllowanceBtn">Edit allowance</button>') +
+          ? '<input class="holiday-allowance-input" id="holidayUsedInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(used) + '" aria-label="Holiday days used"><button class="holiday-allowance-edit" type="button" id="holidaySaveUsedBtn">Save</button>'
+          : '<button class="holiday-allowance-edit" type="button" id="holidayEditUsedBtn">Edit days used</button>') +
       '</div>' +
       '<button class="btn btn-success" type="button" id="holidayLogAllowanceBtn">Log this form: ' + formatHolidayDays(currentDays) + ' working day' + (currentDays === 1 ? '' : 's') + '</button>' +
       '<div class="holiday-allowance-note">Weekends are excluded by the form. Generating the same form twice will not deduct twice.</div>';
@@ -397,28 +405,28 @@
     const logButton = document.getElementById('holidayLogAllowanceBtn');
     if (logButton) logButton.onclick = logCurrentHolidayForm;
 
-    const editButton = document.getElementById('holidayEditAllowanceBtn');
+    const editButton = document.getElementById('holidayEditUsedBtn');
     if (editButton) {
       editButton.onclick = () => {
-        panel.dataset.editingAllowance = 'true';
+        panel.dataset.editingUsedDays = 'true';
         renderHolidayAllowance();
-        document.getElementById('holidayAllowanceInput')?.focus();
+        document.getElementById('holidayUsedInput')?.focus();
       };
     }
 
-    const allowanceInput = document.getElementById('holidayAllowanceInput');
-    const saveAllowance = () => {
-      if (allowanceInput) {
-        writeHolidayAllowance(allowanceInput.value);
-        showNotice('Annual leave allowance updated');
+    const usedInput = document.getElementById('holidayUsedInput');
+    const saveUsedDays = () => {
+      if (usedInput) {
+        writeHolidayUsedDays(usedInput.value);
+        showNotice('Days used updated');
       }
-      panel.dataset.editingAllowance = 'false';
+      panel.dataset.editingUsedDays = 'false';
       renderHolidayAllowance();
     };
-    const saveButton = document.getElementById('holidaySaveAllowanceBtn');
-    if (saveButton) saveButton.onclick = saveAllowance;
-    if (allowanceInput) allowanceInput.onkeydown = event => {
-      if (event.key === 'Enter') saveAllowance();
+    const saveButton = document.getElementById('holidaySaveUsedBtn');
+    if (saveButton) saveButton.onclick = saveUsedDays;
+    if (usedInput) usedInput.onkeydown = event => {
+      if (event.key === 'Enter') saveUsedDays();
     };
   }
 
