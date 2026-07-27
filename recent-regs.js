@@ -449,11 +449,17 @@
     });
 
     const pdfButton = document.getElementById('holidayPdfBtn');
-    if (pdfButton && pdfButton.dataset.holidayCounterHooked !== 'true') {
-      pdfButton.dataset.holidayCounterHooked = 'true';
-      pdfButton.addEventListener('click', () => {
+    if (pdfButton && !document.getElementById('holidayPdfDeductBtn')) {
+      const deductButton = document.createElement('button');
+      deductButton.className = 'btn btn-success';
+      deductButton.id = 'holidayPdfDeductBtn';
+      deductButton.type = 'button';
+      deductButton.textContent = 'Generate & Deduct Days';
+      deductButton.addEventListener('click', () => {
+        pdfButton.click();
         setTimeout(() => logCurrentHolidayForm({ silent: true }), 1200);
       });
+      pdfButton.insertAdjacentElement('afterend', deductButton);
     }
   }
 
