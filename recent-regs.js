@@ -328,11 +328,24 @@
     return value ? Number(value[0]) : 0;
   }
 
+  function countHolidayWeekdays(from, to) {
+    if (!from || !to || from > to) return 0;
+    const cursor = new Date(from + 'T00:00:00');
+    const end = new Date(to + 'T00:00:00');
+    let days = 0;
+    while (cursor <= end) {
+      const day = cursor.getDay();
+      if (day !== 0 && day !== 6) days += 1;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    return days;
+  }
+
   function getHolidayFormSignature() {
     const name = (document.getElementById('holidayName')?.value || '').trim();
     const from = document.getElementById('holidayFrom')?.value || '';
     const to = document.getElementById('holidayTo')?.value || '';
-    const days = getHolidayFormDays();
+    const days = getHolidayFormDays() || countHolidayWeekdays(from, to);
     return { name, from, to, days, signature: [name, from, to, days].join('|') };
   }
 
@@ -456,8 +469,9 @@
       deductButton.type = 'button';
       deductButton.textContent = 'Generate & Deduct Days';
       deductButton.addEventListener('click', () => {
-        logCurrentHolidayForm({ silent: true });
+        const deducted = logCurrentHolidayForm();
         pdfButton.click();
+        if (deducted) setTimeout(renderHolidayAllowance, 250);
       });
       pdfButton.insertAdjacentElement('beforebegin', deductButton);
     }
