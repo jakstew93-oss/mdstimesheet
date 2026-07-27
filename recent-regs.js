@@ -136,6 +136,25 @@
         font-size: 13px;
         font-weight: 800;
       }
+      .holiday-allowance-actions {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .holiday-allowance-edit {
+        appearance: none;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 8px;
+        color: var(--text, #fff);
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        min-height: 34px;
+        padding: 7px 11px;
+      }
       .holiday-allowance-input {
         appearance: textfield;
         background: rgba(0,0,0,.18);
@@ -146,9 +165,10 @@
         font-size: 30px;
         font-weight: 900;
         line-height: 1;
-        min-height: 42px;
+        max-width: 110px;
+        min-height: 34px;
         padding: 5px 8px;
-        width: 100%;
+        width: 110px;
       }
       .holiday-allowance-input::-webkit-outer-spin-button,
       .holiday-allowance-input::-webkit-inner-spin-button {
@@ -358,13 +378,18 @@
     const allowance = readHolidayAllowance();
     const remaining = Math.max(0, allowance - used);
     const currentDays = getHolidayFormDays();
+    const isEditing = panel.dataset.editingAllowance === 'true';
 
     panel.innerHTML =
       '<div class="holiday-allowance-title">Annual leave allowance</div>' +
       '<div class="holiday-allowance-grid">' +
         '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days left</div><div class="holiday-allowance-value">' + formatHolidayDays(remaining) + ' <span>of ' + formatHolidayDays(allowance) + '</span></div></div>' +
         '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days used</div><div class="holiday-allowance-value">' + formatHolidayDays(used) + ' <span>days</span></div></div>' +
-        '<div class="holiday-allowance-box"><label class="holiday-allowance-label" for="holidayAllowanceInput">Allowance</label><input class="holiday-allowance-input" id="holidayAllowanceInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(allowance) + '" aria-label="Annual leave allowance days"></div>' +
+      '</div>' +
+      '<div class="holiday-allowance-actions">' +
+        (isEditing
+          ? '<input class="holiday-allowance-input" id="holidayAllowanceInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(allowance) + '" aria-label="Annual leave allowance days"><button class="holiday-allowance-edit" type="button" id="holidaySaveAllowanceBtn">Save</button>'
+          : '<button class="holiday-allowance-edit" type="button" id="holidayEditAllowanceBtn">Edit allowance</button>') +
       '</div>' +
       '<button class="btn btn-success" type="button" id="holidayLogAllowanceBtn">Log this form: ' + formatHolidayDays(currentDays) + ' working day' + (currentDays === 1 ? '' : 's') + '</button>' +
       '<div class="holiday-allowance-note">Weekends are excluded by the form. Generating the same form twice will not deduct twice.</div>';
@@ -372,16 +397,29 @@
     const logButton = document.getElementById('holidayLogAllowanceBtn');
     if (logButton) logButton.onclick = logCurrentHolidayForm;
 
-    const allowanceInput = document.getElementById('holidayAllowanceInput');
-    if (allowanceInput) {
-      allowanceInput.oninput = () => writeHolidayAllowance(allowanceInput.value);
-      allowanceInput.onchange = () => {
-        writeHolidayAllowance(allowanceInput.value);
+    const editButton = document.getElementById('holidayEditAllowanceBtn');
+    if (editButton) {
+      editButton.onclick = () => {
+        panel.dataset.editingAllowance = 'true';
         renderHolidayAllowance();
-        showNotice('Annual leave allowance updated');
+        document.getElementById('holidayAllowanceInput')?.focus();
       };
-      allowanceInput.onblur = allowanceInput.onchange;
     }
+
+    const allowanceInput = document.getElementById('holidayAllowanceInput');
+    const saveAllowance = () => {
+      if (allowanceInput) {
+        writeHolidayAllowance(allowanceInput.value);
+        showNotice('Annual leave allowance updated');
+      }
+      panel.dataset.editingAllowance = 'false';
+      renderHolidayAllowance();
+    };
+    const saveButton = document.getElementById('holidaySaveAllowanceBtn');
+    if (saveButton) saveButton.onclick = saveAllowance;
+    if (allowanceInput) allowanceInput.onkeydown = event => {
+      if (event.key === 'Enter') saveAllowance();
+    };
   }
 
   function hookHolidayForm() {
