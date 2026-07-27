@@ -456,8 +456,8 @@
       deductButton.type = 'button';
       deductButton.textContent = 'Generate & Deduct Days';
       deductButton.addEventListener('click', () => {
+        logCurrentHolidayForm({ silent: true });
         pdfButton.click();
-        setTimeout(() => logCurrentHolidayForm({ silent: true }), 1200);
       });
       pdfButton.insertAdjacentElement('beforebegin', deductButton);
     }
