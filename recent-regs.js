@@ -406,11 +406,7 @@
           ? '<input class="holiday-allowance-input" id="holidayUsedInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(used) + '" aria-label="Holiday days used"><button class="holiday-allowance-edit" type="button" id="holidaySaveUsedBtn">Save</button>'
           : '<button class="holiday-allowance-edit" type="button" id="holidayEditUsedBtn">Edit days used</button>') +
       '</div>' +
-      '<button class="btn btn-success" type="button" id="holidayLogAllowanceBtn">Log this form: ' + formatHolidayDays(currentDays) + ' working day' + (currentDays === 1 ? '' : 's') + '</button>' +
       '<div class="holiday-allowance-note">Weekends are excluded by the form. Generating the same form twice will not deduct twice.</div>';
-
-    const logButton = document.getElementById('holidayLogAllowanceBtn');
-    if (logButton) logButton.onclick = logCurrentHolidayForm;
 
     const editButton = document.getElementById('holidayEditUsedBtn');
     if (editButton) {
@@ -454,8 +450,7 @@
     const pdfButton = document.getElementById('holidayPdfBtn');
     if (pdfButton && pdfButton.dataset.holidayAllowanceHooked !== 'true') {
       pdfButton.dataset.holidayAllowanceHooked = 'true';
-      pdfButton.textContent = 'Generate Filled PDF & Deduct Days';
-      pdfButton.addEventListener('click', () => setTimeout(logCurrentHolidayForm, 0));
+      pdfButton.addEventListener('click', () => setTimeout(logCurrentHolidayForm, 600));
     }
   }
 
