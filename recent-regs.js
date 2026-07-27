@@ -1,6 +1,7 @@
 (function () {
   const STORAGE_KEY = 'mds_recent_vehicle_regs';
   const HOLIDAY_STORAGE_KEY = 'mds_holiday_forms_sent';
+  const HOLIDAY_ALLOWANCE_STORAGE_KEY = 'mds_holiday_allowance_days';
   const HOLIDAY_ALLOWANCE_DAYS = 21;
   const MAX_REGS = 8;
 
@@ -135,6 +136,25 @@
         font-size: 13px;
         font-weight: 800;
       }
+      .holiday-allowance-input {
+        appearance: textfield;
+        background: rgba(0,0,0,.18);
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 10px;
+        color: var(--text, #fff);
+        font: inherit;
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+        min-height: 42px;
+        padding: 5px 8px;
+        width: 100%;
+      }
+      .holiday-allowance-input::-webkit-outer-spin-button,
+      .holiday-allowance-input::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+      }
       .holiday-allowance-note {
         color: var(--subtext, rgba(255,255,255,.58));
         font-size: 12px;
@@ -259,6 +279,17 @@
     localStorage.setItem(HOLIDAY_STORAGE_KEY, JSON.stringify(forms));
   }
 
+  function readHolidayAllowance() {
+    const stored = Number(localStorage.getItem(HOLIDAY_ALLOWANCE_STORAGE_KEY));
+    return Number.isFinite(stored) && stored >= 0 ? stored : HOLIDAY_ALLOWANCE_DAYS;
+  }
+
+  function writeHolidayAllowance(days) {
+    const parsed = Number(days);
+    if (!Number.isFinite(parsed) || parsed < 0) return;
+    localStorage.setItem(HOLIDAY_ALLOWANCE_STORAGE_KEY, String(Math.round(parsed * 10) / 10));
+  }
+
   function formatHolidayDays(days) {
     return String(Math.round(Number(days || 0) * 10) / 10).replace(/\.0$/, '');
   }
@@ -324,20 +355,33 @@
 
     const forms = readHolidayForms();
     const used = forms.reduce((total, form) => total + form.days, 0);
-    const remaining = Math.max(0, HOLIDAY_ALLOWANCE_DAYS - used);
+    const allowance = readHolidayAllowance();
+    const remaining = Math.max(0, allowance - used);
     const currentDays = getHolidayFormDays();
 
     panel.innerHTML =
       '<div class="holiday-allowance-title">Annual leave allowance</div>' +
       '<div class="holiday-allowance-grid">' +
-        '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days left</div><div class="holiday-allowance-value">' + formatHolidayDays(remaining) + ' <span>of 21</span></div></div>' +
+        '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days left</div><div class="holiday-allowance-value">' + formatHolidayDays(remaining) + ' <span>of ' + formatHolidayDays(allowance) + '</span></div></div>' +
         '<div class="holiday-allowance-box"><div class="holiday-allowance-label">Days used</div><div class="holiday-allowance-value">' + formatHolidayDays(used) + ' <span>days</span></div></div>' +
+        '<div class="holiday-allowance-box"><label class="holiday-allowance-label" for="holidayAllowanceInput">Allowance</label><input class="holiday-allowance-input" id="holidayAllowanceInput" type="number" inputmode="decimal" min="0" step="0.5" value="' + formatHolidayDays(allowance) + '" aria-label="Annual leave allowance days"></div>' +
       '</div>' +
       '<button class="btn btn-success" type="button" id="holidayLogAllowanceBtn">Log this form: ' + formatHolidayDays(currentDays) + ' working day' + (currentDays === 1 ? '' : 's') + '</button>' +
       '<div class="holiday-allowance-note">Weekends are excluded by the form. Generating the same form twice will not deduct twice.</div>';
 
     const logButton = document.getElementById('holidayLogAllowanceBtn');
     if (logButton) logButton.onclick = logCurrentHolidayForm;
+
+    const allowanceInput = document.getElementById('holidayAllowanceInput');
+    if (allowanceInput) {
+      allowanceInput.oninput = () => writeHolidayAllowance(allowanceInput.value);
+      allowanceInput.onchange = () => {
+        writeHolidayAllowance(allowanceInput.value);
+        renderHolidayAllowance();
+        showNotice('Annual leave allowance updated');
+      };
+      allowanceInput.onblur = allowanceInput.onchange;
+    }
   }
 
   function hookHolidayForm() {
