@@ -1,0 +1,32 @@
+name: Add driver names test
+
+on:
+  push:
+    branches:
+      - add-driver-names
+    paths:
+      - tools/add-driver-names.mjs
+      - .github/workflows/add-driver-names.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: add-driver-names
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Add and validate driver names
+        run: node tools/add-driver-names.mjs index.html Index.html
+      - name: Commit generated app files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Index.html
+          git commit -m "Add Luke Chambers, Mark Smith and Jody Wilson"
+          git push
