@@ -1,0 +1,32 @@
+name: Build safe PWA test
+
+on:
+  push:
+    branches:
+      - pwa-install-safe-test
+    paths:
+      - tools/repair-bundled-manifest.mjs
+      - .github/workflows/build-pwa-test.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: pwa-install-safe-test
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Repair and validate bundled manifests
+        run: node tools/repair-bundled-manifest.mjs index.html Index.html
+      - name: Commit generated test files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Index.html
+          git commit -m "Generate safe PWA test bundle"
+          git push
