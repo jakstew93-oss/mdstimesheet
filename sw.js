@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v32';
+const CACHE_NAME = 'mdsmiths-timesheet-v33';
 const APP_SHELL = [
   './',
   './Index.html',
@@ -7,6 +7,8 @@ const APP_SHELL = [
   './recent-regs.js?v=32',
   './pdf-lib.min.js',
   './manifest.webmanifest',
+  './icons/app-icon-192.png',
+  './icons/app-icon-512.png',
   './annual-leave-request-form.pdf',
   'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
