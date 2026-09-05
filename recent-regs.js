@@ -5,6 +5,17 @@
   const HOLIDAY_ALLOWANCE_DAYS = 21;
   const MAX_REGS = 8;
 
+  function ensureInstallManifest() {
+    const manifestUrl = new URL('manifest.webmanifest', window.location.href).href;
+    let manifest = document.querySelector('link[rel="manifest"]');
+    if (!manifest) {
+      manifest = document.createElement('link');
+      manifest.rel = 'manifest';
+      document.head.appendChild(manifest);
+    }
+    if (manifest.href !== manifestUrl) manifest.href = manifestUrl;
+  }
+
   function normaliseReg(value) {
     return String(value || '').trim().replace(/\s+/g, ' ').toUpperCase();
   }
@@ -479,6 +490,7 @@
 
   function bootRecentRegs() {
     try {
+      ensureInstallManifest();
       hookVehicleRegInput();
       renderRecentRegs();
       hookHolidayForm();

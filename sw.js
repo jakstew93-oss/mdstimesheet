@@ -1,10 +1,10 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v33';
+const CACHE_NAME = 'mdsmiths-timesheet-v34';
 const APP_SHELL = [
   './',
   './Index.html',
   './index.html',
   './recent-regs.js',
-  './recent-regs.js?v=32',
+  './recent-regs.js?v=34',
   './pdf-lib.min.js',
   './manifest.webmanifest',
   './icons/app-icon-192.png',
