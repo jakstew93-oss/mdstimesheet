@@ -7,8 +7,8 @@ android {
         applicationId = "com.jak.mdsquickwidget"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1-test"
+        versionCode = 3
+        versionName = "1.2-test"
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
