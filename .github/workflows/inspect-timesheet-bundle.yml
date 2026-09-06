@@ -1,0 +1,20 @@
+name: Inspect Timesheet Integration
+
+on:
+  push:
+    branches: [ quick-timesheet-widget ]
+    paths:
+      - 'tools/inspect-timesheet-bundle.mjs'
+      - '.github/workflows/inspect-timesheet-bundle.yml'
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect bundled app storage and logging hooks
+        run: node tools/inspect-timesheet-bundle.mjs

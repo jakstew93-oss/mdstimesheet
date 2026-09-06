@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MDS Quick Timesheet Widget</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111;font-family:Arial,sans-serif;color:#fff}.widget{width:min(94vw,520px);background:#202124;border:1px solid #3a3b3d;border-radius:26px;padding:18px;box-shadow:0 12px 35px #0008}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.brand{font-weight:800;letter-spacing:.08em}.live{font-size:12px;color:#9aa0a6}.job{display:flex;gap:10px;align-items:center;background:#151617;border-radius:16px;padding:10px 12px;margin-bottom:14px}.job label{font-size:12px;color:#9aa0a6}.job input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;font-size:18px;font-weight:700}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}.stat{background:#151617;border-radius:16px;padding:12px}.stat small{display:block;color:#9aa0a6;margin-bottom:4px}.stat strong{font-size:20px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}.buttons button{border:0;border-radius:16px;padding:15px 8px;font-weight:800;font-size:13px;cursor:pointer;background:#34363a;color:#fff}.buttons button.active{background:#00c853;color:#07140b}.status{margin-top:12px;text-align:center;color:#9aa0a6;font-size:12px;min-height:16px}
+</style>
+</head><body>
+<div class="widget">
+ <div class="top"><div class="brand">MDS QUICK LOG</div><div class="live">JAK • TEST</div></div>
+ <div class="job"><label>JOB</label><input id="job" inputmode="numeric" placeholder="Enter job number"></div>
+ <div class="stats"><div class="stat"><small>Today</small><strong id="today">0h 00m</strong></div><div class="stat"><small>Last log</small><strong id="last">—</strong></div></div>
+ <div class="buttons">
+  <button data-type="START">START</button><button data-type="ON SITE">ON SITE</button>
+  <button data-type="OFF SITE">OFF SITE</button><button data-type="FINISH">FINISH</button>
+ </div>
+ <div class="status" id="status">Prototype — not connected to live data</div>
+</div>
+<script>
+const job=document.getElementById('job'),last=document.getElementById('last'),status=document.getElementById('status');
+job.value=localStorage.getItem('mdsWidgetJob')||''; job.addEventListener('input',()=>localStorage.setItem('mdsWidgetJob',job.value.trim()));
+document.querySelectorAll('button[data-type]').forEach(btn=>btn.onclick=()=>{if(!job.value.trim()){status.textContent='Enter a job number first';job.focus();return}document.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});last.textContent=t;status.textContent=`${btn.dataset.type} • Job ${job.value.trim()} • ${t} (test only)`;});
+</script></body></html>
