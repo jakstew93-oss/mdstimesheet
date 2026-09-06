@@ -2,7 +2,7 @@ name: Build Quick Timesheet Widget APK
 
 on:
   push:
-    branches: [ quick-timesheet-widget ]
+    branches: [ main ]
     paths:
       - 'quick-widget/**'
       - '.github/workflows/build-quick-widget.yml'
