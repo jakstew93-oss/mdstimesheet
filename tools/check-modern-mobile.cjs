@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
   const browser = await chromium.launch({headless: true});
   fs.mkdirSync('screenshots', {recursive:true});
   for (const width of [360, 390, 768, 1280]) {
-    const context = await browser.newContext({viewport:{width,height:900}, serviceWorkers:'block'});
+    const context = await browser.newContext({viewport:{width,height:900}, serviceWorkers:'block', locale:'en-GB', reducedMotion:'reduce'});
     await context.addInitScript(() => {
       // Isolated local browser fixture; never touches a live user session.
       localStorage.setItem('ts_auth_user','Jak Stewart');
@@ -28,6 +28,8 @@ const assert = require('node:assert/strict');
     assert.match(await page.locator('.entry-v2').first().innerText(), /2048/);
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
     assert.equal(overflow,false,`Horizontal overflow at ${width}`);
+    await page.waitForFunction(()=>!document.getElementById('toast').classList.contains('show'));
+    if(width>=720) assert.equal(await page.locator('.mds-replacement').evaluate(el=>getComputedStyle(el).display),'grid');
     await page.evaluate(()=>scrollTo(0,0));
     await page.screenshot({path:`screenshots/log-${width}.png`,fullPage:true});
     for (const tab of ['Breaks','Preview','Export','Log']) {
