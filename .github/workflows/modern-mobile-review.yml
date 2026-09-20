@@ -1,0 +1,34 @@
+name: Modern mobile review
+on:
+  push:
+    branches: [modern-mobile-refresh]
+permissions:
+  contents: write
+jobs:
+  browser-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build bundled refresh
+        run: |
+          node tools/modernize-timesheet.mjs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Build modern mobile bundles"
+            git push
+          fi
+      - run: npm install --no-save playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          python3 -m http.server 8765 &
+          node tools/check-modern-mobile.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: modern-mobile-screenshots
+          path: screenshots
