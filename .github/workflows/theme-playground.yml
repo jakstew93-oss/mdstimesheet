@@ -1,0 +1,52 @@
+name: Build theme playground
+on:
+  push:
+    branches: [theme-playground]
+    paths: [themes.js, themes.css, tools/add-theme-playground.mjs, tools/check-theme-playground.cjs, .github/workflows/theme-playground.yml]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check themes.js
+      - run: node tools/add-theme-playground.mjs
+      - name: Install browser for theme verification
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Check themes at phone and desktop sizes
+        run: |
+          mkdir -p theme-screenshots
+          node tools/check-theme-playground.cjs
+      - name: Upload theme screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme-screenshots
+          path: theme-screenshots/
+      - name: Commit themed bundles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html Index.html sw.js
+          git diff --cached --quiet || git commit -m "Build themed timesheet bundles"
+          git push origin HEAD:theme-playground
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timesheet-theme-playground
+          path: |
+            index.html
+            Index.html
+            themes.js
+            themes.css
+            sw.js
+            manifest.webmanifest
+            recent-regs.js
+            pdf-lib.min.js
+            annual-leave-request-form.pdf
+            icons/
