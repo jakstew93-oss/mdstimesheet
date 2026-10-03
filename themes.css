@@ -285,3 +285,21 @@ html[data-mds-theme="timequest"] {
  .tq-hud-top { font-size:11px; }
 }
 @media print { .tq-hud,.timequest-crt,.tq-road,.tq-notice { display:none !important; } }
+
+@media screen {
+ html[data-mds-theme="timequest"] :is(.quickstart,.week-ending-bar,.day-strip,.draft-status,.empty-entries,.day-group-header,.break-hours-box) {
+  border-radius:0 !important; background:var(--surface) !important; border-color:var(--border2) !important;
+ }
+ html[data-mds-theme="timequest"] .quickstart { border-width:2px; box-shadow:3px 3px 0 #010302,4px 4px 0 #31543a; }
+ html[data-mds-theme="timequest"] .draft-status.has-draft { background:var(--accent-dim) !important; }
+ html[data-mds-theme="timequest"] .draft-status::before { border-radius:0; }
+ html[data-mds-theme="timequest"] #loginScreen { justify-content:flex-start; padding-top:32px; }
+ html[data-mds-theme="timequest"] .login-sub { margin-bottom:24px; }
+ html[data-mds-theme="timequest"] .login-card { flex-shrink:0; }
+ html[data-mds-theme="timequest"] .toast:not(.show) { visibility:hidden; }
+ html[data-mds-theme="timequest"] .toast.show { visibility:visible; }
+}
+@media screen and (max-width:360px) {
+ html[data-mds-theme="timequest"] .header-status::after { display:none; }
+ html[data-mds-theme="timequest"] .qs-stage[data-field="endTime"]::before { font-size:7px; }
+}
