@@ -1,8 +1,8 @@
 /* Theme playground: appearance only; independent of timesheet data. */
 (function () {
   const key = 'mds_theme_preference';
-  const themes = { classic: 'Classic', midnight: 'Midnight Blue', graphite: 'Graphite', light: 'Light' };
-  const colors = {classic:'#0a0a0a',midnight:'#0b1220',graphite:'#17191d',light:'#f3f6f9'};
+  const themes = { classic: 'Classic', midnight: 'Midnight Blue', graphite: 'Graphite', light: 'Light', arcade: '8-bit Arcade' };
+  const colors = {classic:'#0a0a0a',midnight:'#0b1220',graphite:'#17191d',light:'#f3f6f9',arcade:'#d9f5e5'};
   let current = 'classic';
   try { const saved = localStorage.getItem(key); if (themes[saved]) current = saved; } catch (_) {}
   function apply(theme) {
