@@ -96,3 +96,78 @@ html[data-mds-theme="arcade"] {
  html[data-mds-theme="arcade"] .qs-clock { font-size:18px; }
  html[data-mds-theme="arcade"] .theme-picker summary { font-weight:800; }
 }
+
+/* 1980s arcade cabinet: scoped entirely to the experimental Arcade theme. */
+.arcade-cabinet { display:none; }
+@media screen {
+ html[data-mds-theme="arcade"] {
+  --bg:#120d26; --surface:#201536; --surface2:#2b2047; --surface3:#362653;
+  --card:#201536; --border:#8164a8; --border2:#a287c5;
+  --accent:#59f6ff; --accent-hi:#b6fbff; --accent-dim:#18364b;
+  --accent-border:#59b8cd; --accent-glow:rgba(89,246,255,.20);
+  --text:#fff4de; --text2:#d6c3ed; --subtext:#c0abd9;
+  --success:#87f5ad; --warning:#ffe17b; --danger:#ff889e; color-scheme:dark;
+ }
+ html[data-mds-theme="arcade"] body,
+ html[data-mds-theme="arcade"] #loginScreen {
+  background-image:
+   linear-gradient(rgba(255,115,206,.09) 2px,transparent 2px),
+   linear-gradient(90deg,rgba(89,246,255,.07) 2px,transparent 2px) !important;
+  background-size:24px 24px !important;
+ }
+ html[data-mds-theme="arcade"] :is(header,.tabs) { border-bottom-color:#ff73ce; }
+ html[data-mds-theme="arcade"] :is(.card,.login-card,.totals-hero,.summary-card,.entry-v2,.break-entry,.theme-picker) {
+  border-color:#a287c5 !important; box-shadow:4px 4px 0 #080512,6px 6px 0 #ff73ce !important;
+ }
+ html[data-mds-theme="arcade"] :is(.btn,.tab,.qs-stage,.theme-choice,.day-pill,.logout-btn,.mini-edit,.mini-del) {
+  border-color:#a287c5 !important; box-shadow:2px 3px 0 #080512 !important;
+ }
+ html[data-mds-theme="arcade"] :is(.tab.active,.btn-primary,.day-pill.active,.day-pill.active .dp-name,.day-pill.active .dp-num,.day-pill.active .dp-hrs) { color:#120d26 !important; }
+ html[data-mds-theme="arcade"] :is(.totals-hero-box.gross,.totals-hero-box.deduct) { background:var(--surface2); }
+ html[data-mds-theme="arcade"] .totals-hero-box.gross .th-value { color:#ffbde6; }
+ html[data-mds-theme="arcade"] .theme-choice[aria-pressed="true"] { background:#ffe17b; color:#120d26; border-color:#ffe17b !important; }
+ html[data-mds-theme="arcade"] .login-title { color:#fff4de; text-shadow:3px 0 0 #ff73ce,-3px 0 0 #59f6ff,0 4px 0 #080512; }
+ html[data-mds-theme="arcade"] .login-title::before {
+  content:"INSERT COIN"; display:block; color:#ffe17b; font-size:12px;
+  letter-spacing:2px; margin-bottom:12px; text-shadow:none;
+ }
+ html[data-mds-theme="arcade"] .login-title::after {
+  content:"PLAYER ONE READY"; display:block; color:#59f6ff; font-size:10px;
+  letter-spacing:1px; margin-top:12px; text-shadow:none;
+ }
+ html[data-mds-theme="arcade"] :is(.card h2,.qs-title,.totals-hero-label)::after { background:#ff73ce; opacity:1; }
+ html[data-mds-theme="arcade"] .arcade-cabinet {
+  display:block; max-width:620px; width:calc(100% - 28px); margin:18px auto 20px;
+  background:#120d26; border:3px solid #59f6ff; box-shadow:4px 4px 0 #ff73ce;
+  color:#fff4de; font-family:"MDS Pixel",monospace;
+ }
+ .arcade-marquee { display:flex; justify-content:space-between; gap:8px; padding:12px 10px; border-bottom:2px solid #ff73ce; font-size:12px; color:#ffe17b; line-height:1.5; }
+ .arcade-marquee span:nth-child(2) { color:#fff4de; text-align:center; }
+ .arcade-scene {
+  display:flex; align-items:center; gap:12px; padding:20px 12px;
+  background-image:radial-gradient(#ffe17b 1px,transparent 1px),radial-gradient(#ff73ce 1px,transparent 1px);
+  background-size:37px 29px,61px 43px; background-position:8px 3px,23px 15px;
+ }
+ .arcade-sprite { flex:0 0 40px; width:40px; height:40px; image-rendering:pixelated; shape-rendering:crispEdges; }
+ .arcade-tape { flex:0 0 40px; width:40px; height:28px; image-rendering:pixelated; shape-rendering:crispEdges; transform:rotate(-8deg); }
+ .arcade-scene-copy { flex:1; min-width:0; }
+ .arcade-scene-copy strong { display:block; font-weight:400; font-size:12px; line-height:1.6; color:#59f6ff; }
+ .arcade-scene-copy span { display:block; font-size:9px; line-height:1.6; margin-top:6px; color:#fff4de; }
+ .arcade-footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; border-top:2px solid #8164a8; padding:9px 10px; color:#ffbde6; font-size:8px; line-height:1.5; }
+ html[data-mds-theme="arcade"] .qs-title::before {
+  width:14px; height:16px; border-radius:0; box-shadow:none;
+  background:#ffe17b; clip-path:polygon(55% 0,100% 0,65% 40%,100% 40%,30% 100%,45% 55%,0 55%); 
+ }
+ html[data-mds-theme="arcade"] :is(.btn,.tab,.day-pill) { font-family:"MDS Pixel",monospace !important; font-weight:400 !important; letter-spacing:0 !important; line-height:1.5; }
+ html[data-mds-theme="arcade"] .tab { font-size:11px !important; }
+ html[data-mds-theme="arcade"] .btn { font-size:14px !important; }
+ html[data-mds-theme="arcade"] .day-pill { font-family:inherit !important; }
+}
+[data-theme="arcade"] .theme-swatch { background:linear-gradient(90deg,#120d26 40%,#ff73ce 40% 70%,#59f6ff 70%); }
+@media screen and (max-width:360px) {
+ .arcade-marquee { font-size:10px; }
+ .arcade-sprite { width:32px; height:32px; flex-basis:32px; }
+ .arcade-tape { display:none; }
+ .arcade-scene-copy strong { font-size:11px; }
+}
+@media print { .arcade-cabinet { display:none !important; } }

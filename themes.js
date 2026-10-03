@@ -2,7 +2,7 @@
 (function () {
   const key = 'mds_theme_preference';
   const themes = { classic: 'Classic', midnight: 'Midnight Blue', graphite: 'Graphite', light: 'Light', arcade: '8-bit Arcade' };
-  const colors = {classic:'#0a0a0a',midnight:'#0b1220',graphite:'#17191d',light:'#f3f6f9',arcade:'#d9f5e5'};
+  const colors = {classic:'#0a0a0a',midnight:'#0b1220',graphite:'#17191d',light:'#f3f6f9',arcade:'#120d26'};
   let current = 'classic';
   try { const saved = localStorage.getItem(key); if (themes[saved]) current = saved; } catch (_) {}
   function apply(theme) {
@@ -35,6 +35,15 @@
   }));
   const header = document.querySelector('header');
   if (header) header.insertAdjacentElement('afterend', panel);
+  const cabinet = document.createElement('div');
+  cabinet.className = 'arcade-cabinet';
+  cabinet.setAttribute('aria-hidden', 'true');
+  cabinet.innerHTML = '<div class="arcade-marquee"><span>1UP</span><span>MDS TIME QUEST</span><span>1985</span></div>' +
+    '<div class="arcade-scene"><svg class="arcade-sprite" viewBox="0 0 16 16" role="presentation"><path fill="#59f6ff" d="M3 2h2v2H3zM11 2h2v2h-2zM5 4h6v2H5zM3 6h10v2H3zM1 8h14v4H1zM3 12h2v2H3zM11 12h2v2h-2zM5 14h2v2H5zM9 14h2v2H9z"/><path fill="#120d26" d="M4 8h2v2H4zM10 8h2v2h-2z"/></svg>' +
+    '<div class="arcade-scene-copy"><strong>LEVEL 01: THE WORKDAY</strong><span>LOG TIME. SAVE PROGRESS.</span></div>' +
+    '<svg class="arcade-tape" viewBox="0 0 32 22" role="presentation"><path fill="#ff73ce" d="M2 0h28v2h2v18h-2v2H2v-2H0V2h2z"/><path fill="#201536" d="M3 3h26v13H3zM8 18h16v2H8z"/><path fill="#ffe17b" d="M5 5h22v3H5zM6 10h4v4H6zM22 10h4v4h-4zM10 11h12v2H10z"/></svg></div>' +
+    '<div class="arcade-footer"><span>BE KIND, REWIND</span><span>HIGH SCORE: HOME TIME</span></div>';
+  if (header) panel.insertAdjacentElement('afterend', cabinet);
   const login = document.getElementById('loginScreen');
   if (login) login.appendChild(loginPanel);
   apply(current);
