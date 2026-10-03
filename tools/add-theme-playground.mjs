@@ -9,7 +9,7 @@ for (const name of ['index.html', 'Index.html']) {
   const encoded = JSON.stringify(template).replaceAll('</', '<\\/');
   writeFileSync(name, source.slice(0, match.index + match[1].length) + encoded + source.slice(match.index + match[1].length + match[2].length));
 }
-let sw = readFileSync('sw.js', 'utf8').replace(/const CACHE_NAME = '[^']+';/, "const CACHE_NAME = 'mdsmiths-timesheet-themes-v3';");
+let sw = readFileSync('sw.js', 'utf8').replace(/const CACHE_NAME = '[^']+';/, "const CACHE_NAME = 'mdsmiths-timesheet-themes-v4';");
 if (!sw.includes("'./themes.js'")) sw = sw.replace("  './recent-regs.js',", "  './themes.js',\n  './themes.css',\n  './recent-regs.js',");
 writeFileSync('sw.js', sw);
 console.log('Theme assets added to both bundle entry points and offline cache.');

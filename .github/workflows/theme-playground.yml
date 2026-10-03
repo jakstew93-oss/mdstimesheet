@@ -2,7 +2,7 @@ name: Build theme playground
 on:
   push:
     branches: [theme-playground]
-    paths: [themes.js, themes.css, tools/add-theme-playground.mjs, .github/workflows/theme-playground.yml]
+    paths: [themes.js, themes.css, tools/add-theme-playground.mjs, tools/check-theme-playground.cjs, .github/workflows/theme-playground.yml]
 permissions:
   contents: write
 jobs:
@@ -15,6 +15,20 @@ jobs:
           node-version: '22'
       - run: node --check themes.js
       - run: node tools/add-theme-playground.mjs
+      - name: Install browser for theme verification
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Check themes at phone and desktop sizes
+        run: |
+          mkdir -p theme-screenshots
+          node tools/check-theme-playground.cjs
+      - name: Upload theme screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme-screenshots
+          path: theme-screenshots/
       - name: Commit themed bundles
         run: |
           git config user.name "github-actions[bot]"
