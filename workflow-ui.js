@@ -6,6 +6,7 @@
  function draft(){return JSON.parse(localStorage.getItem('mds_qs_draft')||'{}')||{}}
  function workingDraft(){const d=draft();return ['jobNumber',...api.timeFields,'food','hol'].some(k=>!!d[k])}
  function week(){return localStorage.getItem(getWeekKey())||currentWeekEnding()}
+ function weekLabel(value){return new Date(value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
  function storageKey(name){return name+empSuffix()}
  function element(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(className)node.className=className;return node}
  function button(text,action){const node=element('button',text);node.type='button';node.addEventListener('click',action);return node}
@@ -28,7 +29,7 @@
   keys.forEach(key=>{
    const record=data.weeks[key];const count=record?.entries.length||0;
    const row=element('div',undefined,'workflow-week-row');
-   row.append(element('span',formatDate(key)+' · '+count+' '+(count===1?'entry':'entries')+(record?.archived?' · Archived':'')));
+   row.append(element('span',weekLabel(key)+' · '+count+' '+(count===1?'entry':'entries')+(record?.archived?' · Archived':'')));
    row.append(button(key===week()?'Selected':'Open',()=>{if(selectWeek(key))d.close()}));d.append(row);
   });
   d.append(button('Close',()=>d.close()));
@@ -38,7 +39,7 @@
   const current=week(),next=api.nextWeek(current),entries=getEntries();
   if(!entries.length){showToast('Add entries before archiving this week');return}
   const d=dialog('Save this week and start the next');
-  d.append(element('p','Keep all '+entries.length+' entries for the week ending '+formatDate(current)+'. Then open the week ending '+formatDate(next)+'.'));
+  d.append(element('p','Keep all '+entries.length+' entries for the week ending '+weekLabel(current)+'. Then open the week ending '+weekLabel(next)+'.'));
   d.append(button('Save week & continue',()=>{
    if(week()!==current||workingDraft()){d.close();showToast('The current week changed. Try again.');return}
    const data=readWeekStore();data.weeks[current]={...data.weeks[current],archived:true,archivedAt:new Date().toISOString()};writeWeekStore(data);
