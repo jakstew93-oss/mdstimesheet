@@ -1,15 +1,15 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v41';
+const CACHE_NAME = 'mdsmiths-timesheet-v42';
 const APP_SHELL = [
   './',
   './Index.html',
   './index.html',
   './recent-regs.js',
   './recent-regs.js?v=34',
-  './appearance.css?v=41',
-  './appearance.js?v=41',
-  './widget-import.js?v=41',
-  './timesheet-tools.js?v=41',
-  './workflow-ui.js?v=41',
+  './appearance.css?v=42',
+  './appearance.js?v=42',
+  './widget-import.js?v=42',
+  './timesheet-tools.js?v=42',
+  './workflow-ui.js?v=42',
   './fonts/vt323.ttf',
   './pdf-lib.min.js',
   './manifest.webmanifest',

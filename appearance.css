@@ -110,3 +110,17 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
  font-synthesis:none!important;
  letter-spacing:normal!important;
 }
+
+/* Larger arcade type keeps the narrow pixel glyphs readable on a phone. */
+:root[data-app-theme=arcade] body{font-size:18px}
+:root[data-app-theme=arcade] #mds-app :is(button,input,select,textarea,label,p,.week-ending-bar,.mds-day summary,.mds-day-info,.totals-hero-meta,.entry-v2-date,.empty-entries,.remember-details,.day-filter-banner,.summary-row,.van-item-label,.pay-hist-week,.pay-hist-vals){font-size:18px!important}
+:root[data-app-theme=arcade] #mds-app :is(.dp-name,.dp-hrs,.we-label,.th-label,.totals-hero-label,.qs-stage-label,.qs-sec,.entries-section-title,.etime-lbl,.chip,.ttchip,.draft-status,.header-status,.logout-btn){font-size:16px!important}
+:root[data-app-theme=arcade] #mds-app :is(.dp-num,.etime-val,.qs-clock){font-size:22px!important}
+:root[data-app-theme=arcade] #mds-app .qs-stage-val{font-size:24px!important}
+:root[data-app-theme=arcade] #mds-app :is(.qs-title,.th-value,.login-title,h2){font-size:28px!important}
+:root[data-app-theme=arcade] #mds-app .section-select-wrap select{font-size:20px!important}
+:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar){font-size:18px}
+:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar) :is(button,select,p,label,.workflow-week-row,.workflow-check-row){font-size:18px!important}
+:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog) h2{font-size:26px!important}
+:root[data-app-theme=arcade] #mds-app .entry-v2-top{flex-wrap:wrap}
+:root[data-app-theme=arcade] #mds-app .totals-hero-meta{flex-wrap:wrap;gap:8px}
