@@ -3,7 +3,7 @@
 :root[data-app-theme=paper]{--bg:#f5f6f8;--surface:#fff;--surface2:#eef2f7;--surface3:#e4eaf2;--border:#dce2e9;--border2:#a7b5c8;--accent:#245dcc;--accent-hi:#194cae;--accent-dim:#eaf0fc;--accent-border:#adc2ed;--accent-glow:#245dcc20;--text:#18273a;--text2:#46576c;--subtext:#637287;--on-accent:#fff;color-scheme:light}
 :root[data-app-theme=navy]{--bg:#0c1728;--surface:#14243b;--surface2:#1c3050;--surface3:#243b5f;--border:#30435e;--border2:#506d94;--accent:#95b8ff;--accent-hi:#b6cfff;--accent-dim:#243b5f;--accent-border:#557cb6;--accent-glow:#95b8ff30;--text:#ecf2fb;--text2:#bfd0e9;--subtext:#a0b2cc;--on-accent:#102347}
 :root[data-app-theme=sand]{--bg:#f2eee5;--surface:#fffcf6;--surface2:#f2f0e6;--surface3:#e9efdf;--border:#dadccd;--border2:#9eaa8f;--accent:#486345;--accent-hi:#314e30;--accent-dim:#e9efdf;--accent-border:#acbfa1;--accent-glow:#48634520;--text:#333c30;--text2:#4e5b47;--subtext:#69735f;--on-accent:#fff;color-scheme:light}
-:root[data-app-theme=arcade]{--bg:#17152c;--surface:#24203f;--surface2:#343450;--surface3:#403957;--border:#71648d;--border2:#9a88b9;--accent:#a8f06b;--accent-hi:#cbff95;--accent-dim:#343450;--accent-border:#819f59;--accent-glow:#a8f06b25;--text:#f6f2ff;--text2:#dbd2ef;--subtext:#c3bbdf;--on-accent:#16220e;--radius:0px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]){--bg:#17152c;--surface:#24203f;--surface2:#343450;--surface3:#403957;--border:#71648d;--border2:#9a88b9;--accent:#a8f06b;--accent-hi:#cbff95;--accent-dim:#343450;--accent-border:#819f59;--accent-glow:#a8f06b25;--text:#f6f2ff;--text2:#dbd2ef;--subtext:#c3bbdf;--on-accent:#16220e;--radius:0px}
 body{background:var(--bg)!important;color:var(--text)!important;padding-bottom:40px!important}
 #mds-app{max-width:1180px;margin:0 auto;padding:0 16px}
 :root[data-app-view=phone] #mds-app{max-width:440px}
@@ -49,26 +49,26 @@ body:has(#loginScreen:not(.hidden)) #mds-app>header,body:has(#loginScreen:not(.h
 @media(max-width:639px){#mds-app{padding:0 10px}.qs-stages{grid-template-columns:1fr 1fr!important}}
 :root[data-app-view=phone] .qs-stages{grid-template-columns:1fr 1fr!important}
 :root[data-app-view=phone][data-app-layout=focus] .qs-stages{grid-template-columns:1fr!important}
-:root[data-app-theme=arcade] #mds-app .card,:root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app button,:root[data-app-theme=arcade] #mds-app input,:root[data-app-theme=arcade] #mds-app select,:root[data-app-theme=arcade] #mds-app .qs-stage,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .day-pill,:root[data-app-theme=arcade] #mds-app .login-card{border-radius:0!important}
-:root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .card{border:2px solid var(--border)!important;box-shadow:4px 4px 0 var(--surface2)}
-:root[data-app-theme=arcade] #mds-app .qs-title,:root[data-app-theme=arcade] #mds-app .th-value,:root[data-app-theme=arcade] #mds-app .login-title,:root[data-app-theme=arcade] #mds-app h2{font-family:VT323,'Courier New',monospace!important;font-size:26px!important;letter-spacing:normal!important;color:#ffe58a!important}
-:root[data-app-theme=arcade] #mds-app .header-company{font-family:VT323,'Courier New',monospace!important;font-size:20px!important;letter-spacing:normal!important;color:#ffe58a!important}
-:root[data-app-theme=arcade] #mds-app .btn-primary{box-shadow:3px 3px 0 #60863e!important}
-:root[data-app-theme=arcade] #mds-app .btn-primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #60863e!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .card,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .quickstart,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app button,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app input,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app select,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .qs-stage,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .totals-hero,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .day-pill,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .login-card{border-radius:0!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .quickstart,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .totals-hero,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .card{border:2px solid var(--border)!important;box-shadow:4px 4px 0 var(--surface2)}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .qs-title,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .th-value,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .login-title,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app h2{font-family:VT323,'Courier New',monospace!important;font-size:26px!important;letter-spacing:normal!important;color:#ffe58a!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .header-company{font-family:VT323,'Courier New',monospace!important;font-size:20px!important;letter-spacing:normal!important;color:#ffe58a!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .btn-primary{box-shadow:3px 3px 0 #60863e!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .btn-primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #60863e!important}
 #mds-app .entry-v2,#mds-app .preview-hero,#mds-app .holiday-allowance-card{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)}
 #mds-app .etime,#mds-app .preview-stat{background:var(--surface2)!important;color:var(--text)}
 #mds-app .etime-val{color:var(--text)!important}
 #mds-app .totals-hero-box.net,#mds-app .draft-status{background:var(--accent-dim)!important;border-color:var(--accent-border)!important}
 body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
-:root[data-app-theme=arcade] #mds-app .entry-v2,:root[data-app-theme=arcade] #mds-app .etime,:root[data-app-theme=arcade] #mds-app .preview-hero{border-radius:0!important}
-:root[data-app-theme=arcade] #mds-app .totals-hero-box,:root[data-app-theme=arcade] #mds-app .week-ending-bar,:root[data-app-theme=arcade] #mds-app .day-strip{border-radius:0!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .entry-v2,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .etime,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .preview-hero{border-radius:0!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .totals-hero-box,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .week-ending-bar,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .day-strip{border-radius:0!important}
 #app-theme-button{padding:8px 10px;min-height:44px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);font-family:inherit;font-weight:600;font-size:12px;cursor:pointer;flex-shrink:0}
 #app-theme-dialog{width:min(420px,calc(100% - 32px));max-height:80vh;overflow:auto;margin:auto;padding:22px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font-family:inherit;box-shadow:0 18px 60px #0005}
 #app-theme-dialog::backdrop{background:#0008}.theme-dialog-head{display:flex;gap:16px;justify-content:space-between;align-items:center;margin-bottom:18px}.theme-dialog-head h2{font-size:18px;margin:0}.theme-dialog-head button{padding:9px 12px;border:1px solid var(--border2);border-radius:7px;background:var(--surface2);color:var(--text);cursor:pointer}
 .app-theme-options{display:grid;gap:10px}.app-theme-options button{display:flex;align-items:center;gap:12px;min-height:48px;padding:12px;border:1px solid var(--border2);border-radius:8px;font:inherit;text-align:left;background:var(--surface2);color:var(--text);cursor:pointer}.app-theme-options button[aria-pressed=true]{border:2px solid var(--accent);background:var(--accent-dim);font-weight:700}.theme-colour{width:22px;height:22px;border-radius:4px;flex-shrink:0;background:#70e39d}.app-theme-options [data-theme=paper] .theme-colour{background:#245dcc}.app-theme-options [data-theme=navy] .theme-colour{background:#95b8ff}.app-theme-options [data-theme=sand] .theme-colour{background:#486345}.app-theme-options [data-theme=arcade] .theme-colour{background:#a8f06b;border-radius:0}
 .next-step-block{margin:16px 0}.next-step-block .btn{width:100%;min-height:54px;font-size:16px!important}.next-step-block .btn:disabled{opacity:.5;cursor:default}.next-step-block p{font-size:12px;line-height:1.5;color:var(--subtext);margin:8px 0 0}.next-step-block #next-step-error{color:var(--danger)}.next-step-block #next-step-error:empty{display:none}
 .mds-day{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:10px 0;overflow:hidden}.mds-day summary{padding:14px;cursor:pointer;min-height:48px;color:var(--text);font-size:13px}.mds-day-title{font-weight:700}.mds-day-info{display:block;font-size:11px;color:var(--subtext);margin:5px 0 0 17px}.mds-day[open] summary{border-bottom:1px solid var(--border)}.mds-day-entries{padding:10px}.mds-day-entries .entry-v2:last-child{margin-bottom:0}
-:root[data-app-theme=arcade] .mds-day,:root[data-app-theme=arcade] #app-theme-dialog,:root[data-app-theme=arcade] .app-theme-options button{border-radius:0}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .mds-day,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #app-theme-dialog,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .app-theme-options button{border-radius:0}
 @media(max-width:440px){#mds-app header{padding:10px 6px!important;gap:6px!important}#mds-app .header-status{max-width:70px;overflow:hidden;font-size:9px!important}#mds-app .section-select-wrap select{max-width:132px;font-size:15px!important}#mds-app .logout-btn{padding:8px!important;font-size:9px!important}#app-theme-button{padding:8px;font-size:11px}.mds-day summary{padding:12px}}
 :root[data-app-view=phone] #mds-app .header-status{display:none}
 :root[data-app-view=phone] #mds-app .section-select-wrap select{max-width:150px;font-size:16px!important}
@@ -78,7 +78,7 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 .appearance-layout-controls select{min-height:44px;width:100%;padding:10px 12px;font:inherit;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text)}
 #widget-import-dialog{max-width:440px;width:calc(100% - 32px);max-height:85vh;overflow:auto;margin:auto;padding:24px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font-family:inherit}
 #widget-import-dialog::backdrop{background:#0008}#widget-import-dialog h2{font-size:20px;margin:0 0 16px}#widget-import-dialog p{font-size:14px;line-height:1.5;margin:10px 0}#widget-import-dialog button{min-height:44px;padding:10px 16px;margin:10px 8px 0 0;background:var(--accent);color:var(--on-accent);border:0;border-radius:6px;font:inherit;cursor:pointer}
-:root[data-app-theme=arcade] .appearance-layout-controls select{border-radius:0}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .appearance-layout-controls select{border-radius:0}
 
 #mds-app .week-ending-bar{gap:8px;flex-wrap:wrap}
 #mds-app #weekThisWeek{min-height:40px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
@@ -95,15 +95,15 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 .workflow-week-row button,.workflow-check-row button{flex-shrink:0}
 .entry-undo-bar{position:fixed;z-index:9999;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;max-width:calc(100% - 24px);box-sizing:border-box;padding:10px 14px;border:1px solid var(--accent);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:0 6px 30px #0006;font-size:13px}.entry-undo-bar[hidden]{display:none}
 .workflow-export-checks p{font-size:13px;line-height:1.5;color:var(--subtext)}
-:root[data-app-theme=arcade] .workflow-dialog,:root[data-app-theme=arcade] .workflow-actions button,:root[data-app-theme=arcade] .workflow-dialog button,:root[data-app-theme=arcade] .entry-undo-bar{border-radius:0}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .workflow-dialog,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .workflow-actions button,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .workflow-dialog button,:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .entry-undo-bar{border-radius:0}
 
 /* Keep one regular pixel style across every arcade-theme surface. */
-:root[data-app-theme=arcade] :is(body, body *, #mds-app, #mds-app *),
-:root[data-app-theme=arcade] :is(body *, #mds-app *)::before,
-:root[data-app-theme=arcade] :is(body *, #mds-app *)::after,
-:root[data-app-theme=arcade] input::placeholder,
-:root[data-app-theme=arcade] textarea::placeholder,
-:root[data-app-theme=arcade] input::-webkit-datetime-edit{
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(body, body *, #mds-app, #mds-app *),
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(body *, #mds-app *)::before,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(body *, #mds-app *)::after,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) input::placeholder,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) textarea::placeholder,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) input::-webkit-datetime-edit{
  font-family:VT323,'Courier New',monospace!important;
  font-weight:400!important;
  font-style:normal!important;
@@ -112,15 +112,28 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 }
 
 /* Larger arcade type keeps the narrow pixel glyphs readable on a phone. */
-:root[data-app-theme=arcade] body{font-size:18px}
-:root[data-app-theme=arcade] #mds-app :is(button,input,select,textarea,label,p,.week-ending-bar,.mds-day summary,.mds-day-info,.totals-hero-meta,.entry-v2-date,.empty-entries,.remember-details,.day-filter-banner,.summary-row,.van-item-label,.pay-hist-week,.pay-hist-vals){font-size:18px!important}
-:root[data-app-theme=arcade] #mds-app :is(.dp-name,.dp-hrs,.we-label,.th-label,.totals-hero-label,.qs-stage-label,.qs-sec,.entries-section-title,.etime-lbl,.chip,.ttchip,.draft-status,.header-status,.logout-btn){font-size:16px!important}
-:root[data-app-theme=arcade] #mds-app :is(.dp-num,.etime-val,.qs-clock){font-size:22px!important}
-:root[data-app-theme=arcade] #mds-app .qs-stage-val{font-size:24px!important}
-:root[data-app-theme=arcade] #mds-app :is(.qs-title,.th-value,.login-title,h2){font-size:28px!important}
-:root[data-app-theme=arcade] #mds-app .section-select-wrap select{font-size:20px!important}
-:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar){font-size:18px}
-:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar) :is(button,select,p,label,.workflow-week-row,.workflow-check-row){font-size:18px!important}
-:root[data-app-theme=arcade] :is(#app-theme-dialog,.workflow-dialog) h2{font-size:26px!important}
-:root[data-app-theme=arcade] #mds-app .entry-v2-top{flex-wrap:wrap}
-:root[data-app-theme=arcade] #mds-app .totals-hero-meta{flex-wrap:wrap;gap:8px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) body{font-size:18px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(button,input,select,textarea,label,p,.week-ending-bar,.mds-day summary,.mds-day-info,.totals-hero-meta,.entry-v2-date,.empty-entries,.remember-details,.day-filter-banner,.summary-row,.van-item-label,.pay-hist-week,.pay-hist-vals){font-size:18px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(.dp-name,.dp-hrs,.we-label,.th-label,.totals-hero-label,.qs-stage-label,.qs-sec,.entries-section-title,.etime-lbl,.chip,.ttchip,.draft-status,.header-status,.logout-btn){font-size:16px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(.dp-num,.etime-val,.qs-clock){font-size:22px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .qs-stage-val{font-size:24px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(.qs-title,.th-value,.login-title,h2){font-size:28px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .section-select-wrap select{font-size:20px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar){font-size:18px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(#app-theme-dialog,.workflow-dialog,.entry-undo-bar) :is(button,select,p,label,.workflow-week-row,.workflow-check-row){font-size:18px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(#app-theme-dialog,.workflow-dialog) h2{font-size:26px!important}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .entry-v2-top{flex-wrap:wrap}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .totals-hero-meta{flex-wrap:wrap;gap:8px}
+
+/* Pac-Man maze colours and decorative sprites; form controls stay unobstructed. */
+:root[data-app-theme=pacman]{--bg:#050509;--surface:#0a0b18;--surface2:#111329;--surface3:#181c3c;--border:#344dff;--border2:#7181ff;--accent:#ffe600;--accent-hi:#fff47a;--accent-dim:#252210;--accent-border:#d2b900;--accent-glow:#ffe60025;--text:#fffbe7;--text2:#eee8cd;--subtext:#c9c8e5;--on-accent:#171400}
+.pacman-scene{display:none;pointer-events:none}
+:root[data-app-theme=pacman] .pacman-scene{display:flex;align-items:center;justify-content:space-between;height:46px;margin:0 0 16px;padding:0 10px;border:2px solid #344dff;outline:1px solid #344dff;outline-offset:3px;border-radius:7px;background:radial-gradient(circle,#ffdfb0 2px,transparent 3px) center/18px 18px repeat-x}
+.pacman-scene svg{width:28px;height:28px;flex-shrink:0;background:var(--surface);image-rendering:pixelated}
+.pacman-ghosts{display:flex;gap:8px;background:var(--surface);padding-left:8px}
+:root[data-app-theme=pacman] #mds-app :is(.quickstart,.totals-hero,.card,.entry-v2){border:2px solid #344dff!important;box-shadow:inset 0 0 0 3px var(--surface),inset 0 0 0 4px #2536ba}
+:root[data-app-theme=pacman] #mds-app .qs-title::before{width:12px;height:12px;border-radius:50%;background:#ffe600;clip-path:polygon(0 0,100% 0,50% 50%,100% 100%,0 100%)}
+:root[data-app-theme=pacman] #mds-app .day-pill.active{outline:2px solid #344dff;outline-offset:2px}
+:root[data-app-theme=pacman] #mds-app .qs-stage.stamped{border-color:#ffe600!important}
+:root[data-app-theme=pacman] #mds-app .btn-primary{box-shadow:3px 3px 0 #827400!important}
+:root[data-app-theme=pacman] .app-theme-options [data-theme=pacman] .theme-colour{background:#ffe600;border-radius:50%;clip-path:polygon(0 0,100% 0,50% 50%,100% 100%,0 100%)}
