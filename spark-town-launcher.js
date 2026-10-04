@@ -1,6 +1,8 @@
 (function () {
  'use strict';
  let taps=0,lastTap=0,firstTap=0,dialog=null,returnFocus=null;
+ const arcadeAllowed=()=>['arcade','pacman'].includes(document.documentElement.dataset.appTheme);
+ new MutationObserver(()=>{taps=0;lastTap=0;firstTap=0;if(!arcadeAllowed())closeGame();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-app-theme']});
  function closeGame(){
   if(!dialog)return;
   dialog.close();dialog.remove();dialog=null;
@@ -9,7 +11,7 @@
  }
  let previousOverflow='';
  function openGame(button){
-  if(dialog)return;
+  if(dialog||!arcadeAllowed())return;
   returnFocus=button;previousOverflow=document.documentElement.style.overflow;
   dialog=document.createElement('dialog');dialog.id='spark-town-easter-egg';
   dialog.setAttribute('aria-label','Secret arcade game picker');
@@ -25,7 +27,7 @@
   const picker=document.createElement('div');picker.style.cssText='flex:1;overflow:auto;padding:24px 18px;background:#101a2e;color:#edf3dd;font:22px monospace;';
   const heading=document.createElement('h2');heading.textContent='Secret arcade unlocked';heading.style.cssText='font:30px monospace;margin:0 0 10px;color:#ffda68;';
   const intro=document.createElement('p');intro.textContent='Choose your game.';intro.style.cssText='font:18px monospace;margin:0 0 24px;';picker.append(heading,intro);
-  for(const game of [{name:'Spark Town',description:'Explore with the crew. Clean the van, solve wiring puzzles and find Cody’s lunch.',path:'spark-town.html?v=59'},{name:'Cody’s Snackagotchi',description:'Feed passenger Cody. Throw burgers, fries and chicken into his mouth and watch him grow.',path:'cody-snackagotchi.html?v=59'}]){
+  for(const game of [{name:'Spark Town',description:'Explore with the crew. Clean the van, solve wiring puzzles and find Cody’s lunch.',path:'spark-town.html?v=60'},{name:'Cody’s Snackagotchi',description:'Feed passenger Cody. Throw burgers, fries and chicken into his mouth and watch him grow.',path:'cody-snackagotchi.html?v=60'}]){
    const card=document.createElement('button');card.type='button';card.setAttribute('aria-label',game.name);card.style.cssText='display:block;width:100%;max-width:560px;margin:0 auto 18px;padding:20px;text-align:left;border:3px solid #8aa877;background:#eaf0d5;color:#263a3d;cursor:pointer;';
    const label=document.createElement('strong');label.textContent=game.name;label.style.cssText='display:block;font:26px monospace;margin-bottom:12px;';
    const description=document.createElement('span');description.textContent=game.description;description.style.cssText='font:18px monospace;line-height:1.5;display:block;';card.append(label,description);picker.append(card);
@@ -39,6 +41,7 @@
  document.addEventListener('click',event=>{
   const button=event.target.closest?.('#ts-tabs button');
   if(!button||!button.getAttribute('onclick')?.includes("showPage('breaks'"))return;
+  if(!arcadeAllowed()){taps=0;lastTap=0;firstTap=0;return;}
   const now=performance.now();
   if(now-lastTap>1500||now-firstTap>6000){taps=0;firstTap=now;}
   lastTap=now;taps++;
