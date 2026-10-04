@@ -1,4 +1,4 @@
-.driver-avatar{width:24px;height:30px;flex-shrink:0;display:inline-block;vertical-align:middle;shape-rendering:crispEdges;image-rendering:pixelated}
+.driver-avatar{width:24px;height:30px;flex-shrink:0;display:none;vertical-align:middle;shape-rendering:crispEdges;image-rendering:pixelated}
 #mds-app .driver-character-select{width:100%;min-height:48px;display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;font-size:16px;text-align:left;cursor:pointer}
 .driver-character-select::after{content:'▾';margin-left:auto;color:var(--subtext)}
 #mds-app .driver-character-select + select[hidden]{display:none!important}
@@ -18,3 +18,5 @@
 
 .driver-avatar-portrait{width:32px;height:32px;object-fit:contain}
 .chip-drv .driver-avatar-portrait{width:22px;height:22px}
+
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .driver-avatar{display:inline-block}
