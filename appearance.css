@@ -1,0 +1,80 @@
+@font-face{font-family:VT323;src:url('./fonts/vt323.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+:root{--bg:#101513;--surface:#1a211d;--surface2:#222d26;--surface3:#29392e;--card:var(--surface);--border:#344239;--border2:#4e6154;--accent:#70e39d;--accent-hi:#9cf4bc;--accent-dim:#243d2d;--accent-border:#467b56;--accent-glow:#70e39d30;--text:#edf5ef;--text2:#b8c7bd;--subtext:#a4b3a9;--on-accent:#092918;--radius:14px;color-scheme:dark}
+:root[data-app-theme=paper]{--bg:#f5f6f8;--surface:#fff;--surface2:#eef2f7;--surface3:#e4eaf2;--border:#dce2e9;--border2:#a7b5c8;--accent:#245dcc;--accent-hi:#194cae;--accent-dim:#eaf0fc;--accent-border:#adc2ed;--accent-glow:#245dcc20;--text:#18273a;--text2:#46576c;--subtext:#637287;--on-accent:#fff;color-scheme:light}
+:root[data-app-theme=navy]{--bg:#0c1728;--surface:#14243b;--surface2:#1c3050;--surface3:#243b5f;--border:#30435e;--border2:#506d94;--accent:#95b8ff;--accent-hi:#b6cfff;--accent-dim:#243b5f;--accent-border:#557cb6;--accent-glow:#95b8ff30;--text:#ecf2fb;--text2:#bfd0e9;--subtext:#a0b2cc;--on-accent:#102347}
+:root[data-app-theme=sand]{--bg:#f2eee5;--surface:#fffcf6;--surface2:#f2f0e6;--surface3:#e9efdf;--border:#dadccd;--border2:#9eaa8f;--accent:#486345;--accent-hi:#314e30;--accent-dim:#e9efdf;--accent-border:#acbfa1;--accent-glow:#48634520;--text:#333c30;--text2:#4e5b47;--subtext:#69735f;--on-accent:#fff;color-scheme:light}
+:root[data-app-theme=arcade]{--bg:#17152c;--surface:#24203f;--surface2:#343450;--surface3:#403957;--border:#71648d;--border2:#9a88b9;--accent:#a8f06b;--accent-hi:#cbff95;--accent-dim:#343450;--accent-border:#819f59;--accent-glow:#a8f06b25;--text:#f6f2ff;--text2:#dbd2ef;--subtext:#c3bbdf;--on-accent:#16220e;--radius:0px}
+body{background:var(--bg)!important;color:var(--text)!important;padding-bottom:40px!important}
+#mds-app{max-width:1180px;margin:0 auto;padding:0 16px}
+:root[data-app-view=phone] #mds-app{max-width:440px}
+:root[data-app-view=unfolded] #mds-app{max-width:900px}
+#mds-app header,#mds-app .tabs{background:var(--bg)!important;position:relative!important;top:auto!important;backdrop-filter:none!important}
+#mds-app .card,#mds-app .quickstart,#mds-app .totals-hero,#mds-app .login-card,#mds-app .entry-card,#mds-app .day-card,#mds-app .export-summary,#mds-app .break-card{background:var(--surface)!important;color:var(--text);border-color:var(--border)!important;box-shadow:none}
+#mds-app .qs-stage,#mds-app .day-pill,#mds-app .we-val,#mds-app .entry-row{background:var(--surface2)!important;border-color:var(--border)!important;color:var(--text)}
+#mds-app input:not([type=checkbox]):not([type=radio]),#mds-app select:not(#sectionSelect),#mds-app textarea{background:var(--surface2)!important;border-color:var(--border2)!important;color:var(--text)!important;color-scheme:inherit;font-size:16px}
+#mds-app .btn-primary,#mds-app .tab.active,#mds-app .day-pill.active{background:var(--accent)!important;color:var(--on-accent)!important;border-color:var(--accent)!important}
+#mds-app .qs-stage.stamped{background:var(--accent-dim)!important;border-color:var(--accent-border)!important}
+#mds-app .qs-stage-val,#mds-app .th-value{color:var(--accent)!important}
+#mds-app #loginScreen{position:relative!important;inset:auto!important;min-height:70vh;background:var(--bg)!important;z-index:auto!important;padding:40px 16px!important}
+body:has(#loginScreen:not(.hidden)) #mds-app>header,body:has(#loginScreen:not(.hidden)) #mds-app>.tabs,body:has(#loginScreen:not(.hidden)) #mds-app>.page{display:none!important}
+.mds-overview{min-width:0}.mds-replacement>.quickstart{min-width:0}
+#mds-app #page-log .mds-replacement{display:grid}
+#mds-app #page-log.active{display:block!important}
+#mds-app .page{padding:18px 0}.mds-replacement{display:grid;grid-template-columns:1fr;gap:16px}.mds-replacement>.week-ending-bar,.mds-replacement>.day-strip{margin-bottom:0}.mds-replacement>.quickstart{margin:0}.mds-overview .totals-hero{margin-bottom:16px}
+:root[data-app-layout=focus] .qs-stages{grid-template-columns:1fr!important;gap:10px!important}
+:root[data-app-layout=focus] .qs-stage{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding:14px 18px!important}
+:root[data-app-layout=focus] .qs-stage-val{font-size:28px!important;margin:0!important}
+:root[data-app-layout=focus] .qs-stage-label{font-size:12px!important}
+:root[data-app-layout=compact] #mds-app .quickstart{padding:14px!important}
+:root[data-app-layout=compact] #mds-app .qs-stage{padding:10px!important;min-height:65px}
+:root[data-app-layout=compact] #mds-app .qs-meta-row{gap:8px!important}
+:root[data-app-layout=compact] #mds-app .field{margin-bottom:8px!important}
+:root[data-app-layout=compact] #mds-app .day-pill{padding:7px!important}
+:root[data-app-layout=compact] #mds-app .card{padding:14px!important}
+@media(min-width:900px){
+ :root[data-app-layout=dashboard]:not([data-app-view=phone]) .mds-replacement{grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr)}
+ :root[data-app-layout=dashboard]:not([data-app-view=phone]) .mds-replacement>.week-ending-bar,:root[data-app-layout=dashboard]:not([data-app-view=phone]) .mds-replacement>.day-strip{grid-column:1/-1}
+}
+@media(min-width:640px){
+ :root[data-app-view=unfolded] .mds-replacement{grid-template-columns:minmax(0,1.5fr) minmax(190px,1fr);gap:18px}
+ :root[data-app-view=unfolded] .mds-replacement>.week-ending-bar,:root[data-app-view=unfolded] .mds-replacement>.day-strip{grid-column:1/-1}
+ :root[data-app-view=unfolded] #mds-app .quickstart{padding:18px!important}
+ :root[data-app-view=unfolded] .qs-stages{grid-template-columns:1fr 1fr!important}
+ :root[data-app-view=unfolded][data-app-layout=focus] .qs-stages{grid-template-columns:1fr!important}
+ :root[data-app-view=unfolded] .totals-hero-grid{grid-template-columns:1fr!important}
+ :root[data-app-view=unfolded] .totals-hero-meta{flex-wrap:wrap;gap:8px}
+ :root[data-app-view=unfolded] .qs-meta-row{grid-template-columns:1fr 1fr!important}
+}
+@media(min-width:700px){:root[data-app-view=auto] .mds-replacement{grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr)}:root[data-app-view=auto] .mds-replacement>.week-ending-bar,:root[data-app-view=auto] .mds-replacement>.day-strip{grid-column:1/-1}:root[data-app-view=auto] .totals-hero-grid{grid-template-columns:1fr!important}}
+@media(max-width:639px){#mds-app{padding:0 10px}.qs-stages{grid-template-columns:1fr 1fr!important}}
+:root[data-app-view=phone] .qs-stages{grid-template-columns:1fr 1fr!important}
+:root[data-app-view=phone][data-app-layout=focus] .qs-stages{grid-template-columns:1fr!important}
+:root[data-app-theme=arcade] #mds-app .card,:root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app button,:root[data-app-theme=arcade] #mds-app input,:root[data-app-theme=arcade] #mds-app select,:root[data-app-theme=arcade] #mds-app .qs-stage,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .day-pill,:root[data-app-theme=arcade] #mds-app .login-card{border-radius:0!important}
+:root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .card{border:2px solid var(--border)!important;box-shadow:4px 4px 0 var(--surface2)}
+:root[data-app-theme=arcade] #mds-app .qs-title,:root[data-app-theme=arcade] #mds-app .th-value,:root[data-app-theme=arcade] #mds-app .login-title,:root[data-app-theme=arcade] #mds-app h2{font-family:VT323,'Courier New',monospace!important;font-size:26px!important;letter-spacing:1px!important;color:#ffe58a!important}
+:root[data-app-theme=arcade] #mds-app .header-company{font-family:VT323,'Courier New',monospace!important;font-size:20px!important;letter-spacing:1px!important;color:#ffe58a!important}
+:root[data-app-theme=arcade] #mds-app .btn-primary{box-shadow:3px 3px 0 #60863e!important}
+:root[data-app-theme=arcade] #mds-app .btn-primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #60863e!important}
+#mds-app .entry-v2,#mds-app .preview-hero,#mds-app .holiday-allowance-card{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)}
+#mds-app .etime,#mds-app .preview-stat{background:var(--surface2)!important;color:var(--text)}
+#mds-app .etime-val{color:var(--text)!important}
+#mds-app .totals-hero-box.net,#mds-app .draft-status{background:var(--accent-dim)!important;border-color:var(--accent-border)!important}
+body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
+:root[data-app-theme=arcade] #mds-app .entry-v2,:root[data-app-theme=arcade] #mds-app .etime,:root[data-app-theme=arcade] #mds-app .preview-hero{border-radius:0!important}
+:root[data-app-theme=arcade] #mds-app .totals-hero-box,:root[data-app-theme=arcade] #mds-app .week-ending-bar,:root[data-app-theme=arcade] #mds-app .day-strip{border-radius:0!important}
+#app-theme-button{padding:8px 10px;min-height:44px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);font-family:inherit;font-weight:600;font-size:12px;cursor:pointer;flex-shrink:0}
+#app-theme-dialog{width:min(420px,calc(100% - 32px));max-height:80vh;overflow:auto;margin:auto;padding:22px;border:1px solid var(--border2);border-radius:14px;background:var(--surface);color:var(--text);font-family:inherit;box-shadow:0 18px 60px #0005}
+#app-theme-dialog::backdrop{background:#0008}.theme-dialog-head{display:flex;gap:16px;justify-content:space-between;align-items:center;margin-bottom:18px}.theme-dialog-head h2{font-size:18px;margin:0}.theme-dialog-head button{padding:9px 12px;border:1px solid var(--border2);border-radius:7px;background:var(--surface2);color:var(--text);cursor:pointer}
+.app-theme-options{display:grid;gap:10px}.app-theme-options button{display:flex;align-items:center;gap:12px;min-height:48px;padding:12px;border:1px solid var(--border2);border-radius:8px;font:inherit;text-align:left;background:var(--surface2);color:var(--text);cursor:pointer}.app-theme-options button[aria-pressed=true]{border:2px solid var(--accent);background:var(--accent-dim);font-weight:700}.theme-colour{width:22px;height:22px;border-radius:4px;flex-shrink:0;background:#70e39d}.app-theme-options [data-theme=paper] .theme-colour{background:#245dcc}.app-theme-options [data-theme=navy] .theme-colour{background:#95b8ff}.app-theme-options [data-theme=sand] .theme-colour{background:#486345}.app-theme-options [data-theme=arcade] .theme-colour{background:#a8f06b;border-radius:0}
+.next-step-block{margin:16px 0}.next-step-block .btn{width:100%;min-height:54px;font-size:16px!important}.next-step-block .btn:disabled{opacity:.5;cursor:default}.next-step-block p{font-size:12px;line-height:1.5;color:var(--subtext);margin:8px 0 0}.next-step-block #next-step-error{color:var(--danger)}.next-step-block #next-step-error:empty{display:none}
+.mds-day{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:10px 0;overflow:hidden}.mds-day summary{padding:14px;cursor:pointer;min-height:48px;color:var(--text);font-size:13px}.mds-day-title{font-weight:700}.mds-day-info{display:block;font-size:11px;color:var(--subtext);margin:5px 0 0 17px}.mds-day[open] summary{border-bottom:1px solid var(--border)}.mds-day-entries{padding:10px}.mds-day-entries .entry-v2:last-child{margin-bottom:0}
+:root[data-app-theme=arcade] .mds-day,:root[data-app-theme=arcade] #app-theme-dialog,:root[data-app-theme=arcade] .app-theme-options button{border-radius:0}
+@media(max-width:440px){#mds-app header{padding:10px 6px!important;gap:6px!important}#mds-app .header-status{max-width:70px;overflow:hidden;font-size:9px!important}#mds-app .section-select-wrap select{max-width:132px;font-size:15px!important}#mds-app .logout-btn{padding:8px!important;font-size:9px!important}#app-theme-button{padding:8px;font-size:11px}.mds-day summary{padding:12px}}
+:root[data-app-view=phone] #mds-app .header-status{display:none}
+:root[data-app-view=phone] #mds-app .section-select-wrap select{max-width:150px;font-size:16px!important}
+@media(max-width:440px){#mds-app .header-status{display:none}}
+.appearance-layout-controls{display:grid;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.appearance-layout-controls label{font-size:12px;color:var(--subtext)}
+.appearance-layout-controls select{min-height:44px;width:100%;padding:10px 12px;font:inherit;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text)}
+:root[data-app-theme=arcade] .appearance-layout-controls select{border-radius:0}
+
