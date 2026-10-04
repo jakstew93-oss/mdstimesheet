@@ -19,7 +19,7 @@
   const title=document.createElement('span');title.textContent='⚡ Spark Town';
   const back=document.createElement('button');back.type='button';back.textContent='Back to timesheet';back.style.cssText='font:18px monospace;border:2px solid #b2cc9a;background:#edf1d3;color:#263a3d;padding:8px 10px;cursor:pointer;';back.onclick=closeGame;
   bar.append(title,back);
-  const frame=document.createElement('iframe');frame.title='Spark Town electrician adventure';frame.src='spark-town.html?v=57';frame.style.cssText='width:100%;flex:1;min-height:0;border:0;background:#d7e7ba;';
+  const frame=document.createElement('iframe');frame.title='Spark Town electrician adventure';frame.src='spark-town.html?v=58';frame.style.cssText='width:100%;flex:1;min-height:0;border:0;background:#d7e7ba;';
   shell.append(bar,frame);dialog.append(shell);document.body.append(dialog);
   dialog.addEventListener('cancel',event=>{event.preventDefault();closeGame()});
   document.documentElement.style.overflow='hidden';dialog.showModal();back.focus();
