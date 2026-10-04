@@ -79,3 +79,7 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 #widget-import-dialog{max-width:440px;width:calc(100% - 32px);max-height:85vh;overflow:auto;margin:auto;padding:24px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font-family:inherit}
 #widget-import-dialog::backdrop{background:#0008}#widget-import-dialog h2{font-size:20px;margin:0 0 16px}#widget-import-dialog p{font-size:14px;line-height:1.5;margin:10px 0}#widget-import-dialog button{min-height:44px;padding:10px 16px;margin:10px 8px 0 0;background:var(--accent);color:var(--on-accent);border:0;border-radius:6px;font:inherit;cursor:pointer}
 :root[data-app-theme=arcade] .appearance-layout-controls select{border-radius:0}
+
+#mds-app .week-ending-bar{gap:8px;flex-wrap:wrap}
+#mds-app #weekThisWeek{min-height:40px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
+#mds-app #weekThisWeek[aria-pressed=true]{border-color:var(--accent)}
