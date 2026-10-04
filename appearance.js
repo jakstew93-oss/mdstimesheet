@@ -82,14 +82,60 @@
  }
  // Only group existing nodes; their IDs, handlers and calculations stay intact.
 
+
+ let pacPrefs={paused:false,sound:false};
+ try{Object.assign(pacPrefs,JSON.parse(store.getItem('mds_pacman_preferences')||'{}'))}catch(_){}
+ let pacAudio=null,pacPopupTimer;
+ function savePacPrefs(){store.setItem('mds_pacman_preferences',JSON.stringify(pacPrefs));syncPacControls()}
+ function syncPacControls(){
+  root.dataset.pacPaused=String(!!pacPrefs.paused);
+  const pause=document.getElementById('pac-pause'),sound=document.getElementById('pac-sound');
+  if(pause){pause.textContent=pacPrefs.paused?'Resume chase':'Pause chase';pause.setAttribute('aria-pressed',String(!!pacPrefs.paused))}
+  if(sound){sound.textContent=pacPrefs.sound?'Sound: on':'Sound: off';sound.setAttribute('aria-pressed',String(!!pacPrefs.sound))}
+ }
+ function pacSound(saved){
+  if(!pacPrefs.sound||root.dataset.appTheme!=='pacman')return;
+  try{
+   const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
+   if(!pacAudio)pacAudio=new Audio();
+   pacAudio.resume().catch(()=>{});
+   const start=pacAudio.currentTime;
+   (saved?[523,659,784]:[440,220]).forEach((frequency,i)=>{
+    const oscillator=pacAudio.createOscillator(),gain=pacAudio.createGain();
+    const at=start+i*.075;oscillator.type='square';oscillator.frequency.value=frequency;
+    gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(.035,at+.008);gain.gain.exponentialRampToValueAtTime(.001,at+.07);
+    oscillator.connect(gain);gain.connect(pacAudio.destination);oscillator.start(at);oscillator.stop(at+.075);
+    oscillator.onended=()=>{oscillator.disconnect();gain.disconnect()};
+   });
+  }catch(_){}
+ }
+ document.addEventListener('mds-entry-saved',()=>{
+  if(root.dataset.appTheme!=='pacman')return;
+  let popup=document.getElementById('pac-save-popup');
+  if(!popup){popup=document.createElement('div');popup.id='pac-save-popup';popup.className='pac-save-popup';popup.setAttribute('role','status');popup.setAttribute('aria-live','polite');document.body.append(popup)}
+  clearTimeout(pacPopupTimer);popup.hidden=false;popup.textContent='+1 entry';
+  popup.classList.remove('celebrate');void popup.offsetWidth;popup.classList.add('celebrate');
+  pacPopupTimer=setTimeout(()=>{popup.hidden=true;popup.textContent=''},1800);pacSound(true);
+ });
+ document.addEventListener('click',event=>{
+  if(!event.target.closest('#next-time-step,.qs-stage'))return;
+  const before=readDraft();
+  // Only play a chomp when the click actually recorded a time.
+  setTimeout(()=>{const after=readDraft();if(stages.some(([key])=>before[key]!==after[key]&&after[key]))pacSound(false)},0);
+ },true);
+ syncPacControls();
  function addPacmanScene(){
   const quick=document.querySelector('.quickstart');
   if(!quick||quick.querySelector('.pacman-scene'))return;
   const scene=document.createElement('div');scene.className='pacman-scene';scene.setAttribute('aria-hidden','true');
   const pac='<svg class="pac-runner" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path class="pac-mouth-open" fill="#ffe600" d="M14 3H11V1H5V2H3V4H1V12H3V14H5V15H11V13H14L8 8Z"/><path class="pac-mouth-closed" fill="#ffe600" d="M5 1H11V2H13V4H15V12H13V14H11V15H5V14H3V12H1V4H3V2H5Z"/><rect x="7" y="3" width="2" height="2" fill="#050509"/></svg>';
-  const ghost=colour=>'<svg class="pac-ghost" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="'+colour+'" d="M5 1H11V2H13V4H15V15H12V13H10V15H6V13H4V15H1V4H3V2H5Z"/><path fill="white" d="M3 5H7V10H3ZM9 5H13V10H9Z"/><path fill="#2536ba" d="M5 7H7V9H5ZM11 7H13V9H11Z"/></svg>';
-  scene.innerHTML='<div class="pacman-track">'+pac+['#ff5055','#ffb8df','#57e3ee','#ffb35c'].map(ghost).join('')+'</div>';
-  quick.prepend(scene);
+  const ghost=colour=>'<svg class="pac-ghost" style="--ghost-colour:'+colour+'" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path class="pac-ghost-body" fill="'+colour+'" d="M5 1H11V2H13V4H15V15H12V13H10V15H6V13H4V15H1V4H3V2H5Z"/><path fill="white" d="M3 5H7V10H3ZM9 5H13V10H9Z"/><path fill="#2536ba" d="M5 7H7V9H5ZM11 7H13V9H11Z"/></svg>';
+  scene.innerHTML='<div class="pacman-track">'+pac+['#ff5055','#ffb8df','#57e3ee','#ffb35c'].map(ghost).join('')+'<span class="pacman-dots"></span><span class="pac-power-pellet"></span></div>';
+  const controls=document.createElement('div');controls.className='pacman-controls';
+  controls.innerHTML='<button type="button" id="pac-pause" aria-label="Pause or resume Pac-Man animation">Pause chase</button><button type="button" id="pac-sound" aria-label="Arcade sounds">Sound: off</button>';
+  quick.prepend(scene,controls);syncPacControls();
+  controls.querySelector('#pac-pause').addEventListener('click',()=>{pacPrefs.paused=!pacPrefs.paused;savePacPrefs()});
+  controls.querySelector('#pac-sound').addEventListener('click',()=>{pacPrefs.sound=!pacPrefs.sound;savePacPrefs();if(pacPrefs.sound)pacSound(false);else if(pacAudio)pacAudio.suspend().catch(()=>{})});
  }
  function arrange(){
   const log=document.querySelector('.mds-replacement');

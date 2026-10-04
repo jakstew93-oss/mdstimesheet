@@ -147,13 +147,13 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 :root[data-app-theme=pacman] .pac-mouth-open{animation:pac-chomp .24s steps(1,end) infinite}
 :root[data-app-theme=pacman] .pac-mouth-closed{animation:pac-chomp .24s steps(1,end) infinite reverse}
 :root[data-app-theme=pacman] .pac-ghost{animation:pac-ghost-travel 8s linear infinite,pac-eaten-1 8s steps(1,end) infinite}
-.pac-ghost:nth-child(2){--from:42%;--from-offset:11.76px;--to:54%;--to-offset:15.12px}
-.pac-ghost:nth-child(3){--from:56%;--from-offset:15.68px;--to:68%;--to-offset:19.04px}
-.pac-ghost:nth-child(4){--from:70%;--from-offset:19.6px;--to:82%;--to-offset:22.96px}
-.pac-ghost:nth-child(5){--from:84%;--from-offset:23.52px;--to:96%;--to-offset:26.88px}
-:root[data-app-theme=pacman] .pac-ghost:nth-child(3){animation-name:pac-ghost-travel,pac-eaten-2}
-:root[data-app-theme=pacman] .pac-ghost:nth-child(4){animation-name:pac-ghost-travel,pac-eaten-3}
-:root[data-app-theme=pacman] .pac-ghost:nth-child(5){animation-name:pac-ghost-travel,pac-eaten-4}
+.pac-ghost:nth-of-type(2){--from:42%;--from-offset:11.76px;--to:54%;--to-offset:15.12px}
+.pac-ghost:nth-of-type(3){--from:56%;--from-offset:15.68px;--to:68%;--to-offset:19.04px}
+.pac-ghost:nth-of-type(4){--from:70%;--from-offset:19.6px;--to:82%;--to-offset:22.96px}
+.pac-ghost:nth-of-type(5){--from:84%;--from-offset:23.52px;--to:96%;--to-offset:26.88px}
+:root[data-app-theme=pacman] .pac-ghost:nth-of-type(3){animation-name:pac-ghost-travel,pac-eaten-2}
+:root[data-app-theme=pacman] .pac-ghost:nth-of-type(4){animation-name:pac-ghost-travel,pac-eaten-3}
+:root[data-app-theme=pacman] .pac-ghost:nth-of-type(5){animation-name:pac-ghost-travel,pac-eaten-4}
 @keyframes pac-chase{0%{left:0;opacity:1}80%{left:calc(100% - 28px);opacity:1}82%,100%{left:calc(100% - 28px);opacity:0}}
 @keyframes pac-ghost-travel{0%{left:calc(var(--from) - var(--from-offset))}80%,100%{left:calc(var(--to) - var(--to-offset))}}
 @keyframes pac-eaten-1{0%{opacity:1}38.2%,100%{opacity:0}}
@@ -165,4 +165,28 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
  :root[data-app-theme=pacman] .pacman-track>svg,:root[data-app-theme=pacman] .pacman-track svg path{animation:none!important}
  .pacman-track .pac-ghost{left:calc(var(--from) - var(--from-offset))}
  .pacman-track .pac-mouth-closed{display:none}
+}
+
+/* Dots and a power pellet share the chase timing. */
+:root[data-app-theme=pacman] .pacman-scene{background:var(--surface)}
+.pacman-dots{position:absolute;inset:0;z-index:0;background:radial-gradient(circle,#ffdfb0 2px,transparent 3px) center/18px 18px repeat-x}
+.pacman-track>svg{z-index:1}
+.pac-power-pellet{position:absolute;left:calc(26% + 6.72px);top:10px;width:8px;height:8px;border-radius:50%;background:#fff3ca;box-shadow:0 0 7px #fff3ca;z-index:1}
+:root[data-app-theme=pacman] .pacman-dots{animation:pac-dots-eaten 8s linear infinite}
+:root[data-app-theme=pacman] .pac-power-pellet{animation:pac-power-eaten 8s steps(1,end) infinite}
+:root[data-app-theme=pacman] .pac-ghost-body{animation:pac-frightened 8s steps(1,end) infinite}
+@keyframes pac-dots-eaten{0%{clip-path:inset(0 0 0 14px)}80%{clip-path:inset(0 0 0 calc(100% - 14px))}82%,100%{clip-path:inset(0 0 0 100%)}}
+@keyframes pac-power-eaten{0%{opacity:1}20.8%,100%{opacity:0}}
+@keyframes pac-frightened{0%{fill:var(--ghost-colour)}20.8%,100%{fill:#354dff}}
+.pacman-controls{display:none}
+:root[data-app-theme=pacman] .pacman-controls{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 16px}
+.pacman-controls button{min-height:44px;padding:8px 12px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer}
+:root[data-pac-paused=true] .pacman-scene,:root[data-pac-paused=true] .pacman-scene *{animation-play-state:paused!important}
+.pac-save-popup{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:10000;pointer-events:none;padding:12px 22px;border:2px solid #ffe600;background:#080a18;color:#ffe600;font:28px VT323,monospace;box-shadow:4px 4px 0 #344dff}
+.pac-save-popup[hidden]{display:none}
+.pac-save-popup.celebrate{animation:pac-save-rise 1.8s ease-out forwards}
+@keyframes pac-save-rise{0%{opacity:0;transform:translate(-50%,12px)}15%,70%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
+@media(prefers-reduced-motion:reduce){
+ :root[data-app-theme=pacman] .pacman-scene *,.pac-save-popup.celebrate{animation:none!important}
+ .pac-power-pellet{opacity:1}.pac-save-popup.celebrate{opacity:1}
 }
