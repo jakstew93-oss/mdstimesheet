@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v54';
+const CACHE_NAME = 'mdsmiths-timesheet-v55';
 const APP_SHELL = [
   './',
   './Index.html',
@@ -17,7 +17,7 @@ const APP_SHELL = [
   './driver-avatars/ash-kemp.png',
   './driver-avatars/martyn-evans.png',
   './driver-avatars/matthew-heath.png',
-  './driver-avatars/luke-chambers.png',
+  './driver-avatars/luke-chambers-v2.png',
   './fonts/vt323.ttf',
   './pdf-lib.min.js',
   './manifest.webmanifest',
