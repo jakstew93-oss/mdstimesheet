@@ -5,7 +5,7 @@
  const selectors={qsDriverSel:'qsDriverOther',driverNameSelect:'driverName',editDriverNameSelect:'editDriverName'};
  const controls=new WeakMap();let currentSelect=null,dialog=null,returnFocus=null;
  function avatar(name){
-  const portraits={'Jak Stewart':'jak-stewart','Cody Slack':'cody-slack'};
+  const portraits={'Jak Stewart':'jak-stewart','Cody Slack':'cody-slack','Ash Kemp':'ash-kemp'};
   if(portraits[name]){
    const image=document.createElement('img');image.src='driver-avatars/'+portraits[name]+'.png';image.alt='';image.className='driver-avatar driver-avatar-portrait';image.setAttribute('aria-hidden','true');return image;
   }
