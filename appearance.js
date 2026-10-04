@@ -60,9 +60,13 @@
   quick.querySelector('.qs-stages').before(block);
   document.getElementById('next-time-step').addEventListener('click',()=>{
    const index=nextStage(),draft=readDraft(),error=document.getElementById('next-step-error');error.textContent='';
+   // Imported overnight timestamps have full dates; their clock times can cross midnight.
+   const captured=draft._widget?.times;
+   const originalCapture=Array.isArray(captured)&&captured.length>0&&captured.every((t,i)=>
+    draft[stages[i]?.[0]]===new Date(t.epochMillis+t.offsetSeconds*1000).toISOString().slice(11,16));
    for(let step=1;step<stages.length;step++){
     const before=draft[stages[step-1][0]],after=draft[stages[step][0]];
-    if(before&&after&&after<before){error.textContent='The recorded times are out of order. Adjust the times below before continuing.';return}
+    if(!originalCapture&&before&&after&&after<before){error.textContent='The recorded times are out of order. Adjust the times below before continuing.';return}
    }
    if(index===-1){document.getElementById('qsSaveBtn').click();updateNextStep();return}
    if(draft.date&&draft.date!==todayISO()){updateNextStep();return}

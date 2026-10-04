@@ -24,6 +24,7 @@
   let pending = null;
   function acceptLink() {
     if (!location.hash.startsWith('#mds-widget=')) return;
+    if (dialog?.open) dialog.close();
     try {
       if (location.hash.length > 6000) throw new Error('Recorded times link is too large.');
       pending = normalise(JSON.parse(decodeURIComponent(location.hash.slice('#mds-widget='.length))));
