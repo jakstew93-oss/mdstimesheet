@@ -15,3 +15,6 @@
 :root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(.driver-character-dialog,.driver-character-option,.driver-character-select,.driver-picker-close){border-radius:0;font-size:18px}
 :root:is([data-app-theme=arcade],[data-app-theme=pacman]) .driver-picker-head h2{font-size:28px}
 @media(max-width:360px){.driver-character-list{grid-template-columns:1fr}}
+
+.driver-avatar-portrait{width:32px;height:32px;object-fit:contain}
+.chip-drv .driver-avatar-portrait{width:22px;height:22px}
