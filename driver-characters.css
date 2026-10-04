@@ -1,0 +1,17 @@
+.driver-avatar{width:24px;height:30px;flex-shrink:0;display:inline-block;vertical-align:middle;shape-rendering:crispEdges;image-rendering:pixelated}
+#mds-app .driver-character-select{width:100%;min-height:48px;display:flex;align-items:center;gap:9px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;font-size:16px;text-align:left;cursor:pointer}
+.driver-character-select::after{content:'▾';margin-left:auto;color:var(--subtext)}
+#mds-app .driver-character-select + select[hidden]{display:none!important}
+.chip-drv{gap:6px}.chip-drv .driver-avatar{width:16px;height:20px}
+.driver-character-dialog{box-sizing:border-box;width:min(440px,calc(100% - 24px));max-height:85dvh;overflow:auto;margin:auto;padding:18px;border:2px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:inherit}
+.driver-character-dialog::backdrop{background:#0009}
+.driver-picker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.driver-picker-head h2{font-size:22px;margin:0}
+.driver-picker-close{min-height:44px;padding:8px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:6px;font:inherit;cursor:pointer}
+.driver-character-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.driver-character-option{display:flex;align-items:center;gap:8px;min-height:54px;padding:9px 10px;border:1px solid var(--border2);border-radius:7px;background:var(--surface2);color:var(--text);font:inherit;font-size:15px;text-align:left;cursor:pointer;overflow-wrap:anywhere}
+.driver-character-option[aria-pressed=true]{background:var(--accent-dim);border:2px solid var(--accent)}
+.driver-character-option:focus-visible,.driver-character-select:focus-visible,.driver-picker-close:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) :is(.driver-character-dialog,.driver-character-option,.driver-character-select,.driver-picker-close){border-radius:0;font-size:18px}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .driver-picker-head h2{font-size:28px}
+@media(max-width:360px){.driver-character-list{grid-template-columns:1fr}}
