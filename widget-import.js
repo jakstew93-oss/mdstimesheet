@@ -54,41 +54,6 @@
     document.body.append(dialog);
     dialog.addEventListener('close',()=>{pending=null;sessionStorage.removeItem(pendingKey)});
   }
-  function showPasteDialog() {
-    ensureDialog();dialog.replaceChildren();
-    const title=document.createElement('h2');title.id='widget-import-title';title.textContent='Import widget times';
-    const info=document.createElement('p');info.textContent='In MDS Quick Log 2, choose Copy times for MDS app. Paste those times here to use them in this app.';
-    const label=document.createElement('label');label.htmlFor='widget-paste-input';label.textContent='Copied widget times';
-    const input=document.createElement('textarea');input.id='widget-paste-input';input.rows=4;input.placeholder='Paste copied times here';
-    const message=document.createElement('p');message.setAttribute('role','status');
-    const paste=document.createElement('button');paste.type='button';paste.textContent='Paste';
-    paste.addEventListener('click',async()=>{
-      try {input.value=await navigator.clipboard.readText();message.textContent='';}
-      catch (_) {message.textContent='Touch and hold the box, then choose Paste.';input.focus();}
-    });
-    const load=document.createElement('button');load.type='button';load.textContent='Check recorded times';
-    load.addEventListener('click',()=>{
-      try {pending=parseRecordedText(input.value);sessionStorage.setItem(pendingKey,JSON.stringify(pending.draft._widget));maybeOpen();}
-      catch (_) {message.textContent='Paste the recorded times copied from MDS Quick Log.';}
-    });
-    const close=document.createElement('button');close.type='button';close.textContent='Close';close.addEventListener('click',()=>dialog.close());
-    dialog.append(title,info,label,input,paste,load,message,close);
-    if(!dialog.open)dialog.showModal();
-  }
-  function addImportButton() {
-    const quick=document.querySelector('.quickstart');
-    if(!quick)return false;
-    if(!document.getElementById('widget-paste-button')) {
-      const button=document.createElement('button');button.id='widget-paste-button';button.type='button';button.textContent='Import widget times';
-      button.addEventListener('click',showPasteDialog);
-      quick.append(button);
-    }
-    return true;
-  }
-  if(!addImportButton()) {
-    const uiObserver=new MutationObserver(()=>{if(addImportButton())uiObserver.disconnect();});
-    uiObserver.observe(document.body,{childList:true,subtree:true});
-  }
   function maybeOpen() {
     if (!pending || !localStorage.getItem('ts_auth_user') || !document.getElementById('loginScreen')?.classList.contains('hidden')) return;
     ensureDialog();
