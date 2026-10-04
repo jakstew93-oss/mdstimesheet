@@ -83,3 +83,16 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 #mds-app .week-ending-bar{gap:8px;flex-wrap:wrap}
 #mds-app #weekThisWeek{min-height:40px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
 #mds-app #weekThisWeek[aria-pressed=true]{border-color:var(--accent)}
+
+.workflow-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+#workflow-week-actions{grid-column:1/-1;margin:0}
+.workflow-actions button,.workflow-dialog button,.entry-undo-bar button{min-height:44px;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
+.remember-details{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--subtext);min-height:44px}
+.remember-details input{width:18px;height:18px;accent-color:var(--accent)}
+.workflow-dialog{max-width:560px;width:calc(100% - 32px);max-height:85dvh;overflow:auto;box-sizing:border-box;margin:auto;padding:20px;border:1px solid var(--border2);border-radius:12px;background:var(--surface);color:var(--text);font:inherit}
+.workflow-dialog::backdrop{background:#0008}.workflow-dialog h2{margin:0 0 12px;font-size:20px}.workflow-dialog p{font-size:14px;line-height:1.5;margin-bottom:12px}.workflow-dialog>button{margin:12px 8px 0 0}
+.workflow-week-row,.workflow-check-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5}
+.workflow-week-row button,.workflow-check-row button{flex-shrink:0}
+.entry-undo-bar{position:fixed;z-index:9999;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;max-width:calc(100% - 24px);box-sizing:border-box;padding:10px 14px;border:1px solid var(--accent);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:0 6px 30px #0006;font-size:13px}.entry-undo-bar[hidden]{display:none}
+.workflow-export-checks p{font-size:13px;line-height:1.5;color:var(--subtext)}
+:root[data-app-theme=arcade] .workflow-dialog,:root[data-app-theme=arcade] .workflow-actions button,:root[data-app-theme=arcade] .workflow-dialog button,:root[data-app-theme=arcade] .entry-undo-bar{border-radius:0}

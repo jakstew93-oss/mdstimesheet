@@ -45,7 +45,8 @@
   const button=document.getElementById('next-time-step'),status=document.getElementById('next-step-status');
   if(!button)return;
   const draft=readDraft(),index=nextStage();
-  const manual=draft.date && draft.date!==todayISO() && index!==-1;
+  const selectedWeek=localStorage.getItem(getWeekKey())||currentWeekEnding();
+  const manual=index!==-1&&((draft.date&&draft.date!==todayISO())||!MDSTools.withinWeek(draft.date||todayISO(),selectedWeek));
   const label=index===-1?'Save entry':stages[index][1];
   if(button.textContent!==label)button.textContent=label;
   button.disabled=!!manual;
