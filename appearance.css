@@ -51,8 +51,8 @@ body:has(#loginScreen:not(.hidden)) #mds-app>header,body:has(#loginScreen:not(.h
 :root[data-app-view=phone][data-app-layout=focus] .qs-stages{grid-template-columns:1fr!important}
 :root[data-app-theme=arcade] #mds-app .card,:root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app button,:root[data-app-theme=arcade] #mds-app input,:root[data-app-theme=arcade] #mds-app select,:root[data-app-theme=arcade] #mds-app .qs-stage,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .day-pill,:root[data-app-theme=arcade] #mds-app .login-card{border-radius:0!important}
 :root[data-app-theme=arcade] #mds-app .quickstart,:root[data-app-theme=arcade] #mds-app .totals-hero,:root[data-app-theme=arcade] #mds-app .card{border:2px solid var(--border)!important;box-shadow:4px 4px 0 var(--surface2)}
-:root[data-app-theme=arcade] #mds-app .qs-title,:root[data-app-theme=arcade] #mds-app .th-value,:root[data-app-theme=arcade] #mds-app .login-title,:root[data-app-theme=arcade] #mds-app h2{font-family:VT323,'Courier New',monospace!important;font-size:26px!important;letter-spacing:1px!important;color:#ffe58a!important}
-:root[data-app-theme=arcade] #mds-app .header-company{font-family:VT323,'Courier New',monospace!important;font-size:20px!important;letter-spacing:1px!important;color:#ffe58a!important}
+:root[data-app-theme=arcade] #mds-app .qs-title,:root[data-app-theme=arcade] #mds-app .th-value,:root[data-app-theme=arcade] #mds-app .login-title,:root[data-app-theme=arcade] #mds-app h2{font-family:VT323,'Courier New',monospace!important;font-size:26px!important;letter-spacing:normal!important;color:#ffe58a!important}
+:root[data-app-theme=arcade] #mds-app .header-company{font-family:VT323,'Courier New',monospace!important;font-size:20px!important;letter-spacing:normal!important;color:#ffe58a!important}
 :root[data-app-theme=arcade] #mds-app .btn-primary{box-shadow:3px 3px 0 #60863e!important}
 :root[data-app-theme=arcade] #mds-app .btn-primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #60863e!important}
 #mds-app .entry-v2,#mds-app .preview-hero,#mds-app .holiday-allowance-card{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)}
@@ -97,13 +97,16 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 .workflow-export-checks p{font-size:13px;line-height:1.5;color:var(--subtext)}
 :root[data-app-theme=arcade] .workflow-dialog,:root[data-app-theme=arcade] .workflow-actions button,:root[data-app-theme=arcade] .workflow-dialog button,:root[data-app-theme=arcade] .entry-undo-bar{border-radius:0}
 
-/* Apply the arcade typeface to every app surface, including portalled dialogs. */
-:root[data-app-theme=arcade] body,
-:root[data-app-theme=arcade] body *,
-:root[data-app-theme=arcade] body *::before,
-:root[data-app-theme=arcade] body *::after,
+/* Keep one regular pixel style across every arcade-theme surface. */
+:root[data-app-theme=arcade] :is(body, body *, #mds-app, #mds-app *),
+:root[data-app-theme=arcade] :is(body *, #mds-app *)::before,
+:root[data-app-theme=arcade] :is(body *, #mds-app *)::after,
 :root[data-app-theme=arcade] input::placeholder,
 :root[data-app-theme=arcade] textarea::placeholder,
 :root[data-app-theme=arcade] input::-webkit-datetime-edit{
  font-family:VT323,'Courier New',monospace!important;
+ font-weight:400!important;
+ font-style:normal!important;
+ font-synthesis:none!important;
+ letter-spacing:normal!important;
 }
