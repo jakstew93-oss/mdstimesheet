@@ -5,8 +5,9 @@
  const selectors={qsDriverSel:'qsDriverOther',driverNameSelect:'driverName',editDriverNameSelect:'editDriverName'};
  const controls=new WeakMap();let currentSelect=null,dialog=null,returnFocus=null;
  function avatar(name){
-  if(name==='Jak Stewart'){
-   const image=document.createElement('img');image.src='driver-avatars/jak-stewart.png';image.alt='';image.className='driver-avatar driver-avatar-portrait';image.setAttribute('aria-hidden','true');return image;
+  const portraits={'Jak Stewart':'jak-stewart','Cody Slack':'cody-slack'};
+  if(portraits[name]){
+   const image=document.createElement('img');image.src='driver-avatars/'+portraits[name]+'.png';image.alt='';image.className='driver-avatar driver-avatar-portrait';image.setAttribute('aria-hidden','true');return image;
   }
   let index=names.indexOf(name);if(index<0)index=Array.from(name||'Driver').reduce((sum,c)=>sum+c.charCodeAt(0),0)%colours.length;
   const colour=colours[index],hat=colours[(index+3)%colours.length];
