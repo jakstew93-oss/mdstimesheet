@@ -83,3 +83,6 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 #mds-app .week-ending-bar{gap:8px;flex-wrap:wrap}
 #mds-app #weekThisWeek{min-height:40px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
 #mds-app #weekThisWeek[aria-pressed=true]{border-color:var(--accent)}
+
+#mds-app #widget-paste-button{min-height:44px;margin-top:12px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit;cursor:pointer}
+#widget-import-dialog textarea{display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:inherit}

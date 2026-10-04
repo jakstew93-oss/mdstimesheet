@@ -19,12 +19,22 @@
     draft._widget = {id:value.id, times};
     return {draft, local};
   }
-  if (typeof module !== 'undefined' && module.exports) { module.exports = {normalise}; return; }
+  function parseRecordedText(text) {
+    let raw = String(text).trim();
+    if (raw.length > 6000) throw new Error('Recorded times are too large.');
+    if (raw.startsWith('MDS-WIDGET:')) raw = raw.slice('MDS-WIDGET:'.length);
+    else if (raw.startsWith('https://')) {
+      const url = new URL(raw);
+      if (url.origin !== 'https://jakstew93-oss.github.io' || !url.pathname.startsWith('/mdstimesheet/') || !url.hash.startsWith('#mds-widget=')) throw new Error('This is not an MDS recorded-times link.');
+      raw = decodeURIComponent(url.hash.slice('#mds-widget='.length));
+    }
+    return normalise(JSON.parse(raw));
+  }
+  if (typeof module !== 'undefined'  && module.exports) { module.exports = {normalise, parseRecordedText}; return; }
   const pendingKey = 'mds_widget_pending_v1';
   let pending = null;
   function acceptLink() {
     if (!location.hash.startsWith('#mds-widget=')) return;
-    if (dialog?.open) dialog.close();
     try {
       if (location.hash.length > 6000) throw new Error('Recorded times link is too large.');
       pending = normalise(JSON.parse(decodeURIComponent(location.hash.slice('#mds-widget='.length))));
@@ -38,13 +48,50 @@
     if(saved) pending = normalise({...saved,version:1});
   } catch (_) { sessionStorage.removeItem(pendingKey); }
   let dialog;
-  function maybeOpen() {
-    if (!pending || dialog?.open || !localStorage.getItem('ts_auth_user') || !document.getElementById('loginScreen')?.classList.contains('hidden')) return;
-    if(!dialog){
-      dialog=document.createElement('dialog');dialog.id='widget-import-dialog';dialog.setAttribute('aria-labelledby','widget-import-title');
-      document.body.append(dialog);
-      dialog.addEventListener('close',()=>{pending=null;sessionStorage.removeItem(pendingKey)});
+  function ensureDialog() {
+    if (dialog) return;
+    dialog=document.createElement('dialog');dialog.id='widget-import-dialog';dialog.setAttribute('aria-labelledby','widget-import-title');
+    document.body.append(dialog);
+    dialog.addEventListener('close',()=>{pending=null;sessionStorage.removeItem(pendingKey)});
+  }
+  function showPasteDialog() {
+    ensureDialog();dialog.replaceChildren();
+    const title=document.createElement('h2');title.id='widget-import-title';title.textContent='Import widget times';
+    const info=document.createElement('p');info.textContent='In MDS Quick Log 2, choose Copy times for MDS app. Paste those times here to use them in this app.';
+    const label=document.createElement('label');label.htmlFor='widget-paste-input';label.textContent='Copied widget times';
+    const input=document.createElement('textarea');input.id='widget-paste-input';input.rows=4;input.placeholder='Paste copied times here';
+    const message=document.createElement('p');message.setAttribute('role','status');
+    const paste=document.createElement('button');paste.type='button';paste.textContent='Paste';
+    paste.addEventListener('click',async()=>{
+      try {input.value=await navigator.clipboard.readText();message.textContent='';}
+      catch (_) {message.textContent='Touch and hold the box, then choose Paste.';input.focus();}
+    });
+    const load=document.createElement('button');load.type='button';load.textContent='Check recorded times';
+    load.addEventListener('click',()=>{
+      try {pending=parseRecordedText(input.value);sessionStorage.setItem(pendingKey,JSON.stringify(pending.draft._widget));maybeOpen();}
+      catch (_) {message.textContent='Paste the recorded times copied from MDS Quick Log.';}
+    });
+    const close=document.createElement('button');close.type='button';close.textContent='Close';close.addEventListener('click',()=>dialog.close());
+    dialog.append(title,info,label,input,paste,load,message,close);
+    if(!dialog.open)dialog.showModal();
+  }
+  function addImportButton() {
+    const quick=document.querySelector('.quickstart');
+    if(!quick)return false;
+    if(!document.getElementById('widget-paste-button')) {
+      const button=document.createElement('button');button.id='widget-paste-button';button.type='button';button.textContent='Import widget times';
+      button.addEventListener('click',showPasteDialog);
+      quick.append(button);
     }
+    return true;
+  }
+  if(!addImportButton()) {
+    const uiObserver=new MutationObserver(()=>{if(addImportButton())uiObserver.disconnect();});
+    uiObserver.observe(document.body,{childList:true,subtree:true});
+  }
+  function maybeOpen() {
+    if (!pending || !localStorage.getItem('ts_auth_user') || !document.getElementById('loginScreen')?.classList.contains('hidden')) return;
+    ensureDialog();
     dialog.replaceChildren();
     const title=document.createElement('h2');title.id='widget-import-title';title.textContent='Recorded widget times';dialog.append(title);
     const info=document.createElement('p');info.textContent=pending.error||'Add these times to '+localStorage.getItem('ts_auth_user')+'’s quick entry. Original tap timestamps are kept; the timesheet displays hours and minutes.';dialog.append(info);
@@ -70,7 +117,7 @@
       dialog.append(use,message);
     }
     const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Close';cancel.addEventListener('click',()=>dialog.close());dialog.append(cancel);
-    dialog.showModal();
+    if (!dialog.open) dialog.showModal();
   }
   window.addEventListener('hashchange',acceptLink);
   const login=document.getElementById('loginScreen');

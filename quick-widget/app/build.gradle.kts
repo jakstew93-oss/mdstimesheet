@@ -4,11 +4,11 @@ android {
     namespace = "com.jak.mdsquickwidget"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.jak.mdsquickwidget"
+        applicationId = "com.jak.mdsquickwidget.installed"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.4-quick-button"
+        versionCode = 6
+        versionName = "1.5-installed-app"
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }

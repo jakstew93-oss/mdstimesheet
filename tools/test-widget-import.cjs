@@ -21,3 +21,13 @@ test('rejects malformed and reversed capture data',()=>{
  {version:1,id:'a',times:[{...time,offsetSeconds:99999}]},
  {version:1,id:'a',times:[time,{...time,epochMillis:time.epochMillis-1}]}])assert.throws(()=>normalise(payload));
 });
+
+test('clipboard import accepts copied widget data and the original link',()=>{
+ const {parseRecordedText}=require('../widget-import.js');
+ const value={version:1,id:'copied-times',times:[{epochMillis:1791113696789,offsetSeconds:3600}]};
+ const json=JSON.stringify(value);
+ assert.deepEqual(parseRecordedText('MDS-WIDGET:'+json),normalise(value));
+ assert.deepEqual(parseRecordedText('https://jakstew93-oss.github.io/mdstimesheet/#mds-widget='+encodeURIComponent(json)),normalise(value));
+ assert.throws(()=>parseRecordedText('https://other.example/#mds-widget='+encodeURIComponent(json)));
+ assert.throws(()=>parseRecordedText('not recorded times'));
+});
