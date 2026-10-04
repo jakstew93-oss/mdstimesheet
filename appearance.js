@@ -86,9 +86,9 @@
   const quick=document.querySelector('.quickstart');
   if(!quick||quick.querySelector('.pacman-scene'))return;
   const scene=document.createElement('div');scene.className='pacman-scene';scene.setAttribute('aria-hidden','true');
-  const pac='<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="#ffe600" d="M14 3H11V1H5V2H3V4H1V12H3V14H5V15H11V13H14L8 8Z"/><rect x="7" y="3" width="2" height="2" fill="#050509"/></svg>';
-  const ghost=colour=>'<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="'+colour+'" d="M5 1H11V2H13V4H15V15H12V13H10V15H6V13H4V15H1V4H3V2H5Z"/><path fill="white" d="M3 5H7V10H3ZM9 5H13V10H9Z"/><path fill="#2536ba" d="M5 7H7V9H5ZM11 7H13V9H11Z"/></svg>';
-  scene.innerHTML=pac+'<span class="pacman-ghosts">'+['#ff5055','#ffb8df','#57e3ee','#ffb35c'].map(ghost).join('')+'</span>';
+  const pac='<svg class="pac-runner" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path class="pac-mouth-open" fill="#ffe600" d="M14 3H11V1H5V2H3V4H1V12H3V14H5V15H11V13H14L8 8Z"/><path class="pac-mouth-closed" fill="#ffe600" d="M5 1H11V2H13V4H15V12H13V14H11V15H5V14H3V12H1V4H3V2H5Z"/><rect x="7" y="3" width="2" height="2" fill="#050509"/></svg>';
+  const ghost=colour=>'<svg class="pac-ghost" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="'+colour+'" d="M5 1H11V2H13V4H15V15H12V13H10V15H6V13H4V15H1V4H3V2H5Z"/><path fill="white" d="M3 5H7V10H3ZM9 5H13V10H9Z"/><path fill="#2536ba" d="M5 7H7V9H5ZM11 7H13V9H11Z"/></svg>';
+  scene.innerHTML='<div class="pacman-track">'+pac+['#ff5055','#ffb8df','#57e3ee','#ffb35c'].map(ghost).join('')+'</div>';
   quick.prepend(scene);
  }
  function arrange(){
