@@ -96,3 +96,14 @@ body:has(#loginScreen:not(.hidden)) #mds-app .page{display:none!important}
 .entry-undo-bar{position:fixed;z-index:9999;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;max-width:calc(100% - 24px);box-sizing:border-box;padding:10px 14px;border:1px solid var(--accent);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:0 6px 30px #0006;font-size:13px}.entry-undo-bar[hidden]{display:none}
 .workflow-export-checks p{font-size:13px;line-height:1.5;color:var(--subtext)}
 :root[data-app-theme=arcade] .workflow-dialog,:root[data-app-theme=arcade] .workflow-actions button,:root[data-app-theme=arcade] .workflow-dialog button,:root[data-app-theme=arcade] .entry-undo-bar{border-radius:0}
+
+/* Apply the arcade typeface to every app surface, including portalled dialogs. */
+:root[data-app-theme=arcade] body,
+:root[data-app-theme=arcade] body *,
+:root[data-app-theme=arcade] body *::before,
+:root[data-app-theme=arcade] body *::after,
+:root[data-app-theme=arcade] input::placeholder,
+:root[data-app-theme=arcade] textarea::placeholder,
+:root[data-app-theme=arcade] input::-webkit-datetime-edit{
+ font-family:VT323,'Courier New',monospace!important;
+}
