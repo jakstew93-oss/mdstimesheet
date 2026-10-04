@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v55';
+const CACHE_NAME = 'mdsmiths-timesheet-v56';
 const APP_SHELL = [
   './',
   './Index.html',
@@ -12,12 +12,12 @@ const APP_SHELL = [
   './workflow-ui.js?v=51',
   './driver-characters.css?v=51',
   './driver-characters.js?v=51',
-  './driver-avatars/jak-stewart-v2.png',
-  './driver-avatars/cody-slack.png',
-  './driver-avatars/ash-kemp.png',
+  './driver-avatars/jak-stewart-black-shirt.png',
+  './driver-avatars/cody-slack-black-shirt.png',
+  './driver-avatars/ash-kemp-black-shirt.png',
   './driver-avatars/martyn-evans.png',
-  './driver-avatars/matthew-heath.png',
-  './driver-avatars/luke-chambers-v2.png',
+  './driver-avatars/matthew-heath-black-shirt.png',
+  './driver-avatars/luke-chambers-black-shirt.png',
   './fonts/vt323.ttf',
   './pdf-lib.min.js',
   './manifest.webmanifest',

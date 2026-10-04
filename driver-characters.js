@@ -5,16 +5,16 @@
  const selectors={qsDriverSel:'qsDriverOther',driverNameSelect:'driverName',editDriverNameSelect:'editDriverName'};
  const controls=new WeakMap();let currentSelect=null,dialog=null,returnFocus=null;
  function avatar(name){
-  const portraits={'Jak Stewart':'jak-stewart-v2','Cody Slack':'cody-slack','Ash Kemp':'ash-kemp','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath','Luke Chambers':'luke-chambers-v2'};
+  const portraits={'Jak Stewart':'jak-stewart-black-shirt','Cody Slack':'cody-slack-black-shirt','Ash Kemp':'ash-kemp-black-shirt','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath-black-shirt','Luke Chambers':'luke-chambers-black-shirt'};
   if(portraits[name]){
    const image=document.createElement('img');image.src='driver-avatars/'+portraits[name]+'.png';image.alt='';image.className='driver-avatar driver-avatar-portrait';image.setAttribute('aria-hidden','true');return image;
   }
   let index=names.indexOf(name);if(index<0)index=Array.from(name||'Driver').reduce((sum,c)=>sum+c.charCodeAt(0),0)%colours.length;
-  const colour=colours[index],hat=colours[(index+3)%colours.length];
+  const colour='#111111',hat=colours[(index+3)%colours.length];
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('viewBox','0 0 16 20');svg.setAttribute('class','driver-avatar');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
   const accessory=index%3===0?'<path fill="#283045" d="M4 6H7V8H4ZM9 6H12V8H9ZM7 6H9V7H7Z"/>':index%3===1?'<path fill="#704938" d="M6 9H10V10H6Z"/>':'<path fill="#a95452" d="M7 9H9V10H7Z"/>';
-  svg.innerHTML='<path fill="#11172b" d="M4 0H12V2H14V10H12V11H14V13H16V18H12V20H4V18H0V13H2V11H4V10H2V2H4Z"/><path fill="'+hat+'" d="M4 1H12V2H13V4H3V2H4ZM2 4H14V5H2Z"/><path fill="#f1c6a0" d="M4 5H12V9H10V11H6V9H4Z"/><path fill="#172238" d="M5 6H6V7H5ZM10 6H11V7H10Z"/>'+accessory+'<path fill="'+colour+'" d="M3 12H13V13H15V17H12V18H4V17H1V13H3Z"/><path fill="#fff1a7" d="M4 12H5V17H4ZM11 12H12V17H11ZM5 14H11V15H5Z"/><path fill="#f1c6a0" d="M1 16H3V18H1ZM13 16H15V18H13Z"/><path fill="#35435e" d="M4 18H7V20H3V19H4ZM9 18H12V19H13V20H9Z"/>';
+  svg.innerHTML='<path fill="#11172b" d="M4 0H12V2H14V10H12V11H14V13H16V18H12V20H4V18H0V13H2V11H4V10H2V2H4Z"/><path fill="'+hat+'" d="M4 1H12V2H13V4H3V2H4ZM2 4H14V5H2Z"/><path fill="#f1c6a0" d="M4 5H12V9H10V11H6V9H4Z"/><path fill="#172238" d="M5 6H6V7H5ZM10 6H11V7H10Z"/>'+accessory+'<path fill="'+colour+'" d="M3 12H13V13H15V17H12V18H4V17H1V13H3Z"/><path fill="#292929" d="M5 12H11V13H5Z"/><path fill="#f1c6a0" d="M1 16H3V18H1ZM13 16H15V18H13Z"/><path fill="#35435e" d="M4 18H7V20H3V19H4ZM9 18H12V19H13V20H9Z"/>';
   return svg;
  }
  function labelFor(select){const other=document.getElementById(selectors[select.id]);return select.value==='__other__'?(other?.value.trim()||'Other driver'):select.value||'Choose driver'}
