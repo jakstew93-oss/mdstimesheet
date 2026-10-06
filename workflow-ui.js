@@ -1,3 +1,15 @@
+// Shared by manual entry, editing and Quick Start saves.
+window.calcHours = function(start, end) {
+ if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(start || '') ||
+     !/^([01]\d|2[0-3]):[0-5]\d$/.test(end || '')) return '';
+ const [sh, sm] = start.split(':').map(Number);
+ const [eh, em] = end.split(':').map(Number);
+ let minutes = eh * 60 + em - (sh * 60 + sm);
+ // An earlier finish belongs to the following calendar day.
+ if (minutes < 0) minutes += 1440;
+ return minutes > 0 ? minsToStr(minutes) : '';
+};
+
 (function(){
  'use strict';
  const api=window.MDSTools;
