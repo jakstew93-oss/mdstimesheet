@@ -13,10 +13,10 @@ test('both entry points preserve packed resources and provide the Expenses secti
  const source=fs.readFileSync('index.html','utf8'),original=JSON.parse(source.match(/<script type="__bundler\/manifest">\s*([\s\S]*?)\s*<\/script>/)[1]);
  for(const file of ['index.html','Index.html']){
   const text=fs.readFileSync(file,'utf8'),template=JSON.parse(text.match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
-  assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=64/);assert.match(template,/expense-template.js\?v=64/);
+  assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=70/);assert.match(template,/expense-template.js\?v=70/);
   assert.deepEqual(JSON.parse(text.match(/<script type="__bundler\/manifest">\s*([\s\S]*?)\s*<\/script>/)[1]),original);
  }
- const sw=fs.readFileSync('sw.js','utf8');for(const file of ['expenses.js','expenses.css','expense-template.js'])assert.ok(sw.includes(file+'?v=64'));
+ const sw=fs.readFileSync('sw.js','utf8');for(const file of ['expenses.js','expenses.css','expense-template.js'])assert.ok(sw.includes(file+'?v=70'));
 });
 function pdfContext(){
  const ctx={loadPdfLib:async()=>true,Uint8Array,ArrayBuffer,atob,structuredClone,console,setTimeout,clearTimeout,document:{readyState:'loading',addEventListener(){}},crypto:require('node:crypto').webcrypto};ctx.window=ctx;

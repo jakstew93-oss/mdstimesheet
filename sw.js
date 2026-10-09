@@ -1,15 +1,12 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v69';
+const CACHE_NAME = 'mdsmiths-timesheet-v70';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',
-  './expenses.css?v=64',
-  './expenses.js?v=64',
-  './expense-template.js?v=64',
-  './expenses.css?v=64',
-  './expenses.js?v=64',
-  './expense-template.js?v=64',
+  './expenses.css?v=70',
+  './expenses.js?v=70',
+  './expense-template.js?v=70',
   './Index.html',
   './index.html',
   './recent-regs.js',
@@ -72,7 +69,7 @@ self.addEventListener('fetch', event => {
   const isNavigation = event.request.mode === 'navigate';
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, isSameOrigin ? { cache: 'no-store' } : undefined)
       .then(response => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
