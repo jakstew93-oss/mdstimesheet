@@ -1,6 +1,9 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v66';
+const CACHE_NAME = 'mdsmiths-timesheet-v67';
 const APP_SHELL = [
   './',
+  './receipt-ocr.js?v=67',
+  './vendor/ocr/tesseract.min.js',
+  './vendor/ocr/worker.min.js',
   './expenses.css?v=64',
   './expenses.js?v=64',
   './expense-template.js?v=64',

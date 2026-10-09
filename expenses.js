@@ -93,7 +93,23 @@
       }finally{expenseSigSession=null;originalClose(false);render();}
     };
   }
-  function receiptControls(type,i,row){return `<p class="expense-note">Receipt details are entered manually. Photos are attached to this entry and included in your PDF.</p><div class="expense-actions"><button type="button" class="btn btn-secondary" data-camera="${type}" data-row="${i}">Take receipt photo</button><button type="button" class="btn btn-secondary" data-gallery="${type}" data-row="${i}">Choose receipt photos</button></div><div class="expense-receipts">${(row.receipts||[]).map((r,j)=>`<div class="expense-receipt"><a href="${r.data}" target="_blank" rel="noopener" aria-label="Open receipt ${j+1}"><img src="${r.data}" alt="Receipt ${j+1}"></a><button type="button" class="btn btn-secondary" data-receipt-remove="${type}" data-row="${i}" data-index="${j}">Remove photo ${j+1}</button></div>`).join('')}</div>`;}
+  function receiptControls(type,i,row){return `<p class="expense-note">Scan a receipt photo to fill its date and total, or enter them manually. Photos are included in your PDF.</p><div class="expense-actions"><button type="button" class="btn btn-secondary" data-camera="${type}" data-row="${i}">Take receipt photo</button><button type="button" class="btn btn-secondary" data-gallery="${type}" data-row="${i}">Choose receipt photos</button></div><div class="expense-receipts">${(row.receipts||[]).map((r,j)=>`<div class="expense-receipt"><a href="${r.data}" target="_blank" rel="noopener" aria-label="Open receipt ${j+1}"><img src="${r.data}" alt="Receipt ${j+1}"></a><button type="button" class="btn btn-secondary" data-receipt-scan="${type}" data-row="${i}" data-index="${j}">Scan date &amp; amount</button><button type="button" class="btn btn-secondary" data-receipt-remove="${type}" data-row="${i}" data-index="${j}">Remove photo ${j+1}</button></div>`).join('')}</div>`;}
+  let scannerPromise;
+  function scanner(){if(root.MDSReceiptOCR)return Promise.resolve(root.MDSReceiptOCR);if(!scannerPromise)scannerPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./receipt-ocr.js?v=67';s.onload=()=>resolve(root.MDSReceiptOCR);s.onerror=()=>{scannerPromise=null;reject(new Error('Unable to load receipt scanning. Check your connection and try again.'));};document.head.append(s);});return scannerPromise;}
+  async function scannedEntry(photo,existing){
+    const original=claim,employee=owner,ocr=await scanner();status('Scanning receipt…');const result=await ocr.scan(photo.data);
+    if(original!==claim||employee!==activeOwner())throw new Error('Your account or claim changed. Scan the receipt again.');
+    const values=await ocr.review(result,{newEntry:!existing,type:existing?.type||'purchases'});if(!values){status('Receipt scan cancelled.');return;}
+    if(original!==claim||employee!==activeOwner())throw new Error('Your account or claim changed. Scan the receipt again.');
+    let row=existing?.row;
+    if(!row){const cat=categories[values.type];if(claim.rows[values.type].length>=cat.count)throw new Error('This form is full for '+cat.title+'. Start a new claim to add this receipt.');row={receipts:[photo]};for(const[key]of cat.fields)row[key]='';claim.rows[values.type].push(row);}
+    row.date=values.date;row.amount=values.amount;row.receipt='Y';row.receiptScan={text:result.text,scannedAt:new Date().toISOString(),date:values.date,amount:values.amount};dirty=true;
+    render();await save();status('Receipt logged: '+values.date+' · £'+values.amount+'. Saved on this device.');
+  }
+  function scanPhoto(camera){
+    const employee=owner,original=claim,input=document.createElement('input');input.type='file';input.accept='image/*';if(camera)input.setAttribute('capture','environment');
+    input.onchange=()=>{if(!input.files.length)return;action(async()=>{if(owner!==employee||claim!==original||activeOwner()!==employee)throw new Error('Your account or claim changed. Select the photo again.');const file=input.files[0];await scannedEntry({name:file.name,data:await imageData(file)});});};input.click();
+  }
   function setButtons(){document.querySelectorAll('#section-expenses button,#section-expenses input,#section-expenses select').forEach(el=>{el.disabled=busy||receiptBusy||(el.dataset.add&&claim?.rows[el.dataset.add].length>=categories[el.dataset.add].count);});}
   function setPath(path,value){const keys=path.split('.');let obj=claim;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=value;dirty=true;status('Unsaved changes — tap Save claim.');updateTotals();}
   async function imageData(file){
@@ -187,6 +203,9 @@
     if(!$('sectionSelect')||typeof root.switchSection!=='function')return;
     const panel=document.createElement('section');panel.id='section-expenses';panel.hidden=true;panel.innerHTML='<div class="card"><div class="expense-history"><div class="field"><label for="expense-saved">Saved claims</label><select id="expense-saved"></select></div><button type="button" id="expense-new" class="btn btn-secondary">New claim</button></div><div class="expense-actions"><button type="button" id="expense-save" class="btn btn-primary">Save claim</button><button type="button" id="expense-export" class="btn btn-secondary">Download PDF</button><button type="button" id="expense-share" class="btn btn-secondary">Share PDF</button><button type="button" id="expense-backup" class="btn btn-secondary">Download backup</button><button type="button" id="expense-restore" class="btn btn-secondary">Import backup</button></div><p id="expense-status" class="expense-status" role="status" aria-live="polite"></p><div id="expense-total" class="expense-total"></div></div><form id="expense-fields"></form>';
     $('section-holiday').after(panel);
+    const scanActions=document.createElement('div');scanActions.className='expense-actions';scanActions.innerHTML='<button type="button" id="expense-scan-camera" class="btn btn-primary">Scan receipt with camera</button><button type="button" id="expense-scan-photo" class="btn btn-secondary">Scan receipt photo</button>';
+    panel.querySelector('.expense-actions').before(scanActions);
+    $('expense-scan-camera').onclick=()=>scanPhoto(true);$('expense-scan-photo').onclick=()=>scanPhoto(false);
     connectSignatureModal();
     const original=root.switchSection;root.switchSection=function(section){original(section);panel.hidden=section!=='expenses';if(section==='expenses')activate().catch(fail);};
     panel.addEventListener('input',e=>{if(e.target.dataset.expense&&claim)setPath(e.target.dataset.expense,e.target.value);});
@@ -200,6 +219,7 @@
       if(b.dataset.remove){if(!confirm('Remove this expense entry and its receipt photos?'))return;claim.rows[b.dataset.remove].splice(i,1);dirty=true;render();status('Unsaved changes — tap Save claim.');}
       if(b.dataset.camera)selectReceipts(b.dataset.camera,i,true);
       if(b.dataset.gallery)selectReceipts(b.dataset.gallery,i,false);
+      if(b.dataset.receiptScan){const type=b.dataset.receiptScan,row=claim.rows[type][i];action(()=>scannedEntry(row.receipts[Number(b.dataset.index)],{type,row}));}
       if(b.dataset.receiptRemove){if(!confirm('Remove this receipt photo?'))return;const row=claim.rows[b.dataset.receiptRemove][i];row.receipts.splice(Number(b.dataset.index),1);if(!row.receipts.length)row.receipt='N';dirty=true;render();status('Unsaved changes — tap Save claim.');}
     });
     $('expense-save').onclick=()=>action(save);$('expense-export').onclick=()=>action(exportPdf);$('expense-share').onclick=()=>action(sharePdf);
