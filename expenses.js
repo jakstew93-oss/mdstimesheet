@@ -32,6 +32,17 @@
   }
   async function records(){const database=await db();return new Promise((resolve,reject)=>{const tx=database.transaction('claims','readonly'),req=tx.objectStore('claims').getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
   async function write(snapshot,employee){const database=await db();return new Promise((resolve,reject)=>{const tx=database.transaction('claims','readwrite');tx.objectStore('claims').put({key:employee+'|'+snapshot.id,owner:employee,claim:snapshot,updated:Date.now()});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Unable to save expenses.'));tx.onabort=()=>reject(tx.error||new Error('Unable to save expenses.'));});}
+  async function deleteClaim(){
+    const employee=owner,current=claim;
+    if(!current||employee!==activeOwner()||!saved.some(r=>r.claim.id===current.id))return;
+    if(!confirm('Delete the saved claim dated '+current.date+' ('+money(totals(current).total)+') and all its receipt photos?'+(dirty?' Unsaved changes to this claim will also be discarded.':'')+' This cannot be undone.'))return;
+    await queue.catch(()=>{});
+    if(owner!==employee||activeOwner()!==employee||claim!==current)throw new Error('Your account or claim changed. Select the claim again before deleting.');
+    const database=await db();
+    await new Promise((resolve,reject)=>{const tx=database.transaction('claims','readwrite');tx.objectStore('claims').delete(employee+'|'+current.id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Unable to delete the claim.'));tx.onabort=()=>reject(tx.error||new Error('Unable to delete the claim.'));});
+    if(owner!==employee||activeOwner()!==employee)return;
+    claim=fresh(employee);dirty=false;await refreshHistory();render();status('Claim and receipt photos deleted. You can start a new claim.');
+  }
   function status(text){$('expense-status').textContent=text;}
   function fail(error){console.warn('Expenses:',error);status(error.message||'Unable to complete this action. Please try again.');}
   async function save(){
@@ -110,7 +121,7 @@
     const employee=owner,original=claim,input=document.createElement('input');input.type='file';input.accept='image/*';if(camera)input.setAttribute('capture','environment');
     input.onchange=()=>{if(!input.files.length)return;action(async()=>{if(owner!==employee||claim!==original||activeOwner()!==employee)throw new Error('Your account or claim changed. Select the photo again.');const file=input.files[0];await scannedEntry({name:file.name,data:await imageData(file)});});};input.click();
   }
-  function setButtons(){document.querySelectorAll('#section-expenses button,#section-expenses input,#section-expenses select').forEach(el=>{el.disabled=busy||receiptBusy||(el.dataset.add&&claim?.rows[el.dataset.add].length>=categories[el.dataset.add].count);});}
+  function setButtons(){document.querySelectorAll('#section-expenses button,#section-expenses input,#section-expenses select').forEach(el=>{el.disabled=busy||receiptBusy||(el.dataset.add&&claim?.rows[el.dataset.add].length>=categories[el.dataset.add].count)||(el.id==='expense-delete'&&!saved.some(r=>r.claim.id===claim?.id));});}
   function setPath(path,value){const keys=path.split('.');let obj=claim;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=value;dirty=true;status('Unsaved changes — tap Save claim.');updateTotals();}
   async function imageData(file){
     if(file.size>30*1024*1024)throw new Error('This photo is too large. Choose one smaller than 30 MB.');
@@ -203,6 +214,7 @@
     if(!$('sectionSelect')||typeof root.switchSection!=='function')return;
     const panel=document.createElement('section');panel.id='section-expenses';panel.hidden=true;panel.innerHTML='<div class="card"><div class="expense-history"><div class="field"><label for="expense-saved">Saved claims</label><select id="expense-saved"></select></div><button type="button" id="expense-new" class="btn btn-secondary">New claim</button></div><div class="expense-actions"><button type="button" id="expense-save" class="btn btn-primary">Save claim</button><button type="button" id="expense-export" class="btn btn-secondary">Download PDF</button><button type="button" id="expense-share" class="btn btn-secondary">Share PDF</button><button type="button" id="expense-backup" class="btn btn-secondary">Download backup</button><button type="button" id="expense-restore" class="btn btn-secondary">Import backup</button></div><p id="expense-status" class="expense-status" role="status" aria-live="polite"></p><div id="expense-total" class="expense-total"></div></div><form id="expense-fields"></form>';
     $('section-holiday').after(panel);
+    const deleteButton=document.createElement('button');deleteButton.type='button';deleteButton.id='expense-delete';deleteButton.className='btn btn-secondary';deleteButton.textContent='Delete claim';panel.querySelector('.expense-history').append(deleteButton);deleteButton.onclick=()=>action(deleteClaim);
     const scanActions=document.createElement('div');scanActions.className='expense-actions';scanActions.innerHTML='<button type="button" id="expense-scan-camera" class="btn btn-primary">Scan receipt with camera</button><button type="button" id="expense-scan-photo" class="btn btn-secondary">Scan receipt photo</button>';
     panel.querySelector('.expense-actions').before(scanActions);
     $('expense-scan-camera').onclick=()=>scanPhoto(true);$('expense-scan-photo').onclick=()=>scanPhoto(false);

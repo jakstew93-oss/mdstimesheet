@@ -45,3 +45,11 @@ test('expense drawing uses the shared modal while keeping vehicle signatures sep
  ctx.root.openSigModal('expenses');assert.equal(initial,'expense-old');ctx.root.closeSigModal(true);assert.equal(c.signatureImg,'expense-drawn');assert.equal(c.signedDate,'2026-10-09');assert.equal(closed,false);assert.equal(ctx.dirty,true);assert.equal(ctx.root._signatureState('van').dataUrl,'vehicle-original');
  ctx.root.openSigModal('expenses');ctx.root.closeSigModal(false);assert.equal(c.signatureImg,'expense-drawn');
 });
+test('deletion requires confirmation and removes only the signed-in employee claim',async()=>{
+ const source=fs.readFileSync('expenses.js','utf8'),fn=source.slice(source.indexOf('  async function deleteClaim(){'),source.indexOf('  function status('));
+ const current=api.fresh('Jak Stewart');current.id='claim-1';let key,asks=0,refreshes=0;
+ const ctx={owner:'Jak Stewart',claim:current,saved:[{claim:current}],activeOwner:()=> 'Jak Stewart',confirm:()=>{asks++;return false;},money:()=> '£0.00',totals:api.totals,dirty:true,queue:Promise.resolve(),fresh:api.fresh,refreshHistory:async()=>{refreshes++;},render:()=>{},status:()=>{},db:async()=>({transaction:()=>{const tx={objectStore:()=>({delete:k=>{key=k;setTimeout(()=>tx.oncomplete(),0);}})};return tx;}})};
+ vm.createContext(ctx);vm.runInContext(fn,ctx);await ctx.deleteClaim();assert.equal(asks,1);assert.equal(key,undefined);assert.equal(ctx.claim,current);
+ ctx.confirm=()=>true;await ctx.deleteClaim();assert.equal(key,'Jak Stewart|claim-1');assert.equal(ctx.dirty,false);assert.notEqual(ctx.claim.id,'claim-1');assert.equal(refreshes,1);
+ ctx.claim=current;ctx.activeOwner=()=> 'Cody Slack';key=undefined;await ctx.deleteClaim();assert.equal(key,undefined);
+});
