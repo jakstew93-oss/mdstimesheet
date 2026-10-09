@@ -1,0 +1,20 @@
+#section-expenses { max-width: 960px; margin: auto; padding: 18px 14px 90px; }
+#section-expenses[hidden] { display: none !important; }
+#section-expenses .expense-actions { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0; }
+#section-expenses .expense-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+#section-expenses .expense-row { border:1px solid var(--border,#365240); padding:14px; margin:12px 0; border-radius:10px; }
+#section-expenses label { display:block; font-size:13px; margin-bottom:6px; }
+#section-expenses input, #section-expenses select { width:100%; min-width:0; }
+#section-expenses .expense-note { font-size:13px; line-height:1.6; opacity:.8; margin:10px 0; }
+#section-expenses .expense-status { min-height:24px; font-size:13px; margin:10px 0; }
+#section-expenses .expense-total { font-size:22px; font-weight:700; margin:14px 0; }
+#section-expenses summary { cursor:pointer; padding:12px 0; font-weight:700; }
+#section-expenses .expense-receipts { display:flex; flex-wrap:wrap; gap:12px; }
+#section-expenses .expense-receipt { width:140px; }
+#section-expenses .expense-receipt img { width:140px; height:140px; object-fit:contain; background:white; cursor:pointer; border-radius:6px; }
+#section-expenses .expense-receipt button { width:100%; margin-top:5px; }
+#section-expenses .expense-history { display:flex; flex-wrap:wrap; gap:10px; align-items:end; }
+#section-expenses .expense-history .field { flex:1; min-width:180px; }
+#section-expenses .expense-readonly { padding:12px; }
+#section-expenses .expense-wide { grid-column:1/-1; }
+@media(max-width:420px) { #section-expenses .expense-grid { grid-template-columns:1fr; } }

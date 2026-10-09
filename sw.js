@@ -1,6 +1,12 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v63';
+const CACHE_NAME = 'mdsmiths-timesheet-v64';
 const APP_SHELL = [
   './',
+  './expenses.css?v=64',
+  './expenses.js?v=64',
+  './expense-template.js?v=64',
+  './expenses.css?v=64',
+  './expenses.js?v=64',
+  './expense-template.js?v=64',
   './Index.html',
   './index.html',
   './recent-regs.js',
