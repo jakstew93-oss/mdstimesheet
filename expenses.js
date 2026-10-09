@@ -56,15 +56,13 @@
     for(const type of Object.keys(categories)){
       $('expense-total-'+type).textContent=money(t[type]);
       document.querySelectorAll(`[data-mileage-total="${type}"]`).forEach(el=>el.textContent='Amount: '+money(rowAmount(type,claim.rows[type][Number(el.dataset.row)])));
-      $('expense-office-'+type).textContent=money(t[type]);
     }
   }
   function render(){
     if(!claim)return;
     $('expense-fields').innerHTML=`<div class="card"><h2>Employee Expenses Claim Form</h2><div class="expense-grid">${field('name','Name','text',claim.name)}${field('date','Claim Date','date',claim.date)}</div><p class="expense-note">Fill in your expenses, then attach VAT receipts to the matching entry. Save claims and photos on this device; export a PDF or backup to keep a copy elsewhere.</p></div>`+
       Object.entries(categories).map(([type,cat])=>`<div class="card"><h2>${cat.title} · <span id="expense-total-${type}"></span></h2>${claim.rows[type].map((row,i)=>`<details class="expense-row" open><summary>${cat.title} ${i+1}</summary><div class="expense-grid">${cat.fields.map(([key,label,kind])=>field(`rows.${type}.${i}.${key}`,label,kind,row[key]??'',kind==='number'?'required':'')).join('')}</div>${type==='mileage'?`<p data-mileage-total="mileage" data-row="${i}" class="expense-note"></p>`:receiptControls(type,i,row)}<div class="expense-actions"><button type="button" class="btn btn-secondary" data-remove="${type}" data-row="${i}">Remove entry</button></div></details>`).join('')}<button type="button" class="btn btn-secondary" data-add="${type}" ${claim.rows[type].length>=cat.count?'disabled':''}>Add ${cat.title.toLowerCase()} entry</button><p class="expense-note">${claim.rows[type].length} / ${cat.count} entries per form</p></div>`).join('')+
-      `<div class="card"><h2>Employee Signature</h2><div class="expense-grid">${field('signature','Signed (Employee) — type your signature','text',claim.signature)}${field('signedDate','Signature Date','date',claim.signedDate)}</div></div>`+
-      `<div class="card"><details><summary>Office Use Only</summary><div class="expense-grid">${Object.entries(categories).map(([type,cat])=>`<div class="expense-readonly">${cat.title}: <strong id="expense-office-${type}"></strong></div>${field('authorised.'+type,cat.title+' Authorised Y/N','receipt',claim.authorised[type])}`).join('')}${field('authorisedSignature','Authorised Signature — type signature','text',claim.authorisedSignature)}${field('paymentMethod','Payment Method (Cash / BACS / Other)','text',claim.paymentMethod)}${field('paidDate','Date Paid','date',claim.paidDate)}</div></details></div>`;
+      `<div class="card"><h2>Employee Signature</h2><div class="expense-grid">${field('signature','Signed (Employee) — type your signature','text',claim.signature)}${field('signedDate','Signature Date','date',claim.signedDate)}</div></div>`;
     updateTotals();setButtons();
   }
   function receiptControls(type,i,row){return `<p class="expense-note">Receipt details are entered manually. Photos are attached to this entry and included in your PDF.</p><div class="expense-actions"><button type="button" class="btn btn-secondary" data-camera="${type}" data-row="${i}">Take receipt photo</button><button type="button" class="btn btn-secondary" data-gallery="${type}" data-row="${i}">Choose receipt photos</button></div><div class="expense-receipts">${(row.receipts||[]).map((r,j)=>`<div class="expense-receipt"><a href="${r.data}" target="_blank" rel="noopener" aria-label="Open receipt ${j+1}"><img src="${r.data}" alt="Receipt ${j+1}"></a><button type="button" class="btn btn-secondary" data-receipt-remove="${type}" data-row="${i}" data-index="${j}">Remove photo ${j+1}</button></div>`).join('')}</div>`;}
@@ -125,9 +123,8 @@
       cell((t[type]/100).toFixed(2),520,layout.total,59,13.2);
     }
     cell(snapshot.signature,209.04,626.64,370,23);cell(readableDate(snapshot.signedDate),209.04,650.28,370,23);
-    Object.keys(categories).forEach((type,i)=>{cell((t[type]/100).toFixed(2),220,694.2+i*13.68,160);cell(snapshot.authorised[type],380.76,694.2+i*13.68,64.32);});
-    cover(211,749,169,11);cell((t.total/100).toFixed(2),220,748.44,160,13.2);cell(snapshot.authorisedSignature,445.08,694.2,134,67.4);
-    cover(210,762.7,369,12);cell(snapshot.paymentMethod,209.04,762.12,370);cell(readableDate(snapshot.paidDate),209.04,776.28,370,11.76);
+    // Office Use Only belongs to the office: leave the source template untouched here,
+    // including when an older saved claim still contains office values.
     page.pushOperators(PDFLib.popGraphicsState());
     // The appendix preserves complete descriptions even where the original paper cells are small.
     let appendix=null,y=0;
