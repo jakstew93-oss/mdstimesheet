@@ -19,6 +19,7 @@
   const $=id=>document.getElementById(id), money=n=>'£'+(n/100).toFixed(2);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let dbPromise,claim=null,owner='',saved=[],queue=Promise.resolve(),busy=false,receiptBusy=false,dirty=false;
+  let expenseSigSession=null,openingExpenseSig=false;
   function activeOwner(){return localStorage.getItem('ts_auth_user')||'';}
   function db(){
     if(!dbPromise)dbPromise=new Promise((resolve,reject)=>{
@@ -62,8 +63,35 @@
     if(!claim)return;
     $('expense-fields').innerHTML=`<div class="card"><h2>Employee Expenses Claim Form</h2><div class="expense-grid">${field('name','Name','text',claim.name)}${field('date','Claim Date','date',claim.date)}</div><p class="expense-note">Fill in your expenses, then attach VAT receipts to the matching entry. Save claims and photos on this device; export a PDF or backup to keep a copy elsewhere.</p></div>`+
       Object.entries(categories).map(([type,cat])=>`<div class="card"><h2>${cat.title} · <span id="expense-total-${type}"></span></h2>${claim.rows[type].map((row,i)=>`<details class="expense-row" open><summary>${cat.title} ${i+1}</summary><div class="expense-grid">${cat.fields.map(([key,label,kind])=>field(`rows.${type}.${i}.${key}`,label,kind,row[key]??'',kind==='number'?'required':'')).join('')}</div>${type==='mileage'?`<p data-mileage-total="mileage" data-row="${i}" class="expense-note"></p>`:receiptControls(type,i,row)}<div class="expense-actions"><button type="button" class="btn btn-secondary" data-remove="${type}" data-row="${i}">Remove entry</button></div></details>`).join('')}<button type="button" class="btn btn-secondary" data-add="${type}" ${claim.rows[type].length>=cat.count?'disabled':''}>Add ${cat.title.toLowerCase()} entry</button><p class="expense-note">${claim.rows[type].length} / ${cat.count} entries per form</p></div>`).join('')+
-      `<div class="card"><h2>Employee Signature</h2><div class="expense-grid">${field('signature','Signed (Employee) — type your signature','text',claim.signature)}${field('signedDate','Signature Date','date',claim.signedDate)}</div></div>`;
-    updateTotals();setButtons();
+      `<div class="card"><h2>Employee Signature</h2><div class="field"><label>Signature</label><div class="sig-pad-wrap"><button type="button" id="expense-sign" class="sig-canvas-tap" aria-label="Draw employee signature"><canvas id="expense-signature-canvas"></canvas><span class="sig-tap-hint" id="expense-signature-hint">Tap to sign</span></button><div class="expense-actions">${field('signature','Or type name','text',claim.signature,'placeholder="e.g. J. Stewart"')}<button type="button" id="expense-signature-clear" class="sig-clear-btn">Clear</button></div></div></div>${field('signedDate','Signature Date','date',claim.signedDate)}</div>`;
+    updateTotals();setButtons();renderSignature();
+  }
+  function renderSignature(){
+    const canvas=$('expense-signature-canvas');if(!canvas||!claim)return;
+    const rect=canvas.parentElement.getBoundingClientRect();canvas.width=rect.width||320;canvas.height=rect.height||110;
+    const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);$('expense-signature-hint').style.display=claim.signatureImg?'none':'';
+    if(claim.signatureImg){const data=claim.signatureImg,img=new Image();img.onload=()=>{if(canvas.isConnected&&claim?.signatureImg===data){const scale=Math.min(canvas.width/img.width,canvas.height/img.height);ctx.drawImage(img,(canvas.width-img.width*scale)/2,(canvas.height-img.height*scale)/2,img.width*scale,img.height*scale);}};img.src=data;}
+  }
+  function connectSignatureModal(){
+    const originalOpen=root.openSigModal,originalClose=root.closeSigModal,originalState=root._signatureState;
+    root._signatureState=function(context){const state=originalState(context);return openingExpenseSig?{...state,dataUrl:expenseSigSession.claim.signatureImg||''}:state;};
+    root.openSigModal=function(context){
+      if(context!=='expenses')return originalOpen(context);
+      if(!claim||busy||receiptBusy)return;
+      expenseSigSession={claim,owner};openingExpenseSig=true;
+      try{originalOpen('van');}catch(e){expenseSigSession=null;throw e;}finally{openingExpenseSig=false;}
+    };
+    root.closeSigModal=function(use){
+      if(!expenseSigSession)return originalClose(use);
+      const session=expenseSigSession;
+      try{
+        if(use&&session.claim===claim&&session.owner===activeOwner()){
+          claim.signatureImg=root._sigCanvasToCroppedDataUrl($('sigModalCanvas'));
+          if(claim.signatureImg&&!claim.signedDate)claim.signedDate=today();
+          dirty=true;status('Signature added — tap Save claim.');
+        }
+      }finally{expenseSigSession=null;originalClose(false);render();}
+    };
   }
   function receiptControls(type,i,row){return `<p class="expense-note">Receipt details are entered manually. Photos are attached to this entry and included in your PDF.</p><div class="expense-actions"><button type="button" class="btn btn-secondary" data-camera="${type}" data-row="${i}">Take receipt photo</button><button type="button" class="btn btn-secondary" data-gallery="${type}" data-row="${i}">Choose receipt photos</button></div><div class="expense-receipts">${(row.receipts||[]).map((r,j)=>`<div class="expense-receipt"><a href="${r.data}" target="_blank" rel="noopener" aria-label="Open receipt ${j+1}"><img src="${r.data}" alt="Receipt ${j+1}"></a><button type="button" class="btn btn-secondary" data-receipt-remove="${type}" data-row="${i}" data-index="${j}">Remove photo ${j+1}</button></div>`).join('')}</div>`;}
   function setButtons(){document.querySelectorAll('#section-expenses button,#section-expenses input,#section-expenses select').forEach(el=>{el.disabled=busy||receiptBusy||(el.dataset.add&&claim?.rows[el.dataset.add].length>=categories[el.dataset.add].count);});}
@@ -122,7 +150,9 @@
       snapshot.rows[type].forEach((row,i)=>layout.keys.forEach((key,j)=>cell(key==='date'?readableDate(row[key]):key==='calculated'?(rowAmount(type,row)/100).toFixed(2):key==='amount'?(pennies(row[key])/100).toFixed(2):row[key],layout.x[j],layout.top+i*layout.step,layout.w[j],layout.step)));
       cell((t[type]/100).toFixed(2),520,layout.total,59,13.2);
     }
-    cell(snapshot.signature,209.04,626.64,370,23);cell(readableDate(snapshot.signedDate),209.04,650.28,370,23);
+    if(snapshot.signatureImg){const img=await pdf.embedPng(snapshot.signatureImg),scale=Math.min(366/img.width,20/img.height);page.drawImage(img,{x:211,y:h-626.64-23+(23-img.height*scale)/2,width:img.width*scale,height:img.height*scale});}
+    else cell(snapshot.signature,209.04,626.64,370,23);
+    cell(readableDate(snapshot.signedDate),209.04,650.28,370,23);
     // Office Use Only belongs to the office: leave the source template untouched here,
     // including when an older saved claim still contains office values.
     page.pushOperators(PDFLib.popGraphicsState());
@@ -141,6 +171,7 @@
   async function sharePdf(){validate();await save();status('Preparing expense PDF…');const snapshot=structuredClone(claim),bytes=await makePdf(snapshot),name='Expenses-'+snapshot.date+'.pdf',file=new File([bytes],name,{type:'application/pdf'});if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:name});status('Expense PDF shared.');}catch(e){if(e.name==='AbortError')status('Share cancelled.');else throw e;}}else{download(file,name);status('Expense PDF downloaded. You can attach it to a message or email.');}}
   function validBackup(c){
     if(!c||typeof c.name!=='string'||typeof c.date!=='string'||!c.rows)return false;
+    if(c.signatureImg&&!(typeof c.signatureImg==='string'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(c.signatureImg)&&c.signatureImg.length<2000000))return false;
     const textKeys=['signature','signedDate','paymentMethod','paidDate','authorisedSignature'];if(textKeys.some(k=>typeof c[k]!=='string'))return false;
     if(!c.authorised||Object.keys(categories).some(k=>!['','Y','N'].includes(c.authorised[k])))return false;
     return Object.entries(categories).every(([type,cat])=>Array.isArray(c.rows[type])&&c.rows[type].length<=cat.count&&c.rows[type].every(row=>row&&cat.fields.every(([key,,kind])=>kind==='number'?(row[key]===''||Number.isFinite(Number(row[key]))&&Number(row[key])>=0&&Number(row[key])<=10000000):typeof row[key]==='string')&&(!row.receipts||Array.isArray(row.receipts)&&row.receipts.length<=10&&row.receipts.every(r=>typeof r.name==='string'&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.data)&&r.data.length<12000000))));
@@ -156,11 +187,14 @@
     if(!$('sectionSelect')||typeof root.switchSection!=='function')return;
     const panel=document.createElement('section');panel.id='section-expenses';panel.hidden=true;panel.innerHTML='<div class="card"><div class="expense-history"><div class="field"><label for="expense-saved">Saved claims</label><select id="expense-saved"></select></div><button type="button" id="expense-new" class="btn btn-secondary">New claim</button></div><div class="expense-actions"><button type="button" id="expense-save" class="btn btn-primary">Save claim</button><button type="button" id="expense-export" class="btn btn-secondary">Download PDF</button><button type="button" id="expense-share" class="btn btn-secondary">Share PDF</button><button type="button" id="expense-backup" class="btn btn-secondary">Download backup</button><button type="button" id="expense-restore" class="btn btn-secondary">Import backup</button></div><p id="expense-status" class="expense-status" role="status" aria-live="polite"></p><div id="expense-total" class="expense-total"></div></div><form id="expense-fields"></form>';
     $('section-holiday').after(panel);
+    connectSignatureModal();
     const original=root.switchSection;root.switchSection=function(section){original(section);panel.hidden=section!=='expenses';if(section==='expenses')activate().catch(fail);};
     panel.addEventListener('input',e=>{if(e.target.dataset.expense&&claim)setPath(e.target.dataset.expense,e.target.value);});
     panel.addEventListener('submit',e=>e.preventDefault());
     panel.addEventListener('click',e=>{
       const b=e.target.closest('button');if(!b||busy||receiptBusy||!claim)return;
+      if(b.id==='expense-sign')root.openSigModal('expenses');
+      if(b.id==='expense-signature-clear'){claim.signatureImg='';claim.signature='';dirty=true;render();status('Signature cleared — tap Save claim.');}
       const i=Number(b.dataset.row);
       if(b.dataset.add){const type=b.dataset.add;if(claim.rows[type].length>=categories[type].count)return;const row={};for(const[key,,kind]of categories[type].fields)row[key]=kind==='date'?today():key==='rate'?'0.25':'';row.receipts=[];claim.rows[type].push(row);dirty=true;render();status('Unsaved changes — tap Save claim.');}
       if(b.dataset.remove){if(!confirm('Remove this expense entry and its receipt photos?'))return;claim.rows[b.dataset.remove].splice(i,1);dirty=true;render();status('Unsaved changes — tap Save claim.');}

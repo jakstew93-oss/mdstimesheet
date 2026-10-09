@@ -31,8 +31,17 @@ test('backup validation rejects executable image data, invalid amounts and extra
 test('generated PDF keeps the original form and includes complete descriptions',async()=>{
  const ctx=pdfContext(),c=api.fresh('Jak Stewart');c.rows.parking=[{date:'2026-10-09',location:'Ashby',reason:'Site visit',receipt:'N',amount:'4.50'}];c.rows.mileage=[{date:'2026-10-09',route:'Leicester to Ashby',reason:'Site visit',miles:'40',rate:'0.25'}];c.rows.purchases=[{date:'2026-10-09',supplier:'Supplier',items:'Very long item description '.repeat(8),reason:'Cable repair',receipt:'N',amount:'18.25'}];c.signature='Jak Stewart';c.signedDate='2026-10-09';c.paymentMethod='BACS';
  if(process.env.EXPENSE_QA_RECEIPT){c.rows.purchases[0].receipt='Y';c.rows.purchases[0].receipts=[{name:'receipt.jpg',data:'data:image/jpeg;base64,'+fs.readFileSync(process.env.EXPENSE_QA_RECEIPT).toString('base64')}];}
+ if(process.env.EXPENSE_QA_SIGNATURE)c.signatureImg='data:image/png;base64,'+fs.readFileSync(process.env.EXPENSE_QA_SIGNATURE).toString('base64');
  const bytes=await ctx.MDSExpenses.makePdf(c),doc=await ctx.PDFLib.PDFDocument.load(bytes);
  assert.equal(doc.getPages()[0].getWidth(),595.32001);assert.ok(doc.getPageCount()>=2);
  if(process.env.EXPENSE_QA_RECEIPT)assert.equal(doc.getPageCount(),3);
  if(process.env.EXPENSE_QA_PDF)fs.writeFileSync(process.env.EXPENSE_QA_PDF,bytes);
+});
+test('expense drawing uses the shared modal while keeping vehicle signatures separate',()=>{
+ const source=fs.readFileSync('expenses.js','utf8');const fn=source.slice(source.indexOf('  function connectSignatureModal(){'),source.indexOf('  function receiptControls('));
+ let initial,closed;const c={signatureImg:'expense-old',signedDate:''};
+ const ctx={claim:c,owner:'Jak Stewart',busy:false,receiptBusy:false,expenseSigSession:null,openingExpenseSig:false,dirty:false,activeOwner:()=> 'Jak Stewart',today:()=> '2026-10-09',status:()=>{},render:()=>{},$:()=>({})};ctx.root={_signatureState:()=>({dataUrl:'vehicle-original'}),openSigModal:()=>{initial=ctx.root._signatureState('van').dataUrl;},closeSigModal:use=>{closed=use;},_sigCanvasToCroppedDataUrl:()=> 'expense-drawn'};
+ vm.createContext(ctx);vm.runInContext(fn+'\nconnectSignatureModal();',ctx);
+ ctx.root.openSigModal('expenses');assert.equal(initial,'expense-old');ctx.root.closeSigModal(true);assert.equal(c.signatureImg,'expense-drawn');assert.equal(c.signedDate,'2026-10-09');assert.equal(closed,false);assert.equal(ctx.dirty,true);assert.equal(ctx.root._signatureState('van').dataUrl,'vehicle-original');
+ ctx.root.openSigModal('expenses');ctx.root.closeSigModal(false);assert.equal(c.signatureImg,'expense-drawn');
 });
