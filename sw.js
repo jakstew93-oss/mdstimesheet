@@ -1,6 +1,8 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v71';
+const CACHE_NAME = 'mdsmiths-timesheet-v72-watch-test';
 const APP_SHELL = [
   './',
+  './watch-sync/core.js?v=1',
+  './watch-sync/phone.js?v=1',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',

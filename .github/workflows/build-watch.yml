@@ -1,0 +1,41 @@
+name: Build MDS Watch test app
+on:
+  push:
+    branches: [watch-sync-test]
+    paths: ['watch-app/**', 'watch-sync/**', 'tools/test-watch-sync.cjs', '.github/workflows/build-watch.yml']
+  pull_request:
+    paths: ['watch-app/**', 'watch-sync/**', 'tools/test-watch-sync.cjs', '.github/workflows/build-watch.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test sync service and protocol
+        run: node --test tools/test-watch-sync.cjs
+      - name: Bundle Worker without deployment
+        working-directory: watch-sync/service
+        run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/mds-watch-worker
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: mds-watch-test-signing-v1
+      - name: Test and build watch APK
+        working-directory: watch-app
+        run: gradle testDebugUnitTest assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mds-watch-test-apk
+          path: watch-app/app/build/outputs/apk/debug/app-debug.apk
