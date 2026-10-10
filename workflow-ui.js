@@ -122,3 +122,10 @@ window.calcHours = function(start, end) {
  const observer=new MutationObserver(()=>{if(document.querySelector('.quickstart')&&!$('workflow-quick-actions'))refresh()});observer.observe($('mds-app'),{childList:true,subtree:true});
  window.addEventListener('load',refresh);refresh();setInterval(refreshUndo,1000);
 })();
+
+// Load optional watch synchronisation after the main timesheet is ready.
+(function(){
+ if(typeof document==='undefined')return;
+ async function load(src){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.append(s)})}
+ load('./watch-sync/core.js?v=1').then(()=>load('./watch-sync/phone.js?v=1')).catch(()=>console.warn('Watch connection could not be loaded'));
+})();
