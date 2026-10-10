@@ -31,8 +31,11 @@ test('forecast request rounds the location and the reply is read safely',()=>{
  assert.equal(api.parseForecast({current:{temperature_2m:5,weather_code:0},daily:{}}).rainChance,null);
  assert.throws(()=>api.parseForecast({}));
 });
-test('only the pixel themes load it, and it is cached offline',()=>{
- assert.deepEqual(api.THEMES,['arcade','pacman']);
+test('only Jak Stewart sees it, and only in the pixel themes',()=>{
+ assert.ok(api.shownFor('arcade','Jak Stewart'));assert.ok(api.shownFor('pacman','Jak Stewart'));
+ assert.ok(!api.shownFor('pacman','Cody Slack'));assert.ok(!api.shownFor('pacman',null));assert.ok(!api.shownFor('forest','Jak Stewart'));
+});
+test('it is loaded by the app and cached offline',()=>{
  const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
  assert.match(template,/weather-season\.js\?v=77/);assert.match(template,/weather-season\.css\?v=77/);
  const sw=fs.readFileSync('sw.js','utf8');for(const f of ['weather-season.js?v=77','weather-season.css?v=77'])assert.ok(sw.includes(f),f);

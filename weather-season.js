@@ -1,7 +1,8 @@
-// Weather on the Log page and seasonal decorations. Only shown in the 8-bit and Pac-Man themes.
+// Weather on the Log page and seasonal decorations. Only shown to Jak Stewart, in the 8-bit and Pac-Man themes.
 (function(root){
  'use strict';
- const THEMES=['arcade','pacman'];
+ const THEMES=['arcade','pacman'],OWNER='Jak Stewart';
+ function shownFor(theme,user){return THEMES.includes(theme)&&user===OWNER}
 
  // Christmas runs to Twelfth Night, Halloween is its last week and Bonfire Night covers the weekend either side.
  function seasonFor(date,override){
@@ -53,7 +54,7 @@
   return {code:c.weather_code,isDay:c.is_day,temp:Math.round(c.temperature_2m),wind:Math.round(c.wind_speed_10m||0),max:first(d.temperature_2m_max),min:first(d.temperature_2m_min),rainChance:first(d.precipitation_probability_max)};
  }
 
- const api={THEMES,seasonFor,weatherInfo,quipFor,forecastUrl,townUrl,parseForecast,SEASON_LINES};
+ const api={THEMES,OWNER,shownFor,seasonFor,weatherInfo,quipFor,forecastUrl,townUrl,parseForecast,SEASON_LINES};
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDSWeatherSeason=api;
 
@@ -66,7 +67,8 @@
  function write(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(_){}}
  function settings(){return {effects:true,...(read(SETTINGS_KEY)||{})}}
  function saveSettings(s){write(SETTINGS_KEY,s)}
- function allowed(){return THEMES.includes(html.dataset.appTheme)}
+ function signedIn(){try{return localStorage.getItem('ts_auth_user')}catch(_){return null}}
+ function allowed(){return shownFor(html.dataset.appTheme,signedIn())}
  function season(){return seasonFor(new Date(),seasonOverride)}
  function effectsOn(){return allowed()&&settings().effects!==false}
  function el(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n}
@@ -263,6 +265,9 @@
  // The Log view is rebuilt on load; put the card back if it goes missing.
  const app=$('mds-app');
  if(app)new MutationObserver(()=>{if(allowed()&&!$('mds-weather')&&document.querySelector('#page-log .week-ending-bar'))render();if(allowed()&&season()==='christmas'&&settings().effects!==false&&!$('mds-lights'))applySeason()}).observe(app,{childList:true,subtree:true});
+ // Signing in or out shows or hides the login screen.
+ const login=$('loginScreen');
+ if(login)new MutationObserver(update).observe(login,{attributes:true,attributeFilter:['class']});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopEffects();else{refresh(false);applyEffects()}});
  addEventListener('resize',()=>{resize();if(fx.canvas)seedDrops()});
  reducedMotion.addEventListener?.('change',applyEffects);
