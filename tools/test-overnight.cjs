@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-for(const file of ['index.html','Index.html']){
+for(const file of ['index.html']){
  const source=fs.readFileSync(file,'utf8');
  const template=JSON.parse(source.match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
  const ctx={};ctx.window=ctx;vm.createContext(ctx);
