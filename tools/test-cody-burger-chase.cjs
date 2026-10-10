@@ -27,7 +27,7 @@ test('modes cycle scatter and chase and levels get quicker up to a cap',()=>{
 });
 test('the game is in the arcade picker and cached for offline play',()=>{
  assert.match(fs.readFileSync('spark-town-launcher.js','utf8'),/cody-burger-chase\.html\?v=75/);
- for(const file of ['index.html','Index.html'])assert.match(fs.readFileSync(file,'utf8'),/spark-town-launcher\.js\?v=75/);
+ for(const file of ['index.html'])assert.match(fs.readFileSync(file,'utf8'),/spark-town-launcher\.js\?v=75/);
  const sw=fs.readFileSync('sw.js','utf8');for(const f of ['cody-burger-chase.html?v=75','cody-burger-chase.js?v=75','spark-town-launcher.js?v=75'])assert.ok(sw.includes(f),f);
  assert.match(fs.readFileSync('cody-burger-chase.html','utf8'),/cody-burger-chase\.js\?v=75/);
 });

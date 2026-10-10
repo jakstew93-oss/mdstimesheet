@@ -22,11 +22,11 @@ jobs:
         with:
           node-version: '22'
       - name: Add and validate driver names
-        run: node tools/add-driver-names.mjs index.html Index.html
+        run: node tools/add-driver-names.mjs index.html
       - name: Commit generated app files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html Index.html
+          git add index.html
           git commit -m "Add Luke Chambers, Mark Smith and Jody Wilson"
           git push

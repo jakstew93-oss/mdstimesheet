@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v75';
+const CACHE_NAME = 'mdsmiths-timesheet-v76';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
