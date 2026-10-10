@@ -84,6 +84,7 @@ class MainActivity : Activity() {
         }
         val row = state.rows.optJSONObject(state.active)
         if (row != null && !row.optBoolean("deleted")) for ((key, label) in labels) if (row.optString(key).isNotEmpty()) text("$label  ${row.optString(key)}", 14f)
+        text(state.hoursSummary(LocalDate.now().toString()), 13f)
         button("Choose / change job") { chooseJob() }
         button("Today's entries") { entries() }
         button("Sync now") { sync() }

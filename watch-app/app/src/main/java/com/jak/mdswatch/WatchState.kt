@@ -59,6 +59,21 @@ class WatchState(val json: JSONObject = JSONObject()) {
         queue.put(op); apply(op)
         return field
     }
+    fun hoursSummary(date: String): String {
+        fun minutes(value: String): Int? = if (Regex("([01]\\d|2[0-3]):[0-5]\\d").matches(value)) value.take(2).toInt() * 60 + value.takeLast(2).toInt() else null
+        var gross = 0
+        for (id in rows.keys()) {
+            val row = rows.getJSONObject(id)
+            if (row.optBoolean("deleted") || row.optString("date") != date) continue
+            val start = minutes(row.optString("startTime")) ?: continue
+            val end = minutes(row.optString("endTime")) ?: continue
+            gross += (end - start + 1440) % 1440
+        }
+        val breaks = mapOf(7 to 20, 8 to 20, 9 to 30, 10 to 45, 11 to 45, 12 to 45, 13 to 60, 14 to 60, 15 to 60, 16 to 75, 17 to 75, 18 to 90, 19 to 105)
+        val deduction = breaks.filterKeys { gross / 60 >= it }.maxByOrNull { it.key }?.value ?: 0
+        val net = maxOf(0, gross - deduction)
+        return "Today: ${gross / 60}h ${gross % 60}m\nAfter breaks: ${net / 60}h ${net % 60}m"
+    }
     fun batch(): JSONArray = JSONArray().also { result -> for (i in 0 until minOf(queue.length(), 50)) result.put(queue.getJSONObject(i)) }
     fun merge(response: JSONObject) {
         val operations = response.getJSONArray("operations")

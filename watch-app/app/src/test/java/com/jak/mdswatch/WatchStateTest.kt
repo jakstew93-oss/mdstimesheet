@@ -14,6 +14,7 @@ class WatchStateTest {
   state.tap(first+3600000,ZoneId.of("Europe/London"));state.tap(first+10800000,ZoneId.of("Europe/London"));state.tap(first+14400000,ZoneId.of("Europe/London"))
   val row=state.rows.getJSONObject(state.active)
   assertEquals("2026-10-10",row.getString("date"));assertEquals("22:00",row.getString("startTime"));assertEquals("02:00",row.getString("endTime"));assertEquals(4,state.queue.length());assertEquals(first,row.getJSONArray("watchTimestamps").getJSONObject(0).getLong("epochMillis"))
+  assertEquals("Today: 4h 0m\nAfter breaks: 4h 0m",state.hoursSummary("2026-10-10"))
   val old=state.active;state.tap(first+86400000,ZoneId.of("Europe/London"));assertNotEquals(old,state.active);assertEquals("1234",state.job)
  }
  @Test fun PullKeepsNewTapMadeDuringRequestAndAcknowledgesOnlySentIds() {
