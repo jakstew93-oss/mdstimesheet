@@ -123,7 +123,7 @@ class MainActivity : Activity() {
                     executor.execute {
                         try {
                             val response = request(endpoint, "", "/v1/redeem", JSONObject().put("code", pairingCode))
-                            handler.post { state.json.put("endpoint", endpoint).put("token", response.getString("token")); persist(); message = "Paired"; render(); sync() }
+                            handler.post { if (isDestroyed) return@post; state.json.put("endpoint", endpoint).put("token", response.getString("token")); persist(); message = "Paired"; render(); sync() }
                         } catch (_: Exception) { handler.post { message = "Pairing failed · check address and code"; render() } }
                     }
                 } catch (_: Exception) { message = "Enter a valid HTTPS service address"; render() }
@@ -150,6 +150,7 @@ class MainActivity : Activity() {
             try {
                 val response = request(endpoint, token, "/v1/sync", body)
                 handler.post {
+                    if (isDestroyed) return@post
                     var saved = false
                     val before = state.json.toString()
                     try { state.merge(response); persist(); saved = true; message = if (state.queue.length() == 0) "Synced with phone" else "${state.queue.length()} waiting" }
