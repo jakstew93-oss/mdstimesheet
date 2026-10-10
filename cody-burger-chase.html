@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Cody’s Burger Chase</title><style>
+@font-face{font-family:Pixel;src:url('fonts/vt323.ttf')}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#070c19;color:#edf3dd;font:22px Pixel,monospace;overflow:hidden;-webkit-user-select:none;user-select:none}
+main{height:100%;max-width:560px;margin:auto;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{margin:0;font-size:30px;line-height:1;color:#ffd34d;font-weight:normal}
+.eyebrow{font-size:16px;color:#8fa3c9}
+.toolbar{display:flex;gap:6px;flex-shrink:0}
+button{font:inherit;font-size:18px;color:#edf3dd;background:#16234a;border:2px solid #4f7dff;padding:6px 10px;cursor:pointer;touch-action:manipulation}
+button:active{transform:translateY(2px)}
+button:focus-visible{outline:3px solid #ffd34d;outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stat{background:#101a36;border:2px solid #24356b;padding:3px 8px;font-size:15px;color:#8fa3c9;min-width:0}
+.stat strong{display:block;font-size:22px;font-weight:normal;color:#edf3dd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lives{color:#ff6b6b}
+#quip{min-height:22px;text-align:center;color:#7ff0ff;font-size:20px;line-height:22px}
+#stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;touch-action:none}
+canvas{display:block;width:100%;max-width:calc((100dvh - 290px) * 19 / 21);aspect-ratio:19/21;image-rendering:pixelated;border:3px solid #24356b;background:#060a18}
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;pointer-events:none;padding:16px}
+#overlay[hidden]{display:none}
+#overlay strong{font-size:34px;font-weight:normal;color:#ffd34d;background:#060a18e6;padding:4px 12px}
+#overlay span{font-size:19px;background:#060a18e6;padding:4px 10px}
+.how{font-size:16px;color:#8fa3c9;text-align:center;margin:0}
+.pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,48px);gap:6px;justify-content:center}
+.pad button{font-size:24px;padding:0}
+.pad [data-dir=up]{grid-column:2}
+.pad [data-dir=left]{grid-column:1;grid-row:2}
+.pad [data-dir=down]{grid-column:2;grid-row:2}
+.pad [data-dir=right]{grid-column:3;grid-row:2}
+@media (min-height:820px){.pad{grid-template-rows:repeat(2,56px)}}
+</style></head><body><main>
+<header><div><span class="eyebrow">MDS CREW · SECRET ARCADE</span><h1>CODY’S BURGER CHASE</h1></div><div class="toolbar"><button id="sound" type="button" aria-pressed="false">Sound off</button><button id="pause" type="button">Pause</button></div></header>
+<div class="stats"><div class="stat">Score<strong id="score">0</strong></div><div class="stat">Best<strong id="best">0</strong></div><div class="stat">Level<strong id="level">1</strong></div><div class="stat">Lives<strong id="lives">♥♥♥</strong></div></div>
+<div id="quip" role="status" aria-live="polite"></div>
+<div id="stage"><canvas id="board" aria-label="Maze. Cody eats chips while salads chase him."></canvas><div id="overlay"><strong>CODY’S BURGER CHASE</strong><span>Tap, swipe or press an arrow to start</span></div></div>
+<p class="how">Eat every chip. Grab a big burger and the salads turn into burgers — eat them!</p>
+<div class="pad" aria-label="Direction controls"><button type="button" data-dir="up" aria-label="Up">▲</button><button type="button" data-dir="left" aria-label="Left">◀</button><button type="button" data-dir="down" aria-label="Down">▼</button><button type="button" data-dir="right" aria-label="Right">▶</button></div>
+</main><script src="cody-burger-chase.js?v=74"></script></body></html>
