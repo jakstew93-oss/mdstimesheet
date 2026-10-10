@@ -1,0 +1,38 @@
+/* Pocket Tools section. */
+#section-tools { max-width: 720px; margin: 0 auto; padding: 16px 14px 90px; }
+#section-tools[hidden] { display: none !important; }
+#section-tools .tools-head { margin: 0 2px 14px; }
+#section-tools .tools-head h2 { margin: 0 0 4px; font-size: 22px; color: var(--accent); }
+#section-tools .tools-head p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--subtext); }
+#section-tools details.tool { padding: 0 !important; margin-bottom: 10px; }
+#section-tools details.tool > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
+#section-tools details.tool > summary::-webkit-details-marker { display: none; }
+#section-tools details.tool > summary::after { content: '+'; position: absolute; right: 16px; font-size: 20px; color: var(--accent); }
+#section-tools details.tool[open] > summary::after { content: '–'; }
+#section-tools details.tool { position: relative; }
+#section-tools .tool-title { font-weight: 700; font-size: 16px; color: var(--text); padding-right: 24px; }
+#section-tools .tool-blurb { font-size: 13px; color: var(--subtext); padding-right: 24px; }
+#section-tools .tool-body { padding: 0 16px 16px; }
+#section-tools .field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; align-items: end; }
+#section-tools .field input[readonly] { opacity: .75; }
+#section-tools .tool-sub { margin: 18px 0 8px; font-size: 14px; color: var(--accent); }
+#section-tools .tool-out { margin-top: 6px; border-top: 1px solid var(--border); }
+#section-tools .tool-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+#section-tools .tool-row span { color: var(--subtext); }
+#section-tools .tool-row strong { font-family: var(--mono, monospace); font-variant-numeric: tabular-nums; color: var(--text); text-align: right; white-space: nowrap; }
+#section-tools .tool-ok strong { color: var(--success); }
+#section-tools .tool-warn strong { color: var(--warning); }
+#section-tools .tool-bad strong { color: var(--danger); }
+#section-tools .tool-hint { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--subtext); }
+#section-tools .tool-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 13px; }
+#section-tools .tool-table th, #section-tools .tool-table td { padding: 6px 4px; text-align: right; border-bottom: 1px solid var(--border); }
+#section-tools .tool-table th:first-child, #section-tools .tool-table td:first-child { text-align: left; }
+#section-tools .tool-table th { color: var(--subtext); font-weight: 600; }
+#section-tools .tool-table tr.tool-pick td { color: var(--success); font-weight: 700; }
+/* The pixel font runs small, so give results and titles more room in the 8-bit and Pac-Man themes. */
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-title { font-size: 21px; }
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-blurb,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-row,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-table { font-size: 17px; }
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-hint,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tools-head p { font-size: 16px; }
