@@ -74,7 +74,7 @@
  function modeAt(seconds){let t=seconds;for(const [mode,length] of MODES){if(t<length)return mode;t-=length}return 'chase'}
  function levelSettings(level){
   const n=Math.max(0,level-1);
-  return {codySpeed:7.2*Math.min(1.25,1+0.05*n),saladSpeed:6.6*Math.min(1.3,1+0.06*n),burgerSpeed:4,powerTime:Math.max(2.5,7-0.6*n)};
+  return {codySpeed:5.2*Math.min(1.25,1+0.05*n),saladSpeed:4.7*Math.min(1.3,1+0.06*n),burgerSpeed:2.8,powerTime:Math.max(3,8.5-0.6*n)};
  }
  const BURGER_POINTS=[200,400,800,1600];
 
@@ -85,15 +85,27 @@
  const $=id=>document.getElementById(id),canvas=$('board'),ctx=canvas.getContext('2d');
  const T=16,maze=parseMaze(MAZE),W=maze.w*T,H=maze.h*T;
  const SALADS=[{name:'Tomato',body:'#e8483c',dark:'#a8261f'},{name:'Lettuce',body:'#7fd34e',dark:'#3f8f2a'},{name:'Cucumber',body:'#2fae7a',dark:'#17694a'},{name:'Carrot',body:'#ff9a3c',dark:'#c45f12'}];
- let state='title',level=1,score=0,lives=3,best=0,extraLifeGiven=false,chips,burgers,cody,salads,modeClock=0,powerLeft=0,burgerStreak=0,pauseTimer=0,afterPause=null,message='',deathTime=0,flash=0,last=0,sound=false,audio=null,chomp=0,lastChip=0,bonus=[];
+ let state='title',level=1,score=0,lives=3,best=0,extraLifeGiven=false,chips,burgers,cody,salads,modeClock=0,powerLeft=0,burgerStreak=0,pauseTimer=0,afterPause=null,message='',deathTime=0,flash=0,last=0,sound=false,audio=null,chomp=0,lastChip=0,bite=0,bonus=[];
  try{best=Number(localStorage.getItem('cody_burger_chase_best_v1'))||0}catch(_){}
 
  const dpr=Math.min(3,window.devicePixelRatio||1);
  canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;
 
- // Cody's head, cropped from his crew portrait.
- const head=document.createElement('canvas');head.width=head.height=64;
- const portrait=new Image();portrait.onload=()=>{const h=head.getContext('2d');h.imageSmoothingEnabled=false;h.beginPath();h.arc(32,32,32,0,Math.PI*2);h.clip();h.drawImage(portrait,127,60,1000,1000,0,0,64,64)};
+ // Cody's head from his crew portrait, cut along his smile so the lower jaw can drop open and chomp.
+ // Shapes are in the portrait's own pixels (1254 square); the head is cropped to a 1000px square from (127,55).
+ const HEAD=192,CROP={x:127,y:55,size:1000};
+ const headTop=document.createElement('canvas'),headJaw=document.createElement('canvas');headTop.width=headTop.height=headJaw.width=headJaw.height=HEAD;
+ function headOutline(g){g.beginPath();g.ellipse(627,575,395,520,0,0,Math.PI*2)}
+ function jawOutline(g){
+  g.beginPath();g.moveTo(250,1150);g.lineTo(420,935);g.lineTo(488,822);
+  g.quadraticCurveTo(620,838,754,815);g.lineTo(835,935);g.lineTo(1010,1150);g.closePath();
+ }
+ function portraitSpace(g){g.setTransform(HEAD/CROP.size,0,0,HEAD/CROP.size,-CROP.x*HEAD/CROP.size,-CROP.y*HEAD/CROP.size);g.imageSmoothingQuality='high'}
+ const portrait=new Image();portrait.onload=()=>{
+  const top=headTop.getContext('2d');portraitSpace(top);headOutline(top);top.clip();top.drawImage(portrait,0,0);
+  top.globalCompositeOperation='destination-out';jawOutline(top);top.fill();
+  const jaw=headJaw.getContext('2d');portraitSpace(jaw);headOutline(jaw);jaw.clip();jawOutline(jaw);jaw.clip();jaw.drawImage(portrait,0,0);
+ };
  portrait.src='driver-avatars/cody-slack-black-shirt.png';
 
  function newCody(){return {x:maze.player.x,y:maze.player.y,dir:'left',next:'left',prog:0,moving:false,face:-1}}
@@ -134,7 +146,7 @@
  }
 
  function update(dt){
-  chomp+=dt;flash+=dt;bonus=bonus.filter(b=>(b.t-=dt)>0);
+  chomp+=dt;flash+=dt;bite=Math.max(0,bite-dt);bonus=bonus.filter(b=>(b.t-=dt)>0);
   if(state==='pause'){pauseTimer-=dt;if(pauseTimer<=0){const f=afterPause;afterPause=null;f&&f()}return}
   if(state==='dying'){deathTime+=dt;if(deathTime>1.4)afterDeath();return}
   if(state!=='playing')return;
@@ -161,9 +173,9 @@
  function reverse(s){if(!s.moving)return;s.x=((s.x+DIRS[s.dir][0])%maze.w+maze.w)%maze.w;s.y+=DIRS[s.dir][1];s.prog=1-s.prog;s.dir=OPP[s.dir]}
  function eat(a){
   const k=a.x+','+a.y;
-  if(chips.delete(k)){addScore(10);if(sound&&chomp-lastChip>.09){tone(chips.size%2?392:330,.05,'square',.04);lastChip=chomp}}
+  if(chips.delete(k)){addScore(10);bite=.12;if(sound&&chomp-lastChip>.09){tone(chips.size%2?392:330,.05,'square',.04);lastChip=chomp}}
   if(burgers.delete(k)){
-   addScore(50);powerLeft=levelSettings(level).powerTime;burgerStreak=0;
+   addScore(50);bite=.35;powerLeft=levelSettings(level).powerTime;burgerStreak=0;
    salads.forEach(s=>{if(!s.home){s.fright=true;reverse(s)}});
    say(['BURGER TIME!','Salads are on the menu now!','Get in, double cheese!','Lunch is served!'][Math.floor(Math.random()*4)]);tone(196,.25,'sawtooth',.06);
   }
@@ -180,7 +192,7 @@
    if(s.fright){
     const pts=BURGER_POINTS[Math.min(burgerStreak++,3)];addScore(pts);bonus.push({x:p.x,y:p.y,text:String(pts),t:1});
     s.fright=false;s.home=true;s.release=3;const spot=maze.house[s.i%3];s.x=spot.x;s.y=spot.y;s.prog=0;s.moving=false;
-    tone(880,.08,'square',.06);setTimeout(()=>tone(1175,.1,'square',.06),80);
+    bite=.35;tone(880,.08,'square',.06);setTimeout(()=>tone(1175,.1,'square',.06),80);
    } else {
     state='dying';deathTime=0;say(['Got salad-ed!','Not the '+s.name.toLowerCase()+'!','Ugh, vegetables.','Five a day got me.'][Math.floor(Math.random()*4)]);
     tone(330,.2,'triangle');setTimeout(()=>tone(247,.2,'triangle'),200);setTimeout(()=>tone(165,.4,'triangle'),400);return;
@@ -230,12 +242,32 @@
  }
  function drawCody(){
   const p=pos(cody),cx=p.x*T+T/2,cy=p.y*T+T/2;
-  let size=T*1.45;
-  if(state==='dying'){const k=Math.min(1,deathTime/1.2);size*=1-k;ctx.save();ctx.translate(cx,cy);ctx.rotate(k*Math.PI*4);ctx.drawImage(head,-size/2,-size/2,size,size);ctx.restore();return}
-  const bob=cody.moving?Math.sin(chomp*28)*1.2:0;
-  ctx.save();ctx.translate(cx,cy+bob);ctx.scale(cody.face,1);
-  ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(0,0,size/2+1,0,Math.PI*2);ctx.fill();
-  ctx.drawImage(head,-size/2,-size/2,size,size);ctx.restore();
+  let size=T*1.8;
+  ctx.save();
+  if(state==='dying'){const k=Math.min(1,deathTime/1.2);size*=1-k;ctx.translate(cx,cy);ctx.rotate(k*Math.PI*3);drawHead(size,.9*(1-k));ctx.restore();return}
+  // Chomps about four times a second while moving, with a wider bite just after eating.
+  const open=cody.moving?(0.5-0.5*Math.cos(chomp*Math.PI*8)):0.08;
+  ctx.translate(cx,cy-1+(cody.moving?Math.sin(chomp*Math.PI*8)*0.5:0));ctx.scale(cody.face,1);
+  drawHead(size,Math.min(1,open+(bite>0?0.35:0)));ctx.restore();
+ }
+ // Draws the head centred on the origin; open runs from 0 (shut) to 1 (wide open).
+ function drawHead(size,open){
+  const k=size/CROP.size,drop=open*110*k;
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=3;ctx.shadowOffsetY=1;
+  ctx.drawImage(headTop,-size/2,-size/2,size,size);
+  ctx.shadowColor='transparent';
+  // Stretch the cheeks down with the jaw so the sides of the face stay joined.
+  for(let d=0;d<drop;d+=Math.max(.5,drop/8))ctx.drawImage(headJaw,-size/2,-size/2+d,size,size);
+  // Inside of the mouth, revealed as the jaw drops.
+  const mx=(620-CROP.x-CROP.size/2)*k,my=(832-CROP.y-CROP.size/2)*k;
+  if(drop>0.2){
+   ctx.fillStyle='#3a0b0e';ctx.beginPath();ctx.ellipse(mx,my+drop/2-4*k,130*k,drop/2+24*k,0,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#b8434b';ctx.beginPath();ctx.ellipse(mx,my+drop*0.8,70*k,drop*0.3+3*k,0,0,Math.PI*2);ctx.fill();
+  }
+  ctx.drawImage(headJaw,-size/2,-size/2+drop,size,size);
+  ctx.drawImage(headTop,-size/2,-size/2,size,size);
+  ctx.imageSmoothingEnabled=false;
  }
  function draw(){
   drawMaze();
