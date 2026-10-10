@@ -39,8 +39,36 @@ test('cable size helper picks the smallest twin & earth that carries the breaker
  assert.ok(!t.cableSize({...base,ib:40,rating:32,method:'C'}).ratingOk);
  assert.equal(t.TE_METHODS.C.amps[2],27);assert.equal(t.TE_METHODS['103'].amps[2],13.5);assert.equal(t.AMBIENT[40],0.87);assert.equal(t.GROUPING[2],0.7);
 });
+test('max demand applies On-Site Guide household diversity',()=>{
+ const r=t.maxDemand({lightingKw:1,socketCircuits:[32,32,20],cookerKw:10,cookerSocket:true,showersKw:[9.5,8.5,7],fixedHeatKw:3,evKw:7.4,otherKw:4.6});
+ const amps=Object.fromEntries(r.items.map(i=>[i.label.split(' (')[0],i.amps]));
+ assert.equal(amps['Lighting'],2.87);assert.equal(amps['Socket circuits'],52.8);assert.equal(amps['Cooker'],25.04);
+ assert.equal(amps['Showers / instant water heaters'],85.87);assert.equal(amps['EV charger'],32.17);assert.equal(amps['Other heating and power'],15);
+ assert.equal(r.total,Math.round(r.items.reduce((s,i)=>s+i.amps,0)*100)/100);
+ assert.equal(t.maxDemand({cookerKw:2}).items[0].amps,8.7);assert.deepEqual(t.maxDemand({}).items,[]);
+});
+test('adiabatic check works out the minimum cpc and next size',()=>{
+ const r=t.adiabatic(1000,0.1,115);assert.equal(r.minimum,2.75);assert.equal(r.nextSize,4);
+ assert.equal(t.adiabatic(230/0.8,0.1,115).nextSize,1);assert.equal(t.adiabatic(0,0.1,115),null);
+ assert.equal(t.K_VALUES.te.k,115);assert.equal(t.K_VALUES.sepPvc.k,143);assert.equal(t.K_VALUES.swaXlpe.k,46);
+});
+test('conduit and trunking fill pick the smallest size that takes the cables',()=>{
+ let r=t.fill([{cable:'stranded 2.5',count:6},{cable:'stranded 1.5',count:3}],t.CONDUIT_CABLE,t.CONDUIT);assert.equal(r.total,351);assert.equal(r.smallest,'20');
+ r=t.fill([{cable:'stranded 2.5',count:7}],t.CONDUIT_CABLE,t.CONDUIT);assert.equal(r.total,301);assert.equal(r.smallest,'20');
+ assert.equal(t.fill([{cable:'stranded 2.5',count:6}],t.CONDUIT_CABLE,t.CONDUIT).smallest,'16');
+ r=t.fill([{cable:'stranded 6',count:12},{cable:'stranded 2.5',count:20}],t.TRUNKING_CABLE,t.TRUNKING);assert.equal(r.total,506.4);assert.equal(r.smallest,'75×25');
+ assert.equal(t.fill([{cable:'stranded 25',count:200}],t.CONDUIT_CABLE,t.CONDUIT).smallest,null);
+});
+test('test result checks flag Zs over 80%, low insulation and slow RCDs',()=>{
+ assert.deepEqual(t.checkCircuit({type:'B',rating:'32',zs:'0.9',irLL:'>200',irLE:'>999',rcd:'24'}),{zs:{max:1.37,limit:1.1,state:'ok'},ir:{state:'ok'},rcd:{state:'ok'}});
+ assert.equal(t.checkCircuit({type:'B',rating:'32',zs:'1.2'}).zs.state,'warn');
+ assert.equal(t.checkCircuit({type:'C',rating:'32',zs:'0.9'}).zs.state,'bad');
+ assert.equal(t.checkCircuit({irLL:'0.5',irLE:'200'}).ir.state,'bad');assert.equal(t.checkCircuit({rcd:'320'}).rcd.state,'bad');
+ assert.deepEqual(t.checkCircuit({type:'',rating:'32',zs:'0.5'}),{});
+});
 test('Pocket Tools is loaded by the app and cached offline',()=>{
  const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
- assert.match(template,/pocket-tools\.js\?v=78/);assert.match(template,/pocket-tools\.css\?v=78/);
- const sw=fs.readFileSync('sw.js','utf8');for(const f of ['pocket-tools.js?v=78','pocket-tools.css?v=78'])assert.ok(sw.includes(f),f);
+ assert.match(template,/pocket-tools\.js\?v=79/);assert.match(template,/pocket-tools\.css\?v=79/);
+ assert.match(template,/test-results\.js\?v=79/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const f of ['pocket-tools.js?v=79','pocket-tools.css?v=79','test-results.js?v=79'])assert.ok(sw.includes(f),f);
 });

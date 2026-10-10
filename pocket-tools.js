@@ -83,7 +83,67 @@
   return {ratingOk:rating>=ib,neededIt:round2(neededIt),ca,cg,rows,suggestion:rating>=ib?(rows.find(r=>r.ok)||null):null};
  }
 
- const api={VD_CABLES,voltDrop,maxZs,measuredLimit,rcdMaxZs,BREAKER_RATINGS,R1R2,expectedZs,ringCheck,faultCurrent,ohms,loadCurrent,TE_SIZES,TE_METHODS,AMBIENT,GROUPING,cableSize};
+ // Maximum demand with household diversity (On-Site Guide Appendix A, Table A2). Amps at 230 V.
+ const kwToAmps=kw=>kw>0?kw*1000/U0:0;
+ function maxDemand(d){
+  const items=[];const add=(label,amps)=>{if(amps>0)items.push({label,amps:round2(amps)})};
+  add('Lighting (66%)',kwToAmps(d.lightingKw)*0.66);
+  const sockets=[...(d.socketCircuits||[])].filter(a=>a>0).sort((a,b)=>b-a);
+  if(sockets.length)add('Socket circuits (largest + 40% of the rest)',sockets[0]+0.4*sockets.slice(1).reduce((s,a)=>s+a,0));
+  const cooker=kwToAmps(d.cookerKw);
+  if(cooker>0)add('Cooker (10 A + 30% of the rest'+(d.cookerSocket?' + 5 A socket)':')'),Math.min(cooker,10)+0.3*Math.max(0,cooker-10)+(d.cookerSocket?5:0));
+  const showers=[...(d.showersKw||[])].filter(k=>k>0).map(kwToAmps).sort((a,b)=>b-a);
+  if(showers.length)add('Showers / instant water heaters (two largest + 25% of the rest)',(showers[0]||0)+(showers[1]||0)+0.25*showers.slice(2).reduce((s,a)=>s+a,0));
+  add('Immersion, storage and underfloor heating (100%)',kwToAmps(d.fixedHeatKw));
+  add('EV charger (100%)',kwToAmps(d.evKw));
+  const other=kwToAmps(d.otherKw);
+  add('Other heating and power (10 A + 50% of the rest)',Math.min(other,10)+0.5*Math.max(0,other-10));
+  return {items,total:round2(items.reduce((s,i)=>s+i.amps,0))};
+ }
+
+ // Adiabatic equation (Regulation 543.1.3): S = √(I²t) ÷ k.
+ const K_VALUES={
+  te:{name:'Copper cpc in a PVC cable, e.g. twin & earth (115)',k:115},
+  xlpe:{name:'Copper cpc in an XLPE cable (143)',k:143},
+  sepPvc:{name:'Separate PVC-insulated copper cpc (143)',k:143},
+  sepXlpe:{name:'Separate XLPE-insulated copper cpc (176)',k:176},
+  swaPvc:{name:'Steel armour of a PVC SWA cable (51)',k:51},
+  swaXlpe:{name:'Steel armour of an XLPE SWA cable (46)',k:46}
+ };
+ const CSA=[1,1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240];
+ function adiabatic(faultAmps,seconds,k){
+  if(!(faultAmps>0&&seconds>0&&k>0))return null;
+  const s=Math.sqrt(faultAmps*faultAmps*seconds)/k;
+  return {minimum:Math.round(s*100)/100,nextSize:CSA.find(c=>c>=s)||null};
+ }
+
+ // Conduit and trunking fill for short straight runs (On-Site Guide Appendix E, Tables E1, E2, E5 and E6).
+ const CONDUIT_CABLE={'solid 1.0':22,'solid 1.5':27,'solid 2.5':39,'stranded 1.5':31,'stranded 2.5':43,'stranded 4':58,'stranded 6':88,'stranded 10':146,'stranded 16':202,'stranded 25':385};
+ const CONDUIT={16:290,20:460,25:800,32:1400,38:1900,50:3500,63:5600};
+ const TRUNKING_CABLE={'solid 1.5':8.0,'solid 2.5':11.9,'stranded 1.5':8.6,'stranded 2.5':12.6,'stranded 4':16.6,'stranded 6':21.2,'stranded 10':35.3,'stranded 16':47.8,'stranded 25':73.9};
+ const TRUNKING={'50×38':767,'50×50':1037,'75×25':738,'75×38':1146,'75×50':1555,'75×75':2371,'100×25':993,'100×38':1542,'100×50':2091,'100×75':3189,'100×100':4252};
+ function fill(cables,cableFactors,containers){
+  let total=0;
+  for(const c of cables){const f=cableFactors[c.cable];if(f==null||!(c.count>0))continue;total+=f*c.count}
+  total=Math.round(total*10)/10;
+  const fits=Object.entries(containers).filter(([,f])=>f>=total).sort((a,b)=>a[1]-b[1]);
+  return {total,smallest:total>0&&fits.length?fits[0][0]:null};
+ }
+
+ // Test result checks: Zs against 80% of Table 41.3, insulation resistance at least 1 MΩ, RCD within 300 ms at IΔn.
+ function checkCircuit(c){
+  const out={};
+  const parse=v=>parseFloat(String(v??'').replace(/[>≥\s]/g,''));
+  const z=maxZs(c.type,Number(c.rating)),zs=parse(c.zs);
+  if(z&&zs>0)out.zs={max:z,limit:measuredLimit(z),state:zs<=measuredLimit(z)?'ok':zs<=z?'warn':'bad'};
+  const ir=[parse(c.irLL),parse(c.irLE)].filter(v=>v>=0);
+  if(ir.length)out.ir={state:Math.min(...ir)>=1?'ok':'bad'};
+  const ms=parse(c.rcd);
+  if(ms>0)out.rcd={state:ms<=300?'ok':'bad'};
+  return out;
+ }
+
+ const api={maxDemand,K_VALUES,CSA,adiabatic,CONDUIT_CABLE,CONDUIT,TRUNKING_CABLE,TRUNKING,fill,checkCircuit,VD_CABLES,voltDrop,maxZs,measuredLimit,rcdMaxZs,BREAKER_RATINGS,R1R2,expectedZs,ringCheck,faultCurrent,ohms,loadCurrent,TE_SIZES,TE_METHODS,AMBIENT,GROUPING,cableSize};
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDSPocketTools=api;
 
@@ -103,6 +163,9 @@
   }
  }
  function note(id,text){const box=$(id);const p=document.createElement('p');p.className='tool-hint';p.textContent=text;box.append(p)}
+ const FUSE_KEY='mds_fuse_zs_v1';
+ function fuses(){try{const l=JSON.parse(localStorage.getItem(FUSE_KEY)||'[]');return Array.isArray(l)?l:[]}catch(_){return []}}
+ function saveFuses(list){try{localStorage.setItem(FUSE_KEY,JSON.stringify(list))}catch(_){}}
  const breakerOptions=BREAKER_RATINGS.map(r=>[r,r+' A']);
  const typeOptions=[['B','Type B MCB / RCBO'],['C','Type C MCB / RCBO'],['D','Type D MCB / RCBO']];
 
@@ -191,6 +254,74 @@
      body.append(tr)}
     t.append(body);$('cs-out').append(t);
     note('cs-out','Ca '+r.ca+' × Cg '+r.cg+'. Assumes a BS EN 60898/61009 breaker and no extra thermal insulation beyond the method chosen. Check Zs and the full regs before installing.');
+   }},
+  {id:'fuse',title:'Fuse Zs (your values)',blurb:'Save fuse max Zs figures from your regs book, then check readings.',html:()=>
+   '<p class="tool-hint">Type in each fuse once from BS 7671 Table 41.2 (0.4 s) and 41.4 (5 s). They stay saved on this phone.</p>'+
+   `<div class="field-row">${field('fz-type','Fuse',`<select id="fz-type">${opts([['BS 88-2','BS 88-2'],['BS 88-3','BS 88-3'],['BS 3036','BS 3036 (rewireable)'],['BS 1362','BS 1362 (plug)'],['Other','Other']],'BS 88-2')}</select>`)}${field('fz-rating','Rating (A)',numberInput('fz-rating','e.g. 32'))}</div>`+
+   `<div class="field-row">${field('fz-04','Max Zs 0.4 s (Ω)',numberInput('fz-04','from the regs'))}${field('fz-5','Max Zs 5 s (Ω)',numberInput('fz-5','from the regs'))}</div>`+
+   '<button type="button" class="btn btn-secondary" id="fz-add">Save fuse</button><div id="fz-list"></div>'+
+   '<h3 class="tool-sub">Check a reading</h3>'+
+   `<div class="field-row">${field('fz-pick','Saved fuse','<select id="fz-pick"></select>')}${field('fz-time','Disconnection time',`<select id="fz-time">${opts([['04','0.4 s (final circuits ≤ 63 A)'],['5','5 s (distribution circuits)']],'04')}</select>`)}</div>`+
+   field('fz-measured','Measured Zs (Ω)',numberInput('fz-measured','e.g. 1.2'))+out('fz-out'),
+   init(){
+    $('fz-add').addEventListener('click',()=>{
+     const rating=num('fz-rating'),z04=num('fz-04'),z5=num('fz-5');
+     if(!(rating>0)||!(z04>0||z5>0)){if(typeof showToast==='function')showToast('Enter the rating and at least one Zs figure');return}
+     const list=fuses().filter(f=>!(f.type===$('fz-type').value&&f.rating===rating));
+     list.push({type:$('fz-type').value,rating,z04:z04>0?z04:null,z5:z5>0?z5:null});list.sort((a,b)=>a.type.localeCompare(b.type)||a.rating-b.rating);saveFuses(list);
+     ['fz-rating','fz-04','fz-5'].forEach(id=>$(id).value='');TOOLS.find(t=>t.id==='fuse').calc();
+    });
+    $('fz-list').addEventListener('click',e=>{const b=e.target.closest('[data-fuse]');if(!b)return;const list=fuses();list.splice(Number(b.dataset.fuse),1);saveFuses(list);TOOLS.find(t=>t.id==='fuse').calc()});
+   },
+   calc(){
+    const list=fuses(),box=$('fz-list'),sig=JSON.stringify(list);
+    // Redraw only when the list changes, so a tap on ✕ isn't lost when a reading box finishes editing.
+    if(box.dataset.sig!==sig){box.dataset.sig=sig;box.replaceChildren();list.forEach((f,i)=>{const row=document.createElement('div');row.className='tool-row';const a=document.createElement('span');a.textContent=f.type+' '+f.rating+' A';const b=document.createElement('strong');b.textContent=(f.z04?f.z04+' Ω @0.4s':'')+(f.z04&&f.z5?' · ':'')+(f.z5?f.z5+' Ω @5s':'');const x=document.createElement('button');x.type='button';x.className='tool-x';x.dataset.fuse=i;x.setAttribute('aria-label','Delete '+f.type+' '+f.rating+' A');x.textContent='✕';row.append(a,b,x);box.append(row)});
+    const pick=$('fz-pick'),was=pick.value;pick.innerHTML=list.length?opts(list.map((f,i)=>[i,f.type+' '+f.rating+' A']),was):'<option value="">No fuses saved yet</option>'}
+    const pick=$('fz-pick');
+    const f=list[Number(pick.value)],z=f&&($('fz-time').value==='5'?f.z5:f.z04),m=num('fz-measured');
+    if(!f){show('fz-out',[]);note('fz-out','Save a fuse above to check readings against it.');return}
+    if(!z){show('fz-out',[]);note('fz-out','No figure saved for that disconnection time.');return}
+    const lim=measuredLimit(z),lines=[['Max Zs',fmt(z)+' Ω'],['80% for test readings',fmt(lim)+' Ω']];
+    if(m>0)lines.push(['Your reading '+fmt(m)+' Ω',m<=lim?'✓ OK':m<=z?'! Check':'✗ Too high',m<=lim?'ok':m<=z?'warn':'bad']);
+    show('fz-out',lines);
+   }},
+  {id:'demand',title:'Max demand',blurb:'Household load with diversity against the main fuse.',html:()=>
+   `<div class="field-row">${field('md-light','Lighting total (kW)',numberInput('md-light','e.g. 1'))}${field('md-sockets','Socket circuits (A, comma between)','<input id="md-sockets" type="text" inputmode="decimal" placeholder="e.g. 32, 32, 20">')}</div>`+
+   `<div class="field-row">${field('md-cooker','Cooker (kW)',numberInput('md-cooker','e.g. 10'))}${field('md-cooker-socket','Socket on cooker switch',`<select id="md-cooker-socket">${opts([['no','No'],['yes','Yes']],'no')}</select>`)}</div>`+
+   `<div class="field-row">${field('md-showers','Showers (kW, comma between)','<input id="md-showers" type="text" inputmode="decimal" placeholder="e.g. 9.5">')}${field('md-fixed','Immersion / storage / UFH (kW)',numberInput('md-fixed','total'))}</div>`+
+   `<div class="field-row">${field('md-ev','EV charger (kW)',numberInput('md-ev','e.g. 7.4'))}${field('md-other','Other fixed loads (kW)',numberInput('md-other','total'))}</div>`+
+   field('md-fuse','Main fuse',`<select id="md-fuse">${opts([[60,'60 A'],[80,'80 A'],[100,'100 A']],100)}</select>`)+out('md-out'),
+   calc(){
+    const list=id=>$(id).value.split(/[,\s]+/).map(parseFloat).filter(v=>v>0);
+    const r=maxDemand({lightingKw:num('md-light'),socketCircuits:list('md-sockets'),cookerKw:num('md-cooker'),cookerSocket:$('md-cooker-socket').value==='yes',showersKw:list('md-showers'),fixedHeatKw:num('md-fixed'),evKw:num('md-ev'),otherKw:num('md-other')});
+    if(!r.items.length){show('md-out',[]);note('md-out','Fill in the loads in the property.');return}
+    const fuse=Number($('md-fuse').value),ok=r.total<=fuse;
+    show('md-out',r.items.map(i=>[i.label,fmt(i.amps,1)+' A']).concat([['Maximum demand',fmt(r.total,1)+' A'],['Main fuse '+fuse+' A',ok?'✓ Enough':'✗ Over',ok?'ok':'bad']]));
+    note('md-out','Diversity from the On-Site Guide (Table A2). EV chargers have no diversity. '+(ok?'':'Consider load management or a supply upgrade.'));
+   }},
+  {id:'adiabatic',title:'Adiabatic check',blurb:'Is the cpc big enough for the fault current?',html:()=>
+   `<div class="field-row">${field('ad-zs','Zs (Ω)',numberInput('ad-zs','e.g. 0.8'))}${field('ad-amps','or fault current (A)',numberInput('ad-amps','e.g. 1000'))}</div>`+
+   `<div class="field-row">${field('ad-time','Disconnection time (s)',numberInput('ad-time','0.1','0.1'))}${field('ad-size','cpc fitted (mm²)',`<select id="ad-size">${opts(CSA.map(c=>[c,String(c)]),1.5)}</select>`)}</div>`+
+   field('ad-k','Type of cpc',`<select id="ad-k">${opts(Object.entries(K_VALUES).map(([key,v])=>[key,v.name]),'te')}</select>`)+out('ad-out'),
+   calc(){
+    const zs=num('ad-zs'),amps=zs>0?U0/zs:num('ad-amps'),r=adiabatic(amps,num('ad-time'),K_VALUES[$('ad-k').value].k),fitted=Number($('ad-size').value);
+    if(!r){show('ad-out',[]);note('ad-out','Enter Zs or the fault current, and the disconnection time.');return}
+    const ok=fitted>=r.minimum;
+    show('ad-out',[['Fault current',fmt(amps,0)+' A'],['Minimum cpc',fmt(r.minimum)+' mm²'],['Next standard size',r.nextSize?r.nextSize+' mm²':'Over 240 mm²'],['Fitted '+fitted+' mm²',ok?'✓ OK':'✗ Too small',ok?'ok':'bad']]);
+    note('ad-out','S = √(I²t) ÷ k. Use 0.1 s for a breaker tripping instantly; for fuses read the time from the curve.');
+   }},
+  {id:'fill',title:'Conduit & trunking fill',blurb:'Smallest conduit or trunking for your cables.',html:()=>
+   field('fl-kind','Containment',`<select id="fl-kind">${opts([['conduit','Conduit (straight run up to 3 m)'],['trunking','Trunking']],'conduit')}</select>`)+
+   [0,1,2,3].map(i=>`<div class="field-row">${field('fl-cable-'+i,'Singles '+(i+1),`<select id="fl-cable-${i}"><option value="">–</option>${opts(Object.keys(CONDUIT_CABLE).map(k=>[k,k.replace('solid','Solid').replace('stranded','Stranded')+' mm²']),i===0?'stranded 2.5':'')}</select>`)}${field('fl-count-'+i,'How many',numberInput('fl-count-'+i,'0'))}</div>`).join('')+out('fl-out'),
+   calc(){
+    const trunk=$('fl-kind').value==='trunking',cables=[0,1,2,3].map(i=>({cable:$('fl-cable-'+i).value,count:num('fl-count-'+i)})).filter(c=>c.cable&&c.count>0);
+    if(!cables.length){show('fl-out',[]);note('fl-out','Pick the single-core cables (6491X) and how many of each.');return}
+    const missing=trunk&&cables.some(c=>TRUNKING_CABLE[c.cable]==null);
+    const r=fill(cables,trunk?TRUNKING_CABLE:CONDUIT_CABLE,trunk?TRUNKING:CONDUIT);
+    show('fl-out',[['Total cable factor',fmt(r.total,1)],[trunk?'Smallest trunking':'Smallest conduit',r.smallest?(trunk?r.smallest+' mm':r.smallest+' mm'):'Too many for the table',r.smallest?'ok':'bad']]);
+    if(missing)note('fl-out','Solid 1.0 mm² has no trunking factor in the table and is left out.');
+    note('fl-out',trunk?'Trunking factors from the On-Site Guide (Tables E5 and E6).':'For runs over 3 m or with bends, use On-Site Guide Tables E3 and E4 instead.');
    }}
  ];
 
@@ -205,7 +336,7 @@
   if(!$('sectionSelect')||typeof root.switchSection!=='function'||$('section-tools'))return;
   const option=document.createElement('option');option.value='tools';option.textContent='Pocket Tools';$('sectionSelect').append(option);
   const panel=build();($('section-expenses')||$('section-holiday')).after(panel);
-  for(const t of TOOLS){const d=$('tool-'+t.id);const run=()=>{try{t.calc()}catch(e){console.warn('Pocket tool failed',e)}};d.addEventListener('input',run);d.addEventListener('change',run);run()}
+  for(const t of TOOLS){const d=$('tool-'+t.id);const run=()=>{try{t.calc()}catch(e){console.warn('Pocket tool failed',e)}};if(t.init)t.init();d.addEventListener('input',run);d.addEventListener('change',run);run()}
   // Only one tool open at a time keeps the page short on a phone.
   panel.addEventListener('toggle',e=>{if(e.target.open)panel.querySelectorAll('details.tool[open]').forEach(d=>{if(d!==e.target)d.open=false})},true);
   const original=root.switchSection;

@@ -36,3 +36,21 @@
 :root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-table { font-size: 17px; }
 :root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tool-hint,
 :root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tools-head p { font-size: 16px; }
+#section-tools .tool-x { flex-shrink: 0; min-height: 0; padding: 2px 8px; border: 1px solid var(--border); background: none; color: var(--danger); cursor: pointer; }
+#section-tools #fz-add { margin: 4px 0 8px; }
+#section-tools .tr-circuit { margin: 14px 0 0; padding: 10px 12px 12px; border: 1px solid var(--border); border-radius: 10px; min-width: 0; }
+#section-tools .tr-circuit legend { padding: 0 6px; font-weight: 700; color: var(--accent); }
+#section-tools .tr-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 10px; align-items: end; }
+#section-tools .tr-check { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px; font-size: 14px; }
+#section-tools .tr-results { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+#section-tools .tr-chip { padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; }
+#section-tools .tr-chip.tool-ok { color: var(--success); border-color: var(--success); }
+#section-tools .tr-chip.tool-warn { color: var(--warning); border-color: var(--warning); }
+#section-tools .tr-chip.tool-bad { color: var(--danger); border-color: var(--danger); }
+#section-tools .tr-remove { width: auto; padding: 6px 12px; font-size: 13px; }
+#section-tools .tr-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+#section-tools .tr-actions .btn { width: 100%; margin: 0; }
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tr-circuit,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tr-chip { border-radius: 0; }
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tr-chip,
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) #section-tools .tr-check { font-size: 16px; }
