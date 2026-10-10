@@ -11,7 +11,7 @@ function capture(){
  const s=load();if(!s||applying||!user()||localStorage.getItem('timesheet_employee')!==user())return;
  const data=readWeekStore(),current={};let changed=false;
  for(const bucket of Object.values(data.weeks))for(const entry of bucket.entries){
-  if(!entry._syncId||s.rows[entry._syncId]?.deleted){entry._syncId=uuid();changed=true;}
+  if(!entry._syncId||s.rows[entry._syncId]?.deleted||s.queue.some(op=>op.entryId===entry._syncId&&op.kind==='delete')){entry._syncId=uuid();changed=true;}
   current[entry._syncId]=entry;
   const changes=MDSWatchCore.diff(s.observed[entry._syncId],entry);
   if(Object.keys(changes).length)s.queue.push({id:uuid(),entryId:entry._syncId,kind:'patch',changes});

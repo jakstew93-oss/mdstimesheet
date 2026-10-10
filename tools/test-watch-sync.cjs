@@ -57,3 +57,11 @@ test('phone account switch during network response cannot write another employee
  p.data.set('ts_auth_user','Other Employee');p.data.set('timesheet_employee','Other Employee');finish({ok:true,json:async()=>({ack:[],operations:[patch('watch','watch-entry',{id:456,date:'2026-10-10',jobNumber:'456'})],cursor:1,more:false})});await pending;
  assert.equal(p.store().weeks['2026-10-11'].entries.length,1);assert.equal(JSON.parse(p.data.get(p.stateKey)).cursor,0);
 });
+
+test('undo before reconnect creates a fresh sync identity after a pending delete',()=>{
+ const p=phone();p.ctx.MDSWatchSync.capture();const old=p.store().weeks['2026-10-11'].entries[0];
+ p.ctx.writeWeekStore({version:1,weeks:{'2026-10-11':{entries:[]}}});
+ p.ctx.writeWeekStore({version:1,weeks:{'2026-10-11':{entries:[old]}}});
+ const restored=p.store().weeks['2026-10-11'].entries[0];assert.notEqual(restored._syncId,old._syncId);
+ const s=JSON.parse(p.data.get(p.stateKey));assert.ok(s.queue.some(op=>op.kind==='delete'&&op.entryId===old._syncId));assert.ok(s.queue.some(op=>op.kind==='patch'&&op.entryId===restored._syncId));
+});
