@@ -22,11 +22,12 @@ test('salads never turn back unless stuck and steer toward their target',()=>{
 test('modes cycle scatter and chase and levels get quicker up to a cap',()=>{
  assert.equal(api.modeAt(0),'scatter');assert.equal(api.modeAt(8),'chase');assert.equal(api.modeAt(28),'scatter');assert.equal(api.modeAt(500),'chase');
  assert.ok(api.levelSettings(3).saladSpeed>api.levelSettings(1).saladSpeed);
- assert.deepEqual(api.levelSettings(40),api.levelSettings(80));assert.equal(api.levelSettings(40).powerTime,2.5);
+ assert.deepEqual(api.levelSettings(40),api.levelSettings(80));assert.equal(api.levelSettings(40).powerTime,3);
+ assert.ok(api.levelSettings(1).codySpeed<=5.5&&api.levelSettings(1).saladSpeed<api.levelSettings(1).codySpeed);
 });
 test('the game is in the arcade picker and cached for offline play',()=>{
- assert.match(fs.readFileSync('spark-town-launcher.js','utf8'),/cody-burger-chase\.html\?v=74/);
- for(const file of ['index.html','Index.html'])assert.match(fs.readFileSync(file,'utf8'),/spark-town-launcher\.js\?v=74/);
- const sw=fs.readFileSync('sw.js','utf8');for(const f of ['cody-burger-chase.html?v=74','cody-burger-chase.js?v=74','spark-town-launcher.js?v=74'])assert.ok(sw.includes(f),f);
- assert.match(fs.readFileSync('cody-burger-chase.html','utf8'),/cody-burger-chase\.js\?v=74/);
+ assert.match(fs.readFileSync('spark-town-launcher.js','utf8'),/cody-burger-chase\.html\?v=75/);
+ for(const file of ['index.html','Index.html'])assert.match(fs.readFileSync(file,'utf8'),/spark-town-launcher\.js\?v=75/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const f of ['cody-burger-chase.html?v=75','cody-burger-chase.js?v=75','spark-town-launcher.js?v=75'])assert.ok(sw.includes(f),f);
+ assert.match(fs.readFileSync('cody-burger-chase.html','utf8'),/cody-burger-chase\.js\?v=75/);
 });
