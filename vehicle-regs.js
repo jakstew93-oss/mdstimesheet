@@ -1,7 +1,7 @@
 // Vehicle reg dropdowns: the company vans plus any regs added on this phone, on every reg box in the app.
 (function(root){
  'use strict';
- const FLEET=[['LA68 GEU','Martyn’s van'],['LD68 ULM','Jak’s van'],['SK69 PWV','Matt’s van'],['AY22 HTF','Ash’s van'],['BX22 VXR','Big van']];
+ const FLEET=[['LA68 GEU','Martyn’s Van'],['LD68 ULM','Jak’s Van'],['SK69 PWV','Matt’s Van'],['AY22 HTF','Ash’s Van'],['BX22 VXR','Big Van']];
  const KEY='mds_vehicle_regs_v1',INPUT_IDS=['qsReg','vehicleReg','editVehicleReg','vanReg'],NEW='__new';
 
  function normalise(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim()}

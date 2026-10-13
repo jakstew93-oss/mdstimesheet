@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const r=require('../vehicle-regs.js');
 test('the five company vans are in the list, in order',()=>{
- assert.deepEqual(r.mergeList([]).map(o=>o.reg+' '+o.label),['LA68 GEU Martyn’s van','LD68 ULM Jak’s van','SK69 PWV Matt’s van','AY22 HTF Ash’s van','BX22 VXR Big van']);
+ assert.deepEqual(r.mergeList([]).map(o=>o.reg+' '+o.label),['LA68 GEU Martyn’s Van','LD68 ULM Jak’s Van','SK69 PWV Matt’s Van','AY22 HTF Ash’s Van','BX22 VXR Big Van']);
 });
 test('regs are tidied and matched however they are typed',()=>{
  assert.equal(r.tidy(' ld68ulm '),'LD68 ULM');assert.equal(r.tidy('ab12  cde'),'AB12 CDE');assert.equal(r.tidy('w123 abc'),'W123 ABC');assert.equal(r.tidy(''),'');
@@ -18,6 +18,6 @@ test('new regs can be added once and removed, but fleet vans stay',()=>{
 });
 test('the dropdown is loaded by the app and cached offline',()=>{
  const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
- assert.match(template,/vehicle-regs\.js\?v=80/);assert.match(template,/vehicle-regs\.css\?v=80/);
- const sw=fs.readFileSync('sw.js','utf8');for(const f of ['vehicle-regs.js?v=80','vehicle-regs.css?v=80'])assert.ok(sw.includes(f),f);
+ assert.match(template,/vehicle-regs\.js\?v=81/);assert.match(template,/vehicle-regs\.css\?v=80/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const f of ['vehicle-regs.js?v=81','vehicle-regs.css?v=80'])assert.ok(sw.includes(f),f);
 });
