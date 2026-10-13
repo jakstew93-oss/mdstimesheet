@@ -1,0 +1,15 @@
+/* Vehicle reg dropdowns. The original typing box only shows while adding a new reg. */
+.reg-typed[hidden], .reg-add[hidden], .reg-remove[hidden], .reg-owner[hidden] { display: none !important; }
+.reg-select { width: 100%; }
+/* Same ▾ arrow as the Driver box. :not(#sectionSelect) matches the app's own select rule so this one wins. */
+#mds-app select.reg-select:not(#sectionSelect) { padding-right: 34px !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%239a9a9a'/%3E%3C/svg%3E") !important; background-repeat: no-repeat !important; background-position: right 12px center !important; background-size: 10px 6px !important; }
+.reg-owner { margin-top: 4px; font-size: 12px; color: var(--subtext, #9a9a9a); }
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .reg-owner { font-size: 16px; }
+.reg-select + .reg-typed { margin-top: 8px; }
+.reg-add { margin-top: 8px; }
+.reg-add .reg-add-label { width: 100%; }
+.reg-add-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 8px; }
+.reg-add-actions .btn { width: 100%; margin: 0; padding: 10px 12px; }
+.reg-remove { margin-top: 6px; padding: 4px 0; border: 0; background: none; color: var(--danger, #ef4444); font-size: 13px; text-decoration: underline; cursor: pointer; }
+/* The dropdown replaces the recent-reg buttons. */
+#quickRegMemory, #recentRegsContainer { display: none !important; }
