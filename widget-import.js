@@ -31,6 +31,7 @@
     return normalise(JSON.parse(raw));
   }
   if (typeof module !== 'undefined'  && module.exports) { module.exports = {normalise, parseRecordedText}; return; }
+  root.MDSWidgetImport = {normalise, parseRecordedText};
   const pendingKey = 'mds_widget_pending_v1';
   let pending = null;
   function acceptLink() {

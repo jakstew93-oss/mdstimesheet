@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v81';
+const CACHE_NAME = 'mdsmiths-timesheet-v82';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
@@ -14,13 +14,15 @@ const APP_SHELL = [
   './test-results.js?v=79',
   './vehicle-regs.css?v=80',
   './vehicle-regs.js?v=81',
+  './data-backup.js?v=82',
+  './native-bridge.js?v=82',
   './Index.html',
   './index.html',
   './recent-regs.js',
   './recent-regs.js?v=34',
   './appearance.css?v=62',
   './appearance.js?v=62',
-  './widget-import.js?v=62',
+  './widget-import.js?v=82',
   './timesheet-tools.js?v=62',
   './workflow-ui.js?v=62',
   './driver-characters.css?v=62',

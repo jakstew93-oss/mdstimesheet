@@ -29,7 +29,7 @@ class QuickWidgetProvider : AppWidgetProvider() {
         const val ACTION_QUICK = "com.jak.mdsquickwidget.QUICK"
         fun refreshAll(context: Context) {
             val runs = try { CaptureStore.read(context) } catch (_: Exception) { null }
-            // The widget only follows sets tapped on the phone; watch sets are shown in the app.
+            // The widget only follows sets tapped on the phone; watch sets go straight to the app.
             val current = runs?.lastOrNull { it.source == CaptureRun.PHONE }
             val index = if (runs == null) 0 else CaptureRun.nextIndex(runs, CaptureRun.PHONE, System.currentTimeMillis())
             val manager = AppWidgetManager.getInstance(context)
@@ -37,7 +37,7 @@ class QuickWidgetProvider : AppWidgetProvider() {
                 val views = RemoteViews(context.packageName, R.layout.quick_widget)
                 views.setTextViewText(R.id.quickLog, CaptureRun.ACTION_LABELS[index])
                 views.setTextViewText(R.id.status, when {
-                    runs == null -> "Open MDS Quick Log to check saved times"
+                    runs == null -> "Open MDS Timesheet to check saved times"
                     current == null || (index == 0 && !current.complete) -> "Tap to save the current time"
                     else -> "${CaptureRun.STAGE_LABELS[current.times.lastIndex]} saved · ${current.times.last().timeLabel()}"
                 })

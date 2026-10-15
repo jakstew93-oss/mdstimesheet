@@ -3,6 +3,7 @@ plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 // Signed with the MDS key from the MDS_SIGNING_KEYSTORE GitHub secret, so updates install over the
 // previous version and the phone and watch apps can talk to each other.
 val mdsKeystore = System.getenv("MDS_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+val buildNumber = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0) + 100
 
 android {
     namespace = "com.jak.mdsquickwidget.wear"
@@ -12,8 +13,8 @@ android {
         applicationId = "com.jak.mdsquickwidget.installed"
         minSdk = 30
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0-watch"
+        versionCode = buildNumber
+        versionName = "watch-$buildNumber"
     }
     signingConfigs {
         if (mdsKeystore != null) create("mds") {
