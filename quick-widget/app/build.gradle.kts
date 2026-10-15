@@ -1,17 +1,36 @@
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 
+// Signed with the MDS key from the MDS_SIGNING_KEYSTORE GitHub secret, so updates install over the
+// previous version and the phone and watch apps can talk to each other.
+val mdsKeystore = System.getenv("MDS_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+// Each GitHub build gets a higher version number, which is how the app spots a newer release.
+val buildNumber = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0) + 100
+
 android {
     namespace = "com.jak.mdsquickwidget"
     compileSdk = 35
     defaultConfig {
+        // The watch app uses the same ID and signing key so the two can talk to each other.
         applicationId = "com.jak.mdsquickwidget.installed"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.5-installed-app"
+        versionCode = buildNumber
+        versionName = "2.$buildNumber"
     }
+    signingConfigs {
+        if (mdsKeystore != null) create("mds") {
+            storeFile = mdsKeystore; storePassword = "mdsquicklog"; keyAlias = "mds"; keyPassword = "mdsquicklog"
+        }
+    }
+    buildTypes { getByName("debug") { if (mdsKeystore != null) signingConfig = signingConfigs.getByName("mds") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
 }
 
-dependencies { testImplementation("junit:junit:4.13.2") }
+dependencies {
+    implementation(project(":core"))
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
+    implementation("androidx.core:core:1.13.1")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
+}
