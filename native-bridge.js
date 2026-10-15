@@ -13,12 +13,15 @@
  }
  // Fills the Quick Start draft from a recorded set. Times already in the draft from somewhere else are never
  // overwritten, and a time the user corrected by hand stays corrected when the next watch tap arrives.
- function mergeDraft(draft,recorded){
+ // [handled] is how many of this set's stages were already brought in before; after a Reset only newer
+ // stages come back.
+ function mergeDraft(draft,recorded,handled=0){
   draft=draft||{};
   const incoming=recorded.draft,id=incoming._widget.id;
   const same=!!draft._widget&&draft._widget.id===id;
   if(!same&&TIME_FIELDS.some(k=>draft[k]))return null;
-  const before=same?draft._widget.times.length:0,after=incoming._widget.times.length;
+  const before=same?draft._widget.times.length:handled,after=incoming._widget.times.length;
+  if(!same&&after<=before)return {draft,changed:false,added:0};
   if(same&&after<=before)return {draft,changed:false,added:0};
   const next={...draft,date:incoming.date,_widget:incoming._widget};
   for(let i=before;i<after;i++)next[TIME_FIELDS[i]]=incoming[TIME_FIELDS[i]];
@@ -42,15 +45,24 @@
  }
  function readDraft(){try{return JSON.parse(localStorage.getItem('mds_qs_draft')||'{}')||{}}catch(_){return {}}}
  const warned=new Set();
+ // How many stages of each recorded set have been brought in, so Reset clears them for good.
+ const HANDLED_KEY='mds_watch_handled_v1';
+ function handled(){try{return JSON.parse(localStorage.getItem(HANDLED_KEY)||'{}')||{}}catch(_){return {}}}
+ function markHandled(id,count){
+  const all=handled();delete all[id];all[id]=count;
+  const ids=Object.keys(all);ids.slice(0,Math.max(0,ids.length-50)).forEach(k=>delete all[k]);
+  localStorage.setItem(HANDLED_KEY,JSON.stringify(all));
+ }
  function pull(){
   if(!signedIn()||!root.MDSWidgetImport)return;
   let runs;try{runs=JSON.parse(native.pendingRuns()||'[]')}catch(_){return}
   const run=pickRun(runs,savedIds());if(!run)return;
   let recorded;try{recorded=root.MDSWidgetImport.normalise({version:1,id:run.id,times:run.times})}catch(_){return}
-  const result=mergeDraft(readDraft(),recorded);
+  const result=mergeDraft(readDraft(),recorded,handled()[run.id]||0);
   if(!result){if(!warned.has(run.id)){warned.add(run.id);toast('⌚ Watch times are waiting. Save or reset this entry to bring them in.')}return}
   if(!result.changed)return;
   localStorage.setItem('mds_qs_draft',JSON.stringify({...result.draft,_savedAt:new Date().toISOString()}));
+  markHandled(run.id,run.times.length);
   // Don't redraw under someone mid-typing; the next check brings the times in.
   if(document.activeElement&&document.activeElement.closest?.('.quickstart')&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;
   if(typeof renderAll==='function')renderAll();

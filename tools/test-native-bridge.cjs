@@ -31,6 +31,14 @@ test('a draft with other times is never overwritten',()=>{
 test('the bridge, backup and widget import are loaded by the app and cached offline',()=>{
  const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
  const sw=fs.readFileSync('sw.js','utf8');
- for(const f of ['native-bridge.js?v=82','data-backup.js?v=82','widget-import.js?v=82']){assert.ok(template.includes(f),f);assert.ok(sw.includes(f),f)}
+ for(const f of ['native-bridge.js?v=83','data-backup.js?v=82','widget-import.js?v=82']){assert.ok(template.includes(f),f);assert.ok(sw.includes(f),f)}
  assert.ok(template.indexOf('widget-import.js')<template.indexOf('native-bridge.js'));
+});
+test('after Reset, stages already brought in stay gone and only newer taps come back',()=>{
+ const two=rec(run('w','2026-10-15T05:15:00Z','2026-10-15T08:06:00Z'));
+ assert.deepEqual(mergeDraft({},two,2),{draft:{},changed:false,added:0});
+ const three=rec(run('w','2026-10-15T05:15:00Z','2026-10-15T08:06:00Z','2026-10-15T10:30:00Z'));
+ const back=mergeDraft({jobNumber:'7'},three,2);
+ assert.equal(back.added,1);assert.equal(back.draft.timeOffSite,'11:30');
+ assert.equal(back.draft.startTime,undefined);assert.equal(back.draft.timeOnSite,undefined);assert.equal(back.draft.jobNumber,'7');
 });
