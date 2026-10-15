@@ -16,17 +16,33 @@ object CaptureStore {
         val array = JSONArray(source)
         return (0 until array.length()).map { fromJson(array.getJSONObject(it)) }
     }
-    fun fromJson(run: JSONObject): CaptureRun {
-        val times = run.getJSONArray("times")
-        require(times.length() in 1..4)
-        return CaptureRun(run.getString("id"), (0 until times.length()).map { j ->
-            val time = times.getJSONObject(j)
-            CaptureTime(time.getLong("epochMillis"), time.getInt("offsetSeconds"))
-        }, run.optString("source", CaptureRun.PHONE))
+    private fun times(array: JSONArray) = (0 until array.length()).map { j ->
+        val time = array.getJSONObject(j)
+        CaptureTime(time.getLong("epochMillis"), time.getInt("offsetSeconds"))
     }
-    fun json(run: CaptureRun): JSONObject = JSONObject().put("id", run.id).put("times", JSONArray().apply {
-        run.times.forEach { put(JSONObject().put("epochMillis", it.epochMillis).put("offsetSeconds", it.offsetSeconds)) }
-    }).apply { if (run.source != CaptureRun.PHONE) put("source", run.source) }
+    private fun timesJson(times: List<CaptureTime>) = JSONArray().apply {
+        times.forEach { put(JSONObject().put("epochMillis", it.epochMillis).put("offsetSeconds", it.offsetSeconds)) }
+    }
+    fun fromJson(run: JSONObject): CaptureRun {
+        val times = times(run.getJSONArray("times"))
+        require(times.size in 1..4)
+        return CaptureRun(run.getString("id"), times, run.optString("source", CaptureRun.PHONE),
+            run.optLong("base"), run.optInt("baseCount"), run.optLong("seq"), run.optBoolean("closed"))
+    }
+    fun json(run: CaptureRun): JSONObject = JSONObject().put("id", run.id).put("times", timesJson(run.times)).apply {
+        if (run.source != CaptureRun.PHONE) put("source", run.source)
+        if (run.base != 0L) put("base", run.base)
+        if (run.baseCount != 0) put("baseCount", run.baseCount)
+        if (run.seq != 0L) put("seq", run.seq)
+        if (run.closed) put("closed", true)
+    }
+    /** Reads the day the phone app sends to the watch (see native-bridge.js). */
+    fun dayFromJson(day: JSONObject): PhoneDay {
+        val times = day.optJSONArray("times")?.let { times(it) }.orEmpty()
+        require(times.size <= 4)
+        val seen = day.optJSONArray("seen")?.let { s -> (0 until s.length()).map { s.getLong(it) } }.orEmpty().toSet()
+        return PhoneDay(day.getString("id"), day.getString("state"), day.getLong("rev"), times, seen)
+    }
     private fun write(context: Context, runs: List<CaptureRun>) {
         val data = JSONArray().apply { runs.forEach { put(json(it)) } }.toString().toByteArray(Charsets.UTF_8)
         val target = file(context)
@@ -45,5 +61,9 @@ object CaptureStore {
         val (runs, before) = CaptureRun.upsert(read(context), run)
         write(context, runs)
         return before
+    }
+    /** On the watch: takes over the day as the phone app has it. */
+    @Synchronized fun adopt(context: Context, day: PhoneDay) {
+        write(context, CaptureRun.adopt(read(context), day, System.currentTimeMillis()))
     }
 }

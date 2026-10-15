@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.Gravity
 import android.widget.Button
@@ -18,6 +20,9 @@ class WatchActivity : Activity() {
     private lateinit var button: Button
     private lateinit var status: TextView
     private var lastTap = 0L
+    private val handler = Handler(Looper.getMainLooper())
+    // Picks up times logged in the phone app while this screen is open.
+    private val refresh = object : Runnable { override fun run() { render(); handler.postDelayed(this, 3000) } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +47,8 @@ class WatchActivity : Activity() {
         })
     }
 
-    override fun onResume() { super.onResume(); render() }
+    override fun onResume() { super.onResume(); refresh.run() }
+    override fun onPause() { handler.removeCallbacks(refresh); super.onPause() }
 
     private fun record() {
         // Take the time first, before any saving or screen work.

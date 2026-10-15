@@ -48,6 +48,9 @@ class WatchSyncService : WearableListenerService() {
     companion object {
         const val PATH_PREFIX = "/mds/run/"
         const val KEY_RUN = "run"
+        /** Where the app puts the day in progress for the watch (see the watch's PhoneDayService). */
+        const val DAY_PATH = "/mds/day"
+        const val KEY_DAY = "day"
         private const val CHANNEL = "watch-days"
     }
 }

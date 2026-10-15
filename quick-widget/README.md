@@ -4,6 +4,7 @@
 
 Inside the app:
 - Watch taps (MDS Log tile) and widget taps go straight into Quick Start as they happen (`native-bridge.js` pulls them from the app every few seconds). When Finish is tapped on the watch, a notification opens the app.
+- It works both ways: times stamped or typed in Quick Start on the phone are sent to the watch (`MDSNative.syncDay`, Data Layer path `/mds/day`), so the watch carries on from the phone's last stage. Reset on the phone clears the day from the watch, and Save closes it. Each watch tap is brought into Quick Start once, so times corrected or cleared on the phone stay that way.
 - Downloads (CSV, PDFs, backups) save to Downloads/MDS Timesheet, sharing uses Android's share menu, receipt photos use the camera or gallery, and the weather card can use location.
 - **Moving data in:** the app has its own storage, separate from Chrome. In the web app open Export → **Back up or move your data** → Download backup, then in the app use **Restore from a backup**.
 - **Updates:** every signed build from `main` is published as a GitHub release (`app-v<version>`, with `mds-timesheet.apk` and `mds-watch.apk`). The app checks the latest release each time it opens and offers to install it; Export → MDS Timesheet app → Check for updates checks on demand. Android asks once to allow the app to install updates.
