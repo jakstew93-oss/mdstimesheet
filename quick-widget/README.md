@@ -11,3 +11,17 @@ The widget keeps epoch milliseconds and the UTC offset at each tap. Its confirma
 Run `gradle testDebugUnitTest assembleDebug` from `quick-widget/`. The GitHub workflow builds an installable debug APK and runs the timestamp tests. Physical-device widget installation and launcher behaviour still require verification on the phone. Android dispatch can add a small delay between physical touch and receipt; timestamps are captured before file/UI work.
 
 Version 1.5 installs as **MDS Quick Log 2**, alongside version 1.4. The earlier CI debug APK used a disposable signing key, so it cannot be updated in place with a differently signed APK. Keep the old app while any recorded times are still needed. This version uses a separate application ID; CI caches its signing key for later updates.
+
+## Galaxy Watch (Wear OS)
+
+Version 1.6 adds **MDS Log** for Wear OS watches such as the Galaxy Watch 8 Classic. It records the same four stages (Start → On site → Off site → Finish) from a tile or the app's big round button, buzzes to confirm, and sends each set to MDS Quick Log on the phone over the watch's normal Bluetooth link. When Finish is tapped the phone shows **Day recorded on watch**; tapping it opens the installed MDS app with those times, using the same import as the widget. Watch sets are marked ⌚ in Quick Log and are kept separate from widget sets.
+
+Taps always log against the current day. A set left unfinished for 18 hours or more is treated as forgotten, so the next tap starts today's set; a shift that runs past midnight still finishes normally.
+
+The watch app has the same application ID as the phone app and must be signed with the same key, so install both APKs from the **same** workflow run (artifacts `mds-quick-widget-test` and `mds-watch-log`).
+
+Installing on the watch (one-off):
+1. On the watch: Settings → About watch → Software information → tap **Software version** seven times to turn on Developer options.
+2. Settings → Developer options → turn on **ADB debugging** and **Wireless debugging** (watch and phone on the same Wi-Fi).
+3. Install `wear-debug.apk` with a phone app such as Bugjaeger or Easy Fire Tools (pair using the code shown under Wireless debugging), or from a computer with `adb pair`, `adb connect` and `adb install wear-debug.apk`.
+4. On the watch, long-press the watch face → Tiles → add **MDS Log**.

@@ -5,6 +5,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.pm.PackageManager
 import android.app.Activity
+import android.Manifest
+import android.os.Build
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
@@ -18,8 +20,22 @@ import android.widget.TextView
 import java.time.format.DateTimeFormatter
 
 class LogActivity : Activity() {
-    override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState) }
-    override fun onResume() { super.onResume(); render() }
+    companion object { const val EXTRA_RUN_ID = "com.jak.mdsquickwidget.RUN_ID" }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Needed for the "Day recorded on watch" notification.
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+    }
+    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent) }
+    override fun onResume() {
+        super.onResume(); render()
+        // Opened from the watch notification: go straight to the timesheet with that day's times.
+        val runId = intent.getStringExtra(EXTRA_RUN_ID) ?: return
+        intent.removeExtra(EXTRA_RUN_ID)
+        val run = try { CaptureStore.read(this).firstOrNull { it.id == runId } } catch (_: Exception) { null }
+        if (run != null) openInstalledTimesheet(run)
+    }
     private fun copyTimes(run: CaptureRun) {
         val payload = "MDS-WIDGET:" + CaptureStore.json(run).put("version", 1).toString()
         getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("MDS recorded times", payload))
@@ -60,7 +76,7 @@ class LogActivity : Activity() {
             text = value; textSize = size; setTextColor(Color.rgb(237,245,239)); setPadding(0,12,0,12)
         }
         root.addView(text("MDS Quick Log 2", 27f))
-        root.addView(text("One tap on the widget saves the current time, even offline. Open a recorded set below when you’re ready to add the job details in your timesheet."))
+        root.addView(text("One tap on the widget or the MDS Log watch tile saves the current time, even offline. Open a recorded set below when you’re ready to add the job details in your timesheet."))
         val manager = getSystemService(AppWidgetManager::class.java)
         if (manager.isRequestPinAppWidgetSupported) root.addView(Button(this).apply {
             text = "Add home-screen button"
@@ -72,7 +88,8 @@ class LogActivity : Activity() {
         }
         if (runs.isEmpty()) root.addView(text("No times recorded yet. Add the widget, then tap START WORK."))
         runs.asReversed().forEach { run ->
-            root.addView(text(run.times.first().localTime().format(DateTimeFormatter.ofPattern("EEE d MMM yyyy")), 20f))
+            val from = if (run.source == CaptureRun.WATCH) "  ·  ⌚ Watch" else ""
+            root.addView(text(run.times.first().localTime().format(DateTimeFormatter.ofPattern("EEE d MMM yyyy")) + from, 20f))
             run.times.forEachIndexed { i, time -> root.addView(text("${CaptureRun.STAGE_LABELS[i]}   ${time.timeLabel()}")) }
             root.addView(Button(this).apply {
                 text = "Use in installed MDS app"

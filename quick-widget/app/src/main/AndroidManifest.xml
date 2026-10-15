@@ -1,14 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
  <queries>
   <intent><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="https" android:host="jakstew93-oss.github.io"/></intent>
  </queries>
  <application android:allowBackup="true" android:label="MDS Quick Log 2" android:theme="@style/AppTheme">
-  <activity android:name=".LogActivity" android:exported="true" android:theme="@style/AppTheme">
+  <activity android:name=".LogActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/AppTheme">
    <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
   </activity>
   <receiver android:name=".QuickWidgetProvider" android:exported="false">
    <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
    <meta-data android:name="android.appwidget.provider" android:resource="@xml/quick_widget_info"/>
   </receiver>
+  <!-- Receives sets logged on the watch. -->
+  <service android:name=".WatchSyncService" android:exported="true">
+   <intent-filter>
+    <action android:name="com.google.android.gms.wearable.DATA_CHANGED"/>
+    <data android:scheme="wear" android:host="*" android:pathPrefix="/mds/run/"/>
+   </intent-filter>
+  </service>
  </application>
 </manifest>
