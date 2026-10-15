@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v83';
+const CACHE_NAME = 'mdsmiths-timesheet-v84';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
@@ -15,7 +15,7 @@ const APP_SHELL = [
   './vehicle-regs.css?v=80',
   './vehicle-regs.js?v=81',
   './data-backup.js?v=82',
-  './native-bridge.js?v=83',
+  './native-bridge.js?v=84',
   './Index.html',
   './index.html',
   './recent-regs.js',

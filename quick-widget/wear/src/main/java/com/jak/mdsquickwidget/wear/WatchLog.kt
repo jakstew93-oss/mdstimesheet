@@ -14,10 +14,13 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-/** Records watch taps and sends each set to the MDS Quick Log phone app. */
+/** Records watch taps and sends each set to the MDS Timesheet phone app. */
 object WatchLog {
     private const val PATH_PREFIX = "/mds/run/"
     private const val KEY_RUN = "run"
+    /** Where the phone app puts the day in progress (see PhoneDayService). */
+    const val DAY_PATH = "/mds/day"
+    const val KEY_DAY = "day"
     val BUTTON_LABELS = listOf("START", "ON SITE", "OFF SITE", "FINISH")
 
     fun runs(context: Context): List<CaptureRun> = try { CaptureStore.read(context) } catch (_: Exception) { emptyList() }
@@ -57,6 +60,7 @@ object WatchLog {
         return when {
             run == null -> "Tap to log today’s start time"
             run.complete && run.times.first().localTime().toLocalDate() == today -> "Day logged ✓ Sent to your phone"
+            run.closed && run.times.first().localTime().toLocalDate() == today -> "Day saved on your phone ✓"
             !CaptureRun.isOpen(run, now) -> "Tap to log today’s start time"
             else -> run.times.mapIndexed { i, t -> CaptureRun.STAGE_LABELS[i] + " " + t.shortLabel() }.joinToString("\n")
         }

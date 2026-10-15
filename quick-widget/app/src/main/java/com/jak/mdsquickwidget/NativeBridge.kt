@@ -5,7 +5,10 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.util.Base64
 import android.webkit.JavascriptInterface
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
 import org.json.JSONArray
+import org.json.JSONObject
 
 /** What the web page can ask the app to do, as window.MDSNative (see native-bridge.js). */
 class NativeBridge(private val activity: MainActivity) {
@@ -16,6 +19,16 @@ class NativeBridge(private val activity: MainActivity) {
         return JSONArray().apply {
             runs.filter { it.times.last().epochMillis >= cutoff }.forEach { put(CaptureStore.json(it).put("source", it.source)) }
         }.toString()
+    }
+
+    /** Sends the day in Quick Start to the watch, so it carries on from the phone's last stage. */
+    @JavascriptInterface fun syncDay(json: String) {
+        try { CaptureStore.dayFromJson(JSONObject(json)) } catch (_: Exception) { return }
+        val request = PutDataMapRequest.create(WatchSyncService.DAY_PATH).apply {
+            dataMap.putString(WatchSyncService.KEY_DAY, json)
+            dataMap.putLong("sentAt", System.currentTimeMillis())
+        }.asPutDataRequest().setUrgent()
+        Wearable.getDataClient(activity).putDataItem(request)
     }
 
     @JavascriptInterface fun saveFile(name: String, mime: String, base64: String) {
