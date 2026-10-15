@@ -18,7 +18,7 @@ Version 1.6 adds **MDS Log** for Wear OS watches such as the Galaxy Watch 8 Clas
 
 Taps always log against the current day. A set left unfinished for 18 hours or more is treated as forgotten, so the next tap starts today's set; a shift that runs past midnight still finishes normally.
 
-The watch app has the same application ID as the phone app and must be signed with the same key, so install both APKs from the **same** workflow run (artifacts `mds-quick-widget-test` and `mds-watch-log`).
+The watch app has the same application ID as the phone app and must be signed with the same key. Builds sign both with the key stored in the `MDS_SIGNING_KEYSTORE` repository secret (a base64 PKCS12 keystore, alias `mds`), so later builds install over earlier ones. Without the secret the workflow warns and falls back to a throwaway debug key; then install both APKs from the same run. Download them from the run's artifacts `mds-quick-widget-test` and `mds-watch-log`.
 
 Installing on the watch (one-off):
 1. On the watch: Settings → About watch → Software information → tap **Software version** seven times to turn on Developer options.

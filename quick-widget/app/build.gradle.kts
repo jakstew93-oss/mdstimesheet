@@ -1,5 +1,9 @@
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android") }
 
+// Signed with the MDS key from the MDS_SIGNING_KEYSTORE GitHub secret, so updates install over the
+// previous version and the phone and watch apps can talk to each other.
+val mdsKeystore = System.getenv("MDS_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+
 android {
     namespace = "com.jak.mdsquickwidget"
     compileSdk = 35
@@ -11,6 +15,12 @@ android {
         versionCode = 7
         versionName = "1.6-watch"
     }
+    signingConfigs {
+        if (mdsKeystore != null) create("mds") {
+            storeFile = mdsKeystore; storePassword = "mdsquicklog"; keyAlias = "mds"; keyPassword = "mdsquicklog"
+        }
+    }
+    buildTypes { getByName("debug") { if (mdsKeystore != null) signingConfig = signingConfigs.getByName("mds") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
 }

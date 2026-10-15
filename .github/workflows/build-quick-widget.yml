@@ -23,10 +23,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: mds-installed-widget-signing-v1
+      - name: Use the MDS signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.MDS_SIGNING_KEYSTORE }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/mds.keystore"
+            echo "MDS_KEYSTORE_PATH=$RUNNER_TEMP/mds.keystore" >> "$GITHUB_ENV"
+          else
+            echo "::warning::MDS_SIGNING_KEYSTORE secret is not set, so these APKs use a throwaway key and won't install over earlier builds."
+          fi
       - name: Build test APK
         run: gradle testDebugUnitTest assembleDebug
       - uses: actions/upload-artifact@v4
