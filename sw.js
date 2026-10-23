@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v85';
+const CACHE_NAME = 'mdsmiths-timesheet-v86';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
@@ -26,7 +26,7 @@ const APP_SHELL = [
   './timesheet-tools.js?v=62',
   './workflow-ui.js?v=62',
   './driver-characters.css?v=62',
-  './driver-characters.js?v=62',
+  './driver-characters.js?v=63',
   './driver-avatars/jak-stewart-black-shirt.png',
   './driver-avatars/cody-slack-black-shirt.png',
   './driver-avatars/ash-kemp-black-shirt.png',
