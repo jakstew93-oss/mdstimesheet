@@ -1,0 +1,169 @@
+/* Shift dial + glass look. Only applies when shift-dial.js sets data-shift-dial="on" on <html>,
+   which it does only inside the Android app for an allowed user. Everyone else never matches these rules.
+   Colours come from the active theme's variables, so every theme gets its own glass. */
+
+:root[data-shift-dial=on]{
+  --sd-glass:color-mix(in srgb,var(--surface) 58%,transparent);
+  --sd-glass-strong:color-mix(in srgb,var(--surface) 78%,transparent);
+  --sd-edge:color-mix(in srgb,var(--text) 13%,transparent);
+  --sd-hi:color-mix(in srgb,#fff 16%,transparent);
+  --sd-fill:color-mix(in srgb,var(--text) 7%,transparent);
+  --sd-fill-strong:color-mix(in srgb,var(--text) 12%,transparent);
+  --sd-sep:color-mix(in srgb,var(--text) 10%,transparent);
+  --sd-shadow:0 10px 30px rgba(0,0,0,.28);
+  --sd-blur:blur(24px) saturate(170%);
+  --sd-r:22px;
+  --sd-blob1:var(--accent);
+  --sd-blob2:#25b39b;
+  --sd-blob3:#b8f05f;
+}
+:root[data-shift-dial=on][data-app-theme=paper]{--sd-blob2:#a78bfa;--sd-blob3:#5ad1ff;--sd-hi:rgba(255,255,255,.9);--sd-shadow:0 10px 30px rgba(20,30,60,.08)}
+:root[data-shift-dial=on][data-app-theme=navy]{--sd-blob2:#b48cff;--sd-blob3:#38d6ff}
+:root[data-shift-dial=on][data-app-theme=sand]{--sd-blob2:#e0a95e;--sd-blob3:#c9b98a;--sd-hi:rgba(255,255,255,.9);--sd-shadow:0 10px 30px rgba(60,50,20,.08)}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]){--sd-blob2:#ff5ad1;--sd-blob3:#57e3ee;--sd-r:0px}
+
+/* Glow behind the glass */
+:root[data-shift-dial=on] body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(circle at 10% 6%,color-mix(in srgb,var(--sd-blob1) 34%,transparent),transparent 42%),
+    radial-gradient(circle at 96% 40%,color-mix(in srgb,var(--sd-blob2) 30%,transparent),transparent 44%),
+    radial-gradient(circle at 16% 92%,color-mix(in srgb,var(--sd-blob3) 24%,transparent),transparent 48%),
+    var(--bg);
+}
+:root[data-shift-dial=on] body{background:transparent!important;padding-bottom:120px!important}
+
+/* Shared glass surface */
+:root[data-shift-dial=on] #mds-app :is(.card,.quickstart,.totals-hero,.week-ending-bar,.entry-card,.export-summary,.break-card,.login-card,.empty-state),
+:root[data-shift-dial=on] :is(#app-theme-dialog,.workflow-dialog,dialog){
+  background:var(--sd-glass)!important;
+  -webkit-backdrop-filter:var(--sd-blur);backdrop-filter:var(--sd-blur);
+  border:1px solid var(--sd-edge)!important;
+  border-radius:var(--sd-r)!important;
+  box-shadow:inset 0 1px 0 var(--sd-hi),var(--sd-shadow)!important;
+}
+:root[data-shift-dial=on] :is(#app-theme-dialog,.workflow-dialog,dialog){background:var(--sd-glass-strong)!important}
+:root[data-shift-dial=on] dialog::backdrop{background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+:root[data-shift-dial=on] #mds-app .empty-state{border-style:solid!important}
+
+/* Headings: calm, iOS-style section titles */
+:root[data-shift-dial=on] #mds-app .card>h2,
+:root[data-shift-dial=on] #mds-app .totals-hero-label{
+  font-size:13px!important;letter-spacing:.02em!important;text-transform:uppercase;color:var(--subtext)!important;font-weight:600!important
+}
+:root[data-shift-dial=on] #mds-app .card>h2::before{display:none!important}
+
+/* Header */
+:root[data-shift-dial=on] #mds-app header{background:transparent!important;border:none!important;box-shadow:none!important;padding-top:10px}
+:root[data-shift-dial=on] #mds-app header :is(#app-theme-button,.logout-btn){
+  min-height:40px;border-radius:999px!important;padding:0 16px!important;
+  background:var(--sd-glass)!important;border:1px solid var(--sd-edge)!important;
+  -webkit-backdrop-filter:var(--sd-blur);backdrop-filter:var(--sd-blur);
+  box-shadow:inset 0 1px 0 var(--sd-hi)!important;font-size:14px!important;font-weight:600!important;
+  letter-spacing:0!important;text-transform:none!important
+}
+:root[data-shift-dial=on] #mds-app header .logout-btn{color:#ff6b6b!important}
+:root[data-shift-dial=on]:is([data-app-theme=paper],[data-app-theme=sand]) #mds-app header .logout-btn{color:#c62828!important}
+
+/* Floating glass tab bar */
+:root[data-shift-dial=on] #mds-app .tabs{
+  position:fixed!important;left:16px!important;right:16px!important;top:auto!important;
+  bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;z-index:40;
+  max-width:520px;margin:0 auto!important;padding:6px!important;gap:4px;
+  border-radius:999px!important;border:1px solid var(--sd-edge)!important;
+  background:var(--sd-glass-strong)!important;
+  -webkit-backdrop-filter:var(--sd-blur)!important;backdrop-filter:var(--sd-blur)!important;
+  box-shadow:inset 0 1px 0 var(--sd-hi),0 12px 32px rgba(0,0,0,.35)!important
+}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .tabs{border-radius:0!important}
+:root[data-shift-dial=on] #mds-app .tabs .tab{
+  flex:1;min-height:52px;border-radius:999px!important;border:none!important;background:transparent!important;
+  color:var(--subtext)!important;box-shadow:none!important;font-size:13px!important;font-weight:650!important;
+  letter-spacing:0!important;text-transform:none!important
+}
+:root[data-shift-dial=on] #mds-app .tabs .tab.active{
+  background:var(--sd-fill-strong)!important;color:var(--accent)!important
+}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .tabs .tab{border-radius:0!important}
+
+/* Fields */
+:root[data-shift-dial=on] #mds-app :is(input:not([type=checkbox]):not([type=radio]):not(.qs-stage-input),select,textarea){
+  background:var(--sd-fill)!important;border:1px solid transparent!important;border-radius:12px!important;
+  min-height:48px;color:var(--text)!important;box-shadow:none!important
+}
+:root[data-shift-dial=on] #mds-app :is(input,select,textarea):focus{border-color:var(--accent)!important;outline:none}
+:root[data-shift-dial=on] #mds-app .field>label{text-transform:none!important;letter-spacing:0!important;font-size:13px!important;font-weight:500!important;color:var(--subtext)!important}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(input:not([type=checkbox]):not([type=radio]):not(.qs-stage-input),select,textarea){border-radius:0!important}
+
+/* Buttons */
+:root[data-shift-dial=on] #mds-app .btn{
+  min-height:50px;border-radius:999px!important;box-shadow:none!important;font-weight:600!important;
+  letter-spacing:0!important;text-transform:none!important
+}
+:root[data-shift-dial=on] #mds-app .btn:not(.btn-primary):not(.btn-danger):not(.btn-success){
+  background:var(--sd-fill-strong)!important;border:1px solid transparent!important;color:var(--text)!important
+}
+:root[data-shift-dial=on] #mds-app :is(.btn-primary,.btn-success){
+  border:none!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 22px color-mix(in srgb,var(--accent) 35%,transparent)!important
+}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .btn{border-radius:0!important}
+
+/* Checkboxes become simple rows */
+:root[data-shift-dial=on] #mds-app .checkbox-item{background:var(--sd-fill)!important;border:1px solid transparent!important;border-radius:14px!important}
+
+/* Week bar, day strip, totals */
+:root[data-shift-dial=on] #mds-app .day-pill{background:var(--sd-glass)!important;border:1px solid var(--sd-edge)!important;border-radius:16px!important;-webkit-backdrop-filter:var(--sd-blur);backdrop-filter:var(--sd-blur)}
+:root[data-shift-dial=on] #mds-app .day-pill.active{background:color-mix(in srgb,var(--accent) 22%,transparent)!important;border-color:var(--accent)!important}
+:root[data-shift-dial=on] #mds-app .totals-hero-box{background:var(--sd-fill)!important;border:1px solid transparent!important;border-radius:16px!important}
+:root[data-shift-dial=on] #mds-app .totals-hero-box.net{background:color-mix(in srgb,var(--accent) 18%,transparent)!important}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app :is(.day-pill,.totals-hero-box,.checkbox-item){border-radius:0!important}
+
+/* ---------- Shift dial (Log page) ---------- */
+:root[data-shift-dial=on] #mds-app .quickstart .qs-header{display:none!important}
+:root[data-shift-dial=on] #mds-app .quickstart{padding-top:18px!important}
+.sd-dial{display:none}
+:root[data-shift-dial=on] .sd-dial{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0 0 14px}
+.sd-ring{position:relative;width:min(260px,72vw);aspect-ratio:1}
+.sd-ring svg{display:block;width:100%;height:100%}
+.sd-centre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center}
+.sd-status{font-size:15px;font-weight:650;color:var(--accent)}
+.sd-big{font-size:44px;font-weight:750;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--text)}
+.sd-big small{font-size:20px;font-weight:600;color:var(--subtext);margin:0 2px}
+.sd-sub{font-size:13px;color:var(--subtext)}
+:root:is([data-app-theme=arcade],[data-app-theme=pacman]) .sd-big{font-family:VT323,'Courier New',monospace;font-size:60px}
+
+/* The main button becomes a glowing capsule under the dial */
+:root[data-shift-dial=on] #mds-app #next-time-step{min-height:58px;font-size:18px!important}
+:root[data-shift-dial=on] #mds-app #next-step-status{text-align:center}
+
+/* The four stamp boxes become a compact row of times under the dial */
+:root[data-shift-dial=on] #mds-app .qs-stages{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+:root[data-shift-dial=on] #mds-app .qs-stage{
+  min-height:62px!important;padding:8px 2px!important;border-radius:14px!important;
+  background:var(--sd-fill)!important;border:1px solid transparent!important;box-shadow:none!important
+}
+:root[data-shift-dial=on] #mds-app .qs-stage.stamped{background:var(--sd-fill-strong)!important}
+:root[data-shift-dial=on] #mds-app .qs-stage-label{text-transform:none!important;letter-spacing:0!important;font-size:12px!important;color:var(--subtext)!important}
+:root[data-shift-dial=on] #mds-app .qs-stage-val{font-size:18px!important;font-variant-numeric:tabular-nums}
+:root[data-shift-dial=on] #mds-app .qs-stage-edit{display:none!important}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app .qs-stage{border-radius:0!important}
+
+/* Appearance dialog switch */
+.sd-pref{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.sd-pref span{display:flex;flex-direction:column;gap:2px;font-weight:600}
+.sd-pref small{font-weight:400;font-size:12px;color:var(--subtext)}
+.sd-switch{position:relative;flex:none;width:51px;height:31px;padding:0!important;min-height:0!important;border:none!important;border-radius:999px!important;background:var(--border)!important;cursor:pointer}
+.sd-switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:left .18s}
+.sd-switch[aria-checked=true]{background:var(--accent)!important}
+.sd-switch[aria-checked=true]::after{left:22px}
+
+/* The section picker in the header reads as a large title, not a field */
+:root[data-shift-dial=on] #mds-app header #sectionSelect{
+  background-color:transparent!important;border:none!important;min-height:0;padding:0 26px 0 0!important;
+  font-size:26px!important;font-weight:750!important;letter-spacing:-.01em!important;color:var(--text)!important;
+  max-width:62vw!important;width:auto!important;field-sizing:content;text-overflow:ellipsis;
+  -webkit-appearance:none;appearance:none;background-repeat:no-repeat!important;background-position:right 2px center!important;background-size:16px!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important
+}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app header #sectionSelect{font-size:32px!important}
+:root[data-shift-dial=on]:is([data-app-theme=arcade],[data-app-theme=pacman]) #mds-app header :is(#app-theme-button,.logout-btn){border-radius:0!important}
