@@ -232,7 +232,7 @@
   return kind==='snow'?{kind,x:Math.random()*fx.w,y,v:25+Math.random()*45,phase:Math.random()*6.3,size:Math.random()<.3?4:2}:{kind,x:Math.random()*fx.w,y,v:420+Math.random()*260,len:6+Math.round(Math.random()*6)};
  }
  function tick(now){
-  const dt=Math.min(.05,(now-fx.last)/1000);fx.last=now;const g=fx.ctx,W=fx.w,H=fx.h;
+  const dt=Math.max(0,Math.min(.05,(now-fx.last)/1000));fx.last=now;const g=fx.ctx,W=fx.w,H=fx.h;
   g.clearRect(0,0,W,H);
   for(const d of fx.drops){
    if(d.kind==='snow'){d.y+=d.v*dt;d.phase+=dt*1.5;d.x+=Math.sin(d.phase)*12*dt;g.fillStyle='rgba(240,248,255,.85)';g.fillRect(Math.round(d.x),Math.round(d.y),d.size,d.size)}
@@ -245,7 +245,7 @@
   }
   if(fx.season==='halloween'){
    if(now>fx.nextBat){const left=Math.random()<.5;fx.bats.push({x:left?-20:W+20,y:H*(.12+Math.random()*.45),v:(left?1:-1)*(80+Math.random()*60),t:0});fx.nextBat=now+3500+Math.random()*5000}
-   fx.bats=fx.bats.filter(b=>{b.t+=dt;b.x+=b.v*dt;const y=b.y+Math.sin(b.t*4)*10;drawSprite(g,BAT[Math.floor(b.t*8)%2],b.x,y,3,{k:'#9b6bd6'});g.fillStyle='#ff4040';g.fillRect(Math.round(b.x)+9,Math.round(y)+3,2,2);return b.x>-40&&b.x<W+40});
+   fx.bats=fx.bats.filter(b=>{b.t+=dt;b.x+=b.v*dt;const y=b.y+Math.sin(b.t*4)*10;drawSprite(g,BAT[Math.abs(Math.floor(b.t*8))%2],b.x,y,3,{k:'#9b6bd6'});g.fillStyle='#ff4040';g.fillRect(Math.round(b.x)+9,Math.round(y)+3,2,2);return b.x>-40&&b.x<W+40});
   }
   if(fx.season==='bonfire'){
    if(now>fx.nextRocket){fx.rockets.push({x:W*(.15+Math.random()*.7),y:H+5,v:-(H*.55+Math.random()*H*.25),top:H*(.12+Math.random()*.3),color:FIREWORK_COLORS[Math.floor(Math.random()*FIREWORK_COLORS.length)]});fx.nextRocket=now+1400+Math.random()*2600}
