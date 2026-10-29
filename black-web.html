@@ -11,9 +11,11 @@ button{font:inherit;cursor:pointer;touch-action:manipulation}
 .tabs{display:flex;gap:6px;margin-bottom:6px;overflow:hidden}
 .tab{background:#3c3f46;border-radius:8px 8px 0 0;padding:4px 10px;white-space:nowrap;max-width:60%;overflow:hidden;text-overflow:ellipsis}
 .tab.on{background:#1b1c20;color:#fff}
-.url{display:flex;align-items:center;gap:8px;background:#1b1c20;border-radius:999px;padding:6px 12px;font-family:ui-monospace,monospace;font-size:13px;overflow:hidden;white-space:nowrap}
+.urlrow{display:flex;gap:6px;align-items:center}
+.url{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:#1b1c20;color:#ddd;border:0;border-radius:999px;padding:7px 12px;font:13px ui-monospace,monospace;overflow:hidden;white-space:nowrap;text-align:left}
 .url .warn{color:#ff6b6b;font-weight:700;flex-shrink:0}
 .url .addr{overflow:hidden;text-overflow:ellipsis}
+.chip{flex-shrink:0;background:#1b1c20;color:#ddd;border:0;border-radius:999px;width:34px;height:32px;font-size:16px}
 .brand{font:12px system-ui,sans-serif;color:#9aa;margin-top:4px;display:flex;justify-content:space-between;gap:8px}
 .vpnpill{color:#39ff7a}
 
@@ -42,7 +44,7 @@ canvas#rain{position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer
 .marquee{overflow:hidden;white-space:nowrap;background:#ffd400;color:#000;font:700 15px Arial,sans-serif;padding:6px 0}
 .marquee span{display:inline-block;padding-left:100%;animation:scroll 22s linear infinite}
 @keyframes scroll{to{transform:translateX(-100%)}}
-.basket{position:sticky;top:96px;z-index:2;display:flex;justify-content:flex-end;padding:8px 12px}
+.basket{position:sticky;top:100px;z-index:2;display:flex;justify-content:flex-end;padding:8px 12px}
 .basket button{background:#ff2a2a;color:#fff;border:2px solid #fff;border-radius:999px;padding:6px 14px;font:700 15px Arial,sans-serif}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:6px 12px 12px;max-width:900px;margin:0 auto}
 .item{background:#1a1a1a;border:2px solid #444;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px}
@@ -53,13 +55,19 @@ canvas#rain{position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer
 .was{text-decoration:line-through;color:#888;font-size:13px;margin-right:6px}
 .add{background:#ffd400;color:#000;border:0;border-radius:6px;padding:8px;font:700 15px Arial,sans-serif}
 .badge{display:inline-block;background:#b30000;color:#fff;font:700 11px Arial,sans-serif;padding:2px 6px;border-radius:4px;align-self:flex-start}
-section.reviews{max-width:900px;margin:0 auto;padding:6px 12px 12px}
-.reviews h2{font:900 24px Impact,sans-serif;color:#ffd400;margin:10px 0}
+section.reviews,section.badges{max-width:900px;margin:0 auto;padding:6px 12px 12px}
+.reviews h2,.badges h2{font:900 24px Impact,sans-serif;color:#ffd400;margin:10px 0}
 .review{background:#151515;border-left:4px solid #00b67a;padding:10px 12px;margin-bottom:10px}
 .stars{color:#00b67a;letter-spacing:2px}
 .review small{color:#888;display:block;margin-top:4px}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;list-style:none;padding:0;margin:0}
+.badge-grid li{background:#151515;border:2px solid #333;border-radius:10px;padding:10px;text-align:center;font:13px Arial,sans-serif;color:#666}
+.badge-grid li b{display:block;font-size:26px;margin-bottom:4px;filter:grayscale(1);opacity:.4}
+.badge-grid li.got{border-color:#ffd400;color:#fff}
+.badge-grid li.got b{filter:none;opacity:1}
 footer{text-align:center;color:#888;font:13px Arial,sans-serif;padding:16px 14px 30px;border-top:1px solid #333}
 footer b{color:#bbb}
+.linkish{background:none;border:0;color:#7fb2ff;text-decoration:underline;font:inherit;padding:0}
 
 /* Cookie banner */
 .overlay{position:fixed;inset:0;background:#000b;z-index:10;display:flex;align-items:flex-end;justify-content:center;padding:12px}
@@ -82,25 +90,91 @@ footer b{color:#bbb}
 @keyframes wobble{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .partners{color:#1a73e8;text-decoration:underline;background:none;border:0!important;padding:0!important;font:inherit!important}
 
-/* Checkout and the ending */
+/* Panels: checkout, history, captcha, the address bar */
 .panel{position:fixed;inset:0;z-index:11;background:#000d;display:flex;align-items:center;justify-content:center;padding:14px}
 .box{width:100%;max-width:480px;background:#111;border:3px solid #ff2a2a;border-radius:12px;padding:18px;color:#eee;font:16px Arial,sans-serif;max-height:92dvh;overflow:auto}
 .box h2{margin:0 0 10px;font:900 26px Impact,sans-serif;color:#ff2a2a}
 .box ul{padding-left:18px;margin:8px 0}
+.box input{width:100%;padding:10px;border-radius:8px;border:2px solid #555;background:#1d1d1d;color:#fff;font:15px ui-monospace,monospace}
 .pay{display:block;width:100%;margin:8px 0;padding:12px;background:#1d1d1d;color:#fff;border:2px solid #555;border-radius:8px;text-align:left;font:15px Arial,sans-serif}
 .pay:hover,.pay:focus-visible{border-color:#ffd400}
 .alert{border-color:#ffd400}
 .alert h2{color:#ffd400}
 .evri{background:#fff;color:#222;border:0}
 .evri h2{color:#d1006c;font-family:Arial,sans-serif;font-weight:900}
+.light{background:#fff;color:#222;border:0}
+.light h2{color:#222;font:700 20px Arial,sans-serif}
 .btn{display:block;width:100%;margin-top:12px;padding:12px;border-radius:8px;border:0;background:#ffd400;color:#000;font:700 16px Arial,sans-serif}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#ffd400;color:#000;font:700 15px Arial,sans-serif;padding:10px 16px;border-radius:10px;z-index:20;max-width:calc(100% - 30px);text-align:center;box-shadow:0 6px 20px #0008}
-@media (prefers-reduced-motion:reduce){.marquee span{animation:none;padding-left:12px}.log li{transition:none}}
+.btn.dark{background:#222;color:#fff}
+.also{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 4px}
+.also button{background:#1d1d1d;color:#fff;border:2px solid #444;border-radius:8px;padding:8px 4px;font:13px Arial,sans-serif}
+.also span{display:block;font-size:26px}
+.history{list-style:none;padding:0!important}
+.history li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eee}
+.history time{color:#888;font-size:13px;flex-shrink:0}
+.captcha-top{background:#4a90e2;color:#fff;padding:12px;border-radius:6px 6px 0 0;margin:-18px -18px 12px}
+.captcha-top b{display:block;font-size:20px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.tile{aspect-ratio:1;border:0;padding:10%;background:#f4efe6;position:relative}
+.tile i{display:block;width:100%;height:60%;margin-top:20%;border-radius:40% / 50%;background:repeating-linear-gradient(100deg,#e7b464 0 8px,#d39443 8px 11px);box-shadow:inset 0 -6px #b8752e}
+.tile.on{outline:4px solid #4a90e2;outline-offset:-4px}
+.tile.on::after{content:'✔';position:absolute;top:4px;left:6px;color:#fff;background:#4a90e2;border-radius:50%;width:22px;height:22px;font:700 14px/22px Arial}
+.notpolice{display:flex;align-items:center;gap:10px;border:1px solid #ccc;border-radius:4px;padding:10px;margin:12px 0;background:#f9f9f9;font:15px Arial,sans-serif;color:#222}
+.tick{width:28px;height:28px;border:2px solid #999;border-radius:3px;background:#fff;flex-shrink:0;font:700 20px/24px Arial;color:#0a9e4a;text-align:center}
+.err{color:#d93025;min-height:1.2em;margin:8px 0 0}
+
+/* Interruptions */
+.ad{position:fixed;z-index:9;width:min(290px,86vw);background:#fff;color:#000;border:3px solid #0000ee;box-shadow:6px 6px 0 #000a;font:14px Arial,sans-serif}
+.ad .t{background:linear-gradient(90deg,#0000aa,#1084d0);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:4px 6px;font:700 13px Arial,sans-serif}
+.ad .t button{background:#c0c0c0;border:2px outset #fff;width:26px;height:24px;padding:0;font:700 13px Arial;color:#000}
+.ad .b{padding:12px;text-align:center}
+.ad .b strong{display:block;font-size:18px;color:#d00;margin-bottom:6px}
+.ad .b .big{font-size:40px}
+.ad .claim{margin-top:8px;background:#0c0;color:#fff;border:2px outset #6f6;padding:8px 14px;font:700 15px Arial,sans-serif;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{background:#f00}}
+.chatbtn{position:fixed;right:14px;bottom:16px;z-index:8;background:#00b67a;color:#fff;border:0;border-radius:999px;padding:12px 16px;font:700 15px Arial,sans-serif;box-shadow:0 6px 18px #0008}
+.chatbtn i{display:inline-block;width:10px;height:10px;border-radius:50%;background:#7CFC00;margin-right:6px;vertical-align:middle}
+.chat{position:fixed;right:10px;bottom:10px;z-index:9;width:min(340px,calc(100vw - 20px));height:min(430px,70dvh);background:#fff;color:#222;border-radius:14px;box-shadow:0 10px 40px #000;display:flex;flex-direction:column;overflow:hidden;font:14px Arial,sans-serif}
+.chat header{background:#00b67a;color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.chat header small{display:block;opacity:.85}
+.chat header button{background:none;border:0;color:#fff;font:700 20px Arial}
+.msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px;background:#f2f4f5}
+.msg{max-width:80%;padding:8px 10px;border-radius:12px;line-height:1.35}
+.msg.steve{background:#fff;align-self:flex-start;border-bottom-left-radius:3px}
+.msg.me{background:#00b67a;color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.msg.typing{color:#888;font-style:italic}
+.quick{display:flex;gap:6px;overflow-x:auto;padding:8px;border-top:1px solid #eee}
+.quick button{flex-shrink:0;background:#e9f8f2;color:#00744e;border:1px solid #00b67a;border-radius:999px;padding:6px 10px;font:13px Arial,sans-serif}
+.chat form{display:flex;gap:6px;padding:8px;border-top:1px solid #eee}
+.chat form input{flex:1;min-width:0;border:1px solid #ccc;border-radius:999px;padding:8px 12px;font:14px Arial,sans-serif}
+.chat form button{background:#00b67a;color:#fff;border:0;border-radius:999px;padding:8px 14px;font:700 14px Arial}
+.call{position:fixed;inset:0;z-index:30;background:linear-gradient(#1e3c72,#2a5298);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 20px 50px;font:18px system-ui,sans-serif;text-align:center}
+.call .who{font-size:40px;font-weight:300;margin:10px 0 4px}
+.call .pic{width:110px;height:110px;border-radius:50%;background:#ffffff33;font-size:64px;line-height:110px;margin:0 auto}
+.call .acts{display:flex;gap:70px}
+.call .acts button{width:72px;height:72px;border-radius:50%;border:0;font-size:30px;color:#fff}
+.call .acts small{display:block;margin-top:8px;font-size:14px}
+.decline{background:#e53935}
+.answer{background:#43a047;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.bubble{background:#ffffff22;border-radius:18px;padding:14px 18px;max-width:320px;margin:20px auto 0;font-size:20px}
+.police{position:fixed;inset:0;z-index:31;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:20px;color:#fff;font:900 34px Impact,"Arial Black",sans-serif;animation:sirens .5s steps(1) infinite}
+@keyframes sirens{0%{background:#d00}50%{background:#0039d6}}
+.police p{font:700 18px Arial,sans-serif;margin:0;max-width:340px}
+.police.calm{animation:none;background:#111}
+.knock{font-size:46px;animation:shake .25s 3}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#ffd400;color:#000;font:700 15px Arial,sans-serif;padding:10px 16px;border-radius:10px;z-index:40;max-width:calc(100% - 30px);text-align:center;box-shadow:0 6px 20px #0008}
+@media (prefers-reduced-motion:reduce){.marquee span{animation:none;padding-left:12px}.log li{transition:none}.police{animation:none;background:#0039d6}.answer,.ad .claim,.knock{animation:none}}
 </style></head><body>
 
-<div class="chrome" aria-hidden="true">
- <div class="tabs"><span class="tab on" id="tab-title">New Incognito Tab</span><span class="tab">Greggs – Menu</span></div>
- <div class="url"><span class="warn">⚠ Not secure</span><span class="addr" id="addr">shadowfox://start</span></div>
+<div class="chrome">
+ <div class="tabs" aria-hidden="true"><span class="tab on" id="tab-title">New Incognito Tab</span><span class="tab">Greggs – Menu</span></div>
+ <div class="urlrow">
+  <button type="button" class="url" id="url-bar" aria-label="Address bar. Tap to type an address"><span class="warn">⚠ Not secure</span><span class="addr" id="addr">shadowfox://start</span></button>
+  <button type="button" class="chip" id="history-btn" aria-label="Search history">🕘</button>
+  <button type="button" class="chip" id="sound-btn" aria-label="Sound on">🔊</button>
+ </div>
  <div class="brand"><span>ShadowFox Ultra 3000™ · Incognito+ Edition</span><span class="vpnpill" id="vpn-pill">VPN: off</span></div>
 </div>
 
@@ -110,7 +184,7 @@ footer b{color:#bbb}
   <canvas id="rain"></canvas>
   <h1>ShadowFox Ultra 3000™</h1>
   <p>The only browser that can reach the <b>Black Web</b>. Like the dark web, but darker.</p>
-  <p class="small">⚠ Do not use on Mum’s Wi-Fi.</p>
+  <p class="small">⚠ Do not use on Mum’s Wi-Fi. Turn your sound up.</p>
   <div class="bar" aria-hidden="true"><i id="vpn-bar"></i></div>
   <ul class="log" id="vpn-log" aria-live="polite"></ul>
   <button type="button" class="go" id="vpn-go">🛡 Connect VPN</button>
@@ -135,10 +209,15 @@ footer b{color:#bbb}
    <div class="review"><span class="stars">★★★★★</span><p>Kidney arrived well packed. On ice. From Iceland.</p><small>Verified buyer</small></div>
    <div class="review"><span class="stars">★☆☆☆☆</span><p>Bought a new back for loft work. Still hurts. Seller said “sold as seen”.</p><small>Bad back Barry</small></div>
   </section>
+  <section class="badges" aria-labelledby="badges-title">
+   <h2 id="badges-title">🏅 Your badges</h2>
+   <ul class="badge-grid" id="badge-grid"></ul>
+  </section>
   <footer>
-   <p><b>© The Black Web 2026.</b> Registered at Companies House (probably). Your IP address: <span id="ip"></span> (hidden by VPN*)</p>
+   <p><b>© The Black Web 2026.</b> Registered at Companies House (probably). Your IP address: <span id="ip">192.168.0.1</span> (hidden by VPN*)</p>
    <p>*not hidden</p>
    <p id="cookie-count"></p>
+   <p><button type="button" class="linkish" id="history-link">View your search history</button></p>
    <p>Nothing on this site is real. No body parts were harmed. Cody, please stop telling people about this.</p>
   </footer>
  </div>
@@ -151,10 +230,85 @@ footer b{color:#bbb}
  'use strict';
  const $=id=>document.getElementById(id);
  const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+ const btn=(cls,text,onclick)=>{const b=el('button',cls,text);b.type='button';if(onclick)b.onclick=onclick;return b};
  const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const wait=ms=>new Promise(r=>setTimeout(r,reduceMotion?Math.min(ms,80):ms));
+ const store={get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch(_){return f}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
  let toastTimer;
- function toast(text){const t=$('toast');t.textContent=text;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true},3200)}
+ function toast(text){const t=$('toast');t.textContent=text;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true},3400)}
+
+ // ---------- Sound, all made by the phone (no sound files) ----------
+ const SOUND_KEY='mds_blackweb_sound_v1';
+ let soundOn=store.get(SOUND_KEY,true),ac=null,master=null;
+ function audio(){
+  if(!soundOn)return null;
+  if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.14;master.connect(ac.destination)}catch(_){return null}}
+  if(ac.state==='suspended')ac.resume();
+  return ac;
+ }
+ function showSound(){$('sound-btn').textContent=soundOn?'🔊':'🔇';$('sound-btn').setAttribute('aria-label',soundOn?'Sound on':'Sound off')}
+ $('sound-btn').onclick=()=>{soundOn=!soundOn;store.set(SOUND_KEY,soundOn);showSound();if(!soundOn){stopRing();if(master)master.gain.value=0}else if(master)master.gain.value=.14};
+ showSound();
+ function tone(freq,start,dur,type='sine',vol=1){
+  const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,a.currentTime+start);g.gain.setValueAtTime(0,a.currentTime+start+dur);
+  o.connect(g);g.connect(master);o.start(a.currentTime+start);o.stop(a.currentTime+start+dur+.02);return o;
+ }
+ function noise(start,dur,freq=1800,q=.7,vol=1){
+  const a=audio();if(!a)return;const len=Math.floor(a.sampleRate*dur),buf=a.createBuffer(1,len,a.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=buf;f.type='bandpass';f.frequency.value=freq;f.Q.value=q;g.gain.value=vol;
+  s.connect(f);f.connect(g);g.connect(master);s.start(a.currentTime+start);
+ }
+ // That 90s dial-up modem noise.
+ function dialUp(){
+  if(!audio())return;
+  tone(350,0,.7);tone(440,0,.7);
+  const DTMF=[[697,1209],[697,1336],[770,1209],[770,1477],[852,1336],[941,1336],[852,1209]];
+  DTMF.forEach(([lo,hi],i)=>{tone(lo,.8+i*.13,.09);tone(hi,.8+i*.13,.09)});
+  tone(2100,1.9,.6);
+  for(let i=0;i<10;i++){tone(i%2?1200:2250,2.55+i*.07,.07,'square',.5)}
+  noise(3.25,.9,2400,.5,.9);
+  for(let i=0;i<14;i++)tone(980+Math.random()*1400,3.3+i*.05,.05,'sawtooth',.25);
+  noise(4.2,.6,1100,.9,.7);tone(1650,4.85,.25,'triangle',.4);
+ }
+ let ringTimer=null;
+ function ring(){if(!audio())return;[0,.6].forEach(s=>{tone(400,s,.4,'sine',.8);tone(450,s,.4,'sine',.8)})}
+ function startRing(){stopRing();ring();ringTimer=setInterval(ring,2400)}
+ function stopRing(){clearInterval(ringTimer);ringTimer=null}
+ function knock(){[0,.32,.64].forEach(s=>noise(s,.09,180,1.4,2.5))}
+ function siren(){const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain(),lfo=a.createOscillator(),depth=a.createGain();
+  o.type='sawtooth';o.frequency.value=900;lfo.frequency.value=1.6;depth.gain.value=320;lfo.connect(depth);depth.connect(o.frequency);g.gain.value=.35;o.connect(g);g.connect(master);
+  o.start();lfo.start();o.stop(a.currentTime+2.6);lfo.stop(a.currentTime+2.6)}
+
+ // ---------- Badges ----------
+ const BADGES=[
+  ['cookies','🍪','Accepted the cookies'],
+  ['reject','🙅','Tried to reject them 3 times'],
+  ['robot','🤖','Proved you’re not the police'],
+  ['mum','📞','Caught by Mum'],
+  ['ignored','🙉','Ignored Mum twice'],
+  ['police','🚓','Survived the Cyber Police'],
+  ['steve','💬','Chatted to Steve'],
+  ['amateur','🌑','Went looking for the dark web'],
+  ['history','🕘','Read the search history'],
+  ['ads','💾','Clicked a dodgy pop-up'],
+  ['greggs','🥐','Paid in Greggs vouchers'],
+  ['evri','📦','Parcel lost by Evri'],
+ ];
+ const BADGE_KEY='mds_blackweb_badges_v1';
+ let earned=new Set(store.get(BADGE_KEY,[]));
+ function renderBadges(){
+  const grid=$('badge-grid');grid.replaceChildren();
+  BADGES.forEach(([id,icon,name])=>{const li=el('li',earned.has(id)?'got':'');li.append(el('b',null,icon),document.createTextNode(earned.has(id)?name:'???'));grid.append(li)});
+  $('badges-title').textContent='🏅 Your badges ('+earned.size+'/'+BADGES.length+')';
+ }
+ function award(id){
+  if(earned.has(id))return;earned.add(id);store.set(BADGE_KEY,[...earned]);renderBadges();
+  const b=BADGES.find(x=>x[0]===id);setTimeout(()=>toast('🏅 Badge unlocked: '+b[2]),700);
+  if(earned.size===BADGES.length)setTimeout(()=>toast('🏆 All badges! You are officially as bad as Cody.'),4300);
+ }
+ renderBadges();
 
  // ---------- Matrix rain behind the VPN screen ----------
  const rain=$('rain'),g=rain.getContext('2d');let drops=[],raining=!reduceMotion;
@@ -175,28 +329,30 @@ footer b{color:#bbb}
  $('vpn-go').addEventListener('click',async()=>{
   const go=$('vpn-go');
   if(go.dataset.ready){enter();return}
-  go.disabled=true;go.textContent='Connecting…';
+  go.disabled=true;go.textContent='Connecting…';dialUp();
   const log=$('vpn-log');log.replaceChildren();
   for(let i=0;i<STEPS.length;i++){
    const li=el('li');li.innerHTML='&gt; '+STEPS[i]+' ✔';log.append(li);
    requestAnimationFrame(()=>li.classList.add('in'));
    $('vpn-bar').style.width=((i+1)/STEPS.length*100)+'%';
-   await wait(650);
+   await wait(850);
   }
   $('vpn-pill').textContent='VPN: on 🔒 (free trial)';
   go.disabled=false;go.dataset.ready='1';go.textContent='☠ Enter the Black Web';go.focus();
  });
-
+ let onSite=false;
+ async function typeAddress(url){const addr=$('addr');for(let i=1;i<=url.length;i+=reduceMotion?url.length:2){addr.textContent=url.slice(0,i);await wait(35)}addr.textContent=url}
  async function enter(){
-  raining=false;
-  const url='blackweb://bodyparts4u.onion.co.uk',addr=$('addr');
-  $('vpn-go').disabled=true;
-  for(let i=1;i<=url.length;i+=reduceMotion?url.length:2){addr.textContent=url.slice(0,i);await wait(35)}
-  addr.textContent=url;
+  raining=false;$('vpn-go').disabled=true;
+  await typeAddress('blackweb://bodyparts4u.onion.co.uk');
   $('tab-title').textContent='☠ THE BLACK WEB – Body Parts R Us';
-  $('vpn-screen').hidden=true;$('site').hidden=false;window.scrollTo(0,0);
+  $('vpn-screen').hidden=true;$('site').hidden=false;window.scrollTo(0,0);onSite=true;
   showCookies();
  }
+
+ // ---------- Only one pop-up at a time (apart from ads and chat) ----------
+ const busy=()=>!!document.querySelector('.overlay,.panel,.call,.police');
+ function whenFree(fn){if(!busy())fn();else setTimeout(()=>whenFree(fn),1500)}
 
  // ---------- 2. The shop ----------
  const ITEMS=[
@@ -211,22 +367,28 @@ footer b{color:#bbb}
   {e:'🫀',n:'Heart',d:'Second hand. A bit broken. Still beats.',p:'£150'},
   {e:'🪱',n:'Appendix',d:'Nobody knows what it does. Neither did the last owner.',p:'FREE',b:'FREE GIFT'},
  ];
+ const ALSO=[{e:'🧊',n:'Bag of ice (Iceland)',p:'£1'},{e:'👜',n:'Cool bag',p:'£3.99'},{e:'🌭',n:'Sausage roll',p:'£1.25'}];
  const basket=[];
+ function addToBasket(it){
+  basket.push(it);$('basket').textContent='🛒 Basket ('+basket.length+')';toast(it.e+' '+it.n+' added. Keep it cool.');
+ }
  ITEMS.forEach(it=>{
   const card=el('div','item');
   if(it.b)card.append(el('span','badge',it.b));
   card.append(el('div','emoji',it.e),el('h3',null,it.n),el('p',null,it.d));
   const price=el('div','price');if(it.was)price.append(el('span','was',it.was));price.append(it.p);card.append(price);
-  const add=el('button','add','Add to basket');add.type='button';
-  add.onclick=()=>{if(!cookiesAccepted){showCookies();return}basket.push(it);$('basket').textContent='🛒 Basket ('+basket.length+')';toast(it.e+' '+it.n+' added. Keep it cool.')};
-  card.append(add);$('grid').append(card);
+  card.append(btn('add','Add to basket',()=>{
+   if(!cookiesAccepted){showCookies();return}
+   if(!robotChecked){robotCheck(()=>addToBasket(it));return}
+   addToBasket(it);
+  }));
+  $('grid').append(card);
  });
- $('ip').textContent='192.168.0.1';
 
  // ---------- The cookie banner (the whole point) ----------
  const COUNT_KEY='mds_blackweb_cookies_v1';
  let cookiesAccepted=false,rejectTries=0,overlay;
- function showCount(){let n=0;try{n=Number(localStorage.getItem(COUNT_KEY))||0}catch(_){}$('cookie-count').textContent=n?'Cookies accepted on this phone: '+n+'. Just like Cody.':''}
+ function showCount(){const n=Number(store.get(COUNT_KEY,0))||0;$('cookie-count').textContent=n?'Cookies accepted on this phone: '+n+'. Just like Cody.':''}
  showCount();
  const REJECT_LINES=['Reject all','Are you sure?','Rejecting is illegal here','Go on, accept them','Accept all'];
  function showCookies(){
@@ -235,23 +397,21 @@ footer b{color:#bbb}
   const box=el('div','cookie');
   box.append(el('h2',null,'🍪 We value your privacy*'));box.firstChild.id='cookie-title';
   const p1=el('p',null,'This Black Web site uses cookies to improve your organ shopping experience. We and our ');
-  const partners=el('button','partners','847 partners');partners.type='button';
-  partners.onclick=()=>toast('Partners include: the bloke in the van, Big Dave, and Iceland.');
-  p1.append(partners,document.createTextNode(' (all from the Black Web) would like to store cookies on your device.'));
+  p1.append(btn('partners','847 partners',()=>toast('Partners include: the bloke in the van, Big Dave, and Iceland.')),document.createTextNode(' (all from the Black Web) would like to store cookies on your device.'));
   box.append(p1,el('p',null,'*We do not value your privacy.'));
   const row=el('div','row');
-  const accept=el('button','accept','Accept all');accept.type='button';accept.onclick=acceptCookies;
-  const reject=el('button','reject','Reject all');reject.type='button';
+  const accept=btn('accept','Accept all',acceptCookies);
+  const reject=btn('reject','Reject all');
   reject.onclick=()=>{
    rejectTries++;
+   if(rejectTries>=3)award('reject');
    if(rejectTries>=REJECT_LINES.length-1){acceptCookies();return}
    reject.textContent=REJECT_LINES[rejectTries];
    // It runs away from your thumb.
    const w=box.clientWidth-reject.offsetWidth-20,h=Math.max(60,row.offsetTop-reject.offsetHeight-6);
    reject.classList.add('loose');reject.style.left=Math.max(10,Math.random()*w)+'px';reject.style.top=Math.max(10,Math.random()*h)+'px';
   };
-  const manage=el('button','manage','Manage preferences');manage.type='button';manage.onclick=()=>showPrefs(box);
-  row.append(accept,manage,reject);box.append(row);overlay.append(box);document.body.append(overlay);accept.focus();
+  row.append(accept,btn('manage','Manage preferences',()=>showPrefs(box)),reject);box.append(row);overlay.append(box);document.body.append(overlay);accept.focus();
  }
  const PREFS=[
   ['Strictly necessary','Kidney tracking. Always on.'],
@@ -266,44 +426,220 @@ footer b{color:#bbb}
   const list=el('ul','prefs');
   PREFS.forEach(([name,why])=>{
    const li=el('li'),text=el('div');text.append(el('strong',null,name),el('small',null,why));
-   const sw=el('button','switch');sw.type='button';sw.setAttribute('role','switch');sw.setAttribute('aria-checked','true');sw.setAttribute('aria-label',name+' cookies');
+   const sw=btn('switch','');sw.setAttribute('role','switch');sw.setAttribute('aria-checked','true');sw.setAttribute('aria-label',name+' cookies');
    sw.onclick=()=>{sw.classList.remove('wobble');void sw.offsetWidth;sw.classList.add('wobble');toast('Nice try. That one’s stuck on.')};
    li.append(text,sw);list.append(li);
   });
-  const save=el('button','accept','Save my choices');save.type='button';save.style.width='100%';save.onclick=acceptCookies;
+  const save=btn('accept','Save my choices',acceptCookies);save.style.width='100%';
   box.append(list,save);save.focus();
  }
  function acceptCookies(){
+  if(cookiesAccepted)return;
   cookiesAccepted=true;
-  try{localStorage.setItem(COUNT_KEY,String((Number(localStorage.getItem(COUNT_KEY))||0)+1))}catch(_){}
-  showCount();
+  store.set(COUNT_KEY,(Number(store.get(COUNT_KEY,0))||0)+1);showCount();
   overlay.remove();overlay=null;
-  toast('🍪 Cookies accepted. The Black Web is now fully GDPR compliant.');
+  toast('🍪 Cookies accepted. The Black Web is now fully GDPR compliant.');award('cookies');
+  startInterruptions();
  }
 
- // ---------- 3. Checkout ----------
+ // ---------- "I'm not a robot" (every square is a sausage roll) ----------
+ let robotChecked=false;
+ function robotCheck(then){
+  showPanel('light',box=>{
+   const top=el('div','captcha-top');top.append(el('span',null,'Select all squares with'),el('b',null,'a kidney 🫘'),el('span',null,'Before adding organs to your basket, prove you’re human.'));
+   const police=el('div','notpolice');const tick=el('span','tick');tick.setAttribute('role','checkbox');tick.setAttribute('aria-checked','false');
+   police.append(tick,el('span',null,'I am not the police'));
+   setTimeout(()=>{tick.textContent='✔';tick.setAttribute('aria-checked','true');toast('We believe you.')},900);
+   const tiles=el('div','tiles');
+   for(let i=0;i<9;i++){const t=btn('tile','');t.setAttribute('aria-label','Square '+(i+1)+' (sausage roll)');t.setAttribute('aria-pressed','false');t.append(el('i'));
+    t.onclick=()=>{const on=t.classList.toggle('on');t.setAttribute('aria-pressed',String(on))};tiles.append(t)}
+   const errLine=el('p','err');
+   const verify=btn('btn','Verify',()=>{
+    if(!tiles.querySelector('.on')){errLine.textContent='Please select all the kidneys.';return}
+    closePanel();robotChecked=true;award('robot');toast('✅ They were all sausage rolls. Close enough.');then();
+   });
+   verify.style.background='#4a90e2';verify.style.color='#fff';
+   box.append(top,police,tiles,errLine,verify);
+  });
+ }
+
+ // ---------- Interruptions: pop-up ads, Steve, Mum and the Cyber Police ----------
+ let started=false;
+ function startInterruptions(){
+  if(started)return;started=true;
+  setTimeout(()=>popAd(0),4000);
+  setTimeout(()=>showChatButton(true),9000);
+  setTimeout(()=>whenFree(mumCalls),20000);
+  setTimeout(()=>popAd(1),32000);
+  setTimeout(()=>whenFree(cyberPolice),48000);
+  setTimeout(()=>popAd(2),62000);
+  setTimeout(()=>popAd(3),90000);
+ }
+ const ADS=[
+  {t:'Congratulations!!!',big:'🎉',h:'You are the 1,000,000th visitor!',b:'Claim your FREE iPad now. (It’s a kidney.)',c:'CLAIM NOW'},
+  {t:'System message',big:'💾',h:'Your phone is low on RAM',b:'Download more RAM for free. 100% legit. Works on Samsungs.',c:'DOWNLOAD RAM'},
+  {t:'Singles alert',big:'🫘',h:'Hot kidneys in your area',b:'3 lonely kidneys within 2 miles of you want to meet.',c:'MEET THEM'},
+  {t:'Norton AntiVirus 2003',big:'🛡',h:'47 viruses found!',b:'One of them is Cody.',c:'REMOVE CODY'},
+ ];
+ const AD_REPLIES=['Nice try. That’s how they get you.','Downloading… just kidding. Your phone is now 12% more cursed.','They’ve blocked you.','Cody can’t be removed. We’ve tried.'];
+ function popAd(i){
+  if(!onSite)return;
+  const a=ADS[i],ad=el('div','ad');ad.setAttribute('role','dialog');ad.setAttribute('aria-label',a.t);
+  const bar=el('div','t');bar.append(el('span',null,a.t),btn('','✕',()=>ad.remove()));bar.lastChild.setAttribute('aria-label','Close');
+  const body=el('div','b');body.append(el('div','big',a.big),el('strong',null,a.h),el('div',null,a.b),btn('claim',a.c,()=>{ad.remove();toast(AD_REPLIES[i]);award('ads')}));
+  ad.append(bar,body);
+  ad.style.left=Math.round(Math.random()*Math.max(10,innerWidth-310))+'px';ad.style.top=Math.round(110+Math.random()*Math.max(20,innerHeight-430))+'px';
+  document.body.append(ad);
+ }
+
+ // Live chat with Steve
+ let chat,chatBtn,chatted=false;
+ const STEVE={
+  'Is this legal?':'Define legal 🤔',
+  'Do you deliver?':'Yes, with Evri. So no.',
+  'Can I return a kidney?':'Only in the original packaging.',
+  'Are you the police?':'No. Are YOU the police?',
+  'Who is this?':'Steve. From the Black Web. Saturdays I’m at Greggs.',
+  'Any discount codes?':'Use CODY10 for 10% off. He’s used it 14 times.',
+ };
+ const RANDOM_STEVE=['Mate I’m on my break','Have you tried turning your kidney off and on again?','lol','Your mum just messaged us','I’ll pass that on to the bloke in the van','Is that you Cody? It’s always you','We don’t do refunds. Or answers.'];
+ function showChatButton(open){
+  if(!onSite||chatBtn)return;
+  chatBtn=btn('chatbtn','',()=>openChat());chatBtn.innerHTML='<i></i>Chat with Steve';document.body.append(chatBtn);
+  if(open)openChat(true);
+ }
+ function say(text,who){const m=el('div','msg '+who,text);chat.querySelector('.msgs').append(m);m.scrollIntoView({block:'end'});return m}
+ function steveSays(text){const typing=say('Steve is typing…','steve typing');setTimeout(()=>{typing.remove();say(text,'steve')},reduceMotion?50:1100)}
+ function openChat(auto){
+  if(chat){chat.hidden=false;chatBtn.hidden=true;return}
+  chat=el('section','chat');chat.setAttribute('aria-label','Live chat with Steve');
+  const head=el('header'),who=el('div');who.append(el('strong',null,'Steve · Black Web Support'),el('small',null,'Usually replies whenever'));
+  head.append(who,btn('','✕',()=>{chat.hidden=true;chatBtn.hidden=false}));head.lastChild.setAttribute('aria-label','Close chat');
+  const msgs=el('div','msgs');msgs.setAttribute('aria-live','polite');
+  const quick=el('div','quick');
+  Object.keys(STEVE).forEach(q=>quick.append(btn('',q,()=>ask(q))));
+  const form=el('form'),input=el('input');input.placeholder='Type a message…';input.setAttribute('aria-label','Message Steve');input.maxLength=120;
+  form.append(input,btn('','Send'));form.lastChild.type='submit';
+  form.onsubmit=e=>{e.preventDefault();const t=input.value.trim();if(!t)return;input.value='';ask(t)};
+  chat.append(head,msgs,quick,form);document.body.append(chat);chatBtn.hidden=true;
+  steveSays('Hi Cody 👋 Back again?');
+  if(!auto)input.focus();
+ }
+ function ask(q){
+  say(q,'me');
+  const lower=q.toLowerCase();
+  let reply=STEVE[q];
+  if(!reply&&/dark ?web/.test(lower))reply='Amateur. This is the BLACK web.';
+  if(!reply&&/(mum|mom)/.test(lower))reply='She’s already been on. Your tea’s ready.';
+  if(!reply&&/(police|cop|fbi)/.test(lower))reply='Shh.';
+  steveSays(reply||RANDOM_STEVE[Math.floor(Math.random()*RANDOM_STEVE.length)]);
+  if(!chatted){chatted=true;award('steve')}
+ }
+
+ // Mum's calling
+ let mumDeclines=0;
+ function mumCalls(){
+  const call=el('div','call');call.setAttribute('role','dialog');call.setAttribute('aria-modal','true');call.setAttribute('aria-label','Incoming call from Mum');
+  const top=el('div');top.append(el('div',null,mumDeclines?'Incoming call ('+(mumDeclines+1)+')':'Incoming call'),el('div','who','Mum ❤️'),el('div',null,'mobile'));
+  const pic=el('div','pic','👩');
+  const acts=el('div','acts');
+  const dec=el('div'),ans=el('div');
+  dec.append(btn('decline','📵',()=>{stopRing();call.remove();mumDeclines++;
+   if(mumDeclines>=2){award('ignored');toast('💬 Mum: ANSWER YOUR PHONE. I can see you’re online.')}
+   if(mumDeclines<3)setTimeout(()=>whenFree(mumCalls),reduceMotion?400:2500);
+  }),el('small',null,'Decline'));
+  ans.append(btn('answer','📞',()=>{stopRing();answered(call)}),el('small',null,'Answer'));
+  dec.firstChild.setAttribute('aria-label','Decline');ans.firstChild.setAttribute('aria-label','Answer');
+  acts.append(dec,ans);call.append(top,pic,acts);document.body.append(call);startRing();ans.firstChild.focus();
+ }
+ function answered(call){
+  call.replaceChildren();
+  const top=el('div');top.append(el('div','who','Mum ❤️'),el('div',null,'00:0'+(3+Math.floor(Math.random()*6))));
+  const said=el('div','bubble','“Cody, are you on that black web again? Your tea’s ready. And take your feet off the sofa.”');
+  const end=el('div','acts'),hang=el('div');end.append(hang);hang.append(btn('decline','📵',()=>{call.remove();award('mum');toast('Mum hung up first. Classic.')}),el('small',null,'Hang up'));
+  hang.firstChild.setAttribute('aria-label','Hang up');
+  call.append(top,said,end);hang.firstChild.focus();
+ }
+
+ // The Cyber Police (it's Evri)
+ function cyberPolice(){
+  const p=el('div','police');p.setAttribute('role','alertdialog');p.setAttribute('aria-modal','true');
+  p.append(el('div','knock','✊ KNOCK KNOCK'),el('div',null,'🚨 CYBER POLICE 🚨'),el('div',null,'OPEN UP'));
+  document.body.append(p);knock();setTimeout(siren,900);
+  setTimeout(()=>{
+   p.classList.add('calm');p.replaceChildren(el('div',null,'📦'),el('div',null,'Only joking.'),el('p',null,'It’s Evri. We tried to deliver something but you were in. So we left.'));
+   const ok=btn('btn','Phew',()=>{p.remove();award('police')});ok.style.maxWidth='260px';p.append(ok);ok.focus();
+  },reduceMotion?300:3200);
+ }
+
+ // ---------- Panels ----------
  let panel;
  function showPanel(cls,build){
   if(panel)panel.remove();
   panel=el('div','panel');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
   const box=el('div','box '+(cls||''));build(box);panel.append(box);document.body.append(panel);
-  box.querySelector('button')?.focus();
+  box.querySelector('button,input')?.focus();
  }
  function closePanel(){if(panel){panel.remove();panel=null}}
+
+ // Cody's search history
+ const HISTORY=[
+  ['how to use a vpn','22:41'],['is the black web real','22:43'],['black web vs dark web which is darker','22:44'],
+  ['greggs opening times near me','22:51'],['how much is a kidney worth','22:58'],['how much is a kidney worth asking for a friend','22:58'],
+  ['do vpns work on mums wifi','23:05'],['why is someone knocking','23:12'],['how to delete search history','23:20'],['how to delete search history ON PHONE','23:21'],
+ ];
+ function showHistory(){
+  showPanel('light',box=>{
+   box.append(el('h2',null,'🕘 History'));
+   const ul=el('ul','history');HISTORY.slice().reverse().forEach(([q,t])=>{const li=el('li');li.append(el('span',null,'🔍 '+q),el('time',null,'Today '+t));ul.append(li)});
+   box.append(ul,btn('btn','Clear history',()=>toast('Error: history too embarrassing to delete.')),btn('btn dark','Close',closePanel));
+  });
+  award('history');
+ }
+ $('history-btn').onclick=()=>{if(!busy())showHistory()};
+ $('history-link').onclick=showHistory;
+
+ // Typing an address
+ $('url-bar').onclick=()=>{
+  if(busy())return;
+  showPanel('',box=>{
+   box.append(el('h2',null,'Where to?'));
+   const form=el('form'),input=el('input');input.placeholder='Type a web address';input.setAttribute('aria-label','Web address');input.autocapitalize='none';input.maxLength=80;
+   const out=el('p','err');out.setAttribute('role','status');out.style.color='#ffd400';
+   form.append(input,btn('btn','Go'));form.lastChild.type='submit';
+   form.onsubmit=e=>{
+    e.preventDefault();const v=input.value.trim().toLowerCase();if(!v)return;
+    if(/dark/.test(v)){out.textContent='Amateur. You want the BLACK web.';award('amateur')}
+    else if(/google/.test(v))out.textContent='Google can’t find you here. That’s the point.';
+    else if(/greggs/.test(v))out.textContent='Greggs is closed. It’s 23:47, Cody.';
+    else if(/(police|gov|fbi)/.test(v))out.textContent='ShadowFox has blocked this site for your safety. Their safety. Someone’s safety.';
+    else if(/black/.test(v)){closePanel();if(!onSite)toast('Connect the VPN first. You’re not mad.');else toast('You’re already on the Black Web.')}
+    else out.textContent='404: that site is too legal for ShadowFox.';
+   };
+   box.append(form,out,btn('btn dark','Cancel',closePanel));
+  });
+ };
+
+ // ---------- 3. Checkout ----------
  $('basket').onclick=()=>{
   if(!cookiesAccepted){showCookies();return}
   if(!basket.length){toast('Your basket is empty. Unlike the freezer out back.');return}
+  showCheckout();
+ };
+ function showCheckout(){
   showPanel('',box=>{
    box.append(el('h2',null,'🛒 Checkout'));
    const ul=el('ul');basket.forEach(it=>ul.append(el('li',null,it.e+' '+it.n+' – '+it.p)));box.append(ul);
-   box.append(el('p',null,'Choose how to pay:'));
-   ['🪙 Bitcoin','🥐 Greggs vouchers','🟣 Nectar points','💷 Cash in a Tesco bag'].forEach(m=>{
-    const b=el('button','pay',m);b.type='button';b.onclick=()=>pay(m);box.append(b);
-   });
-   const back=el('button','btn','Keep shopping');back.type='button';back.onclick=closePanel;box.append(back);
+   box.append(el('p',null,'Customers also bought:'));
+   const also=el('div','also');
+   ALSO.forEach(it=>{const b=btn('','',()=>{addToBasket(it);showCheckout()});b.append(el('span',null,it.e),document.createTextNode(it.n+' '+it.p));also.append(b)});
+   box.append(also,el('p',null,'Choose how to pay:'));
+   ['🪙 Bitcoin','🥐 Greggs vouchers','🟣 Nectar points','💷 Cash in a Tesco bag'].forEach(m=>box.append(btn('pay',m,()=>pay(m))));
+   box.append(btn('btn','Keep shopping',closePanel));
   });
- };
+ }
  async function pay(method){
+  if(/Greggs/.test(method))award('greggs');
   showPanel('',box=>{box.append(el('h2',null,'Processing…'),el('p',null,'Paying with '+method.slice(2).trim()+'. Do not close ShadowFox. Do not tell your mum.'))});
   await wait(1800);
   $('vpn-pill').textContent='VPN: off 😬 (trial ended)';
@@ -311,20 +647,18 @@ footer b{color:#bbb}
    box.append(el('h2',null,'⚠ VPN FREE TRIAL EXPIRED'));
    box.append(el('p',null,'Your IP address is now visible to everyone: '+$('ip').textContent+'.'));
    box.append(el('p',null,'That’s your own router, Cody.'));
-   const b=el('button','btn','Check my order');b.type='button';b.onclick=delivered;box.append(b);
+   box.append(btn('btn','Check my order',delivered));
   });
  }
  function delivered(){
-  const first=basket[0];
+  const first=basket[0];award('evri');
   showPanel('evri',box=>{
    box.append(el('h2',null,'evri'));
    box.append(el('p',null,'Sorry we missed you! We tried to deliver your '+(basket.length>1?basket.length+' items':first.n.toLowerCase())+' but nobody was in.'));
    box.append(el('p',null,'📦 Your parcel has been left with a neighbour. We’re not sure which one.'));
    box.append(el('p',null,'Photo of delivery: a blurry picture of someone else’s door.'));
-   const again=el('button','btn','Start again');again.type='button';again.onclick=()=>location.reload();
-   const done=el('button','btn','Leave the Black Web');done.type='button';done.style.background='#222';done.style.color='#fff';
-   done.onclick=()=>{closePanel();basket.length=0;$('basket').textContent='🛒 Basket (0)';toast('History cleared. Mum will never know.')};
-   box.append(again,done);
+   box.append(btn('btn','Start again',()=>location.reload()));
+   box.append(btn('btn dark','Leave the Black Web',()=>{closePanel();basket.length=0;$('basket').textContent='🛒 Basket (0)';toast('History cleared. Mum will never know.')}));
   });
  }
 })();
