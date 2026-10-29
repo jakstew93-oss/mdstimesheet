@@ -165,6 +165,53 @@ footer b{color:#bbb}
 .knock{font-size:46px;animation:shake .25s 3}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#ffd400;color:#000;font:700 15px Arial,sans-serif;padding:10px 16px;border-radius:10px;z-index:40;max-width:calc(100% - 30px);text-align:center;box-shadow:0 6px 20px #0008}
+.clockline{margin:8px auto 0;max-width:520px;background:#222;border:1px dashed #ffd400;color:#ffd400;border-radius:8px;padding:6px 10px;font:14px Arial,sans-serif}
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 12px 8px;max-width:900px;margin:0 auto}
+.extras button{background:#1a1a1a;color:#fff;border:2px solid #ffd400;border-radius:10px;padding:12px 8px;font:700 15px Arial,sans-serif}
+.extras button span{display:block;font-size:28px}
+.review .who{display:flex;align-items:center;gap:8px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#2a2a2a;image-rendering:pixelated;object-fit:cover}
+.unlocks{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.unlocks .btn{margin:0}
+.vanta-btn{background:#000;color:#bbb;border:2px solid #333!important}
+.value li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #333;list-style:none}
+.value{padding:0!important}
+.value small{display:block;color:#999}
+.value b{color:#39ff7a;white-space:nowrap}
+.total{font:900 22px Impact,sans-serif;color:#ffd400;margin:12px 0 0}
+.auction-item{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.auction-item .avatar{width:48px;height:48px}
+.bid{font:900 40px Impact,sans-serif;color:#39ff7a;margin:4px 0}
+.leader{color:#ccc;min-height:1.3em}
+.timer{float:right;font:900 26px Impact,sans-serif;color:#ffd400}
+.timer.low{color:#ff2a2a;animation:blink 1s steps(2) infinite}
+.bids{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.bids button{padding:12px 4px;border-radius:8px;border:2px solid #39ff7a;background:#0f2a17;color:#39ff7a;font:700 16px Arial,sans-serif}
+.feed{list-style:none;padding:0!important;margin:10px 0 0;max-height:120px;overflow:auto;font-size:14px;color:#bbb}
+.bossbtn{position:fixed;left:0;top:46%;z-index:55;background:#fff;color:#222;border:0;border-radius:0 999px 999px 0;padding:10px 12px 10px 8px;font:700 14px Arial,sans-serif;box-shadow:0 6px 18px #0008}
+.sheet{position:fixed;inset:0;z-index:60;background:#fff;color:#222;font:13px Calibri,Arial,sans-serif;display:flex;flex-direction:column}
+.sheet .xl{background:#217346;color:#fff;padding:8px 10px;font:600 14px Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .ribbon{background:#f3f2f1;border-bottom:1px solid #ddd;padding:6px 10px;color:#444;white-space:nowrap;overflow:hidden}
+.sheet .fx{display:flex;gap:8px;border-bottom:1px solid #ddd;padding:4px 10px;font-family:Consolas,monospace}
+.sheet .cells{flex:1;overflow:auto}
+.sheet table{border-collapse:collapse;min-width:100%}
+.sheet td,.sheet th{border:1px solid #e1e1e1;padding:3px 6px;white-space:nowrap;text-align:left}
+.sheet th{background:#f3f2f1;color:#666;font-weight:400;text-align:center}
+.sheet .tabs2{display:flex;gap:2px;background:#f3f2f1;border-top:1px solid #ddd;padding:4px 6px}
+.sheet .tabs2 button{border:0;background:#fff;padding:6px 10px;font:13px Arial,sans-serif;color:#217346}
+.sheet .tabs2 button.dim{background:none;color:#999}
+.winerr{background:#f0f0f0;color:#000;border:1px solid #888;border-radius:6px;font:14px "Segoe UI",Arial,sans-serif;padding:0;overflow:hidden}
+.winerr .wt{background:#fff;padding:8px 12px;border-bottom:1px solid #ddd;font-weight:600}
+.winerr .wb{display:flex;gap:12px;padding:16px 14px;align-items:flex-start}
+.winerr .wb .x{font-size:32px;line-height:1}
+.winerr .wa{display:flex;flex-direction:column;gap:8px;padding:0 14px 14px}
+.winerr .wa button{background:#e1e1e1;border:1px solid #adadad;padding:9px;font:14px "Segoe UI",Arial,sans-serif;text-align:left}
+.vanta{position:fixed;inset:0;z-index:50;background:#141414;color:#eee;overflow:hidden;touch-action:none;font:16px Arial,sans-serif}
+.vanta .find{position:absolute;background:none;border:0;font-size:40px;padding:6px;line-height:1}
+.vanta .dark{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle 95px at var(--x,50%) var(--y,50%),transparent 0,transparent 55%,#000 100%)}
+.vanta.lit .dark{display:none}
+.vanta .vhead{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;color:#888;font:15px Arial,sans-serif}
+.vanta .vhead button{background:#111;color:#aaa;border:1px solid #333;border-radius:999px;padding:8px 12px;font:14px Arial,sans-serif}
 @media (prefers-reduced-motion:reduce){.marquee span{animation:none;padding-left:12px}.log li{transition:none}.police{animation:none;background:#0039d6}.answer,.ad .claim,.knock{animation:none}}
 </style></head><body>
 
@@ -198,13 +245,18 @@ footer b{color:#bbb}
    <h1>☠ THE BLACK WEB ☠</h1>
    <p class="tag">Body Parts R Us · Quality Second-Hand Organs</p>
    <p class="est">Est. last Tuesday · Not the dark web. Darker.</p>
+   <p class="clockline" id="clockline" hidden></p>
   </header>
   <div class="marquee" aria-hidden="true"><span>🔥 HALF TERM SALE 🔥 FREE DELIVERY OVER 2 KIDNEYS • NOW TAKING GREGGS VOUCHERS • ALL PARTS COME WITH 28 DAYS WARRANTY (NOT YOURS) • APPENDIX FREE WITH EVERY ORDER • AS SEEN ON CODY’S PHONE •</span></div>
   <div class="basket"><button type="button" id="basket">🛒 Basket (0)</button></div>
+  <div class="extras">
+   <button type="button" id="valuation-btn"><span>💷</span>Sell your parts: free valuation</button>
+   <button type="button" id="auction-btn"><span>🔨</span>Live auction: Cody’s left kidney</button>
+  </div>
   <div class="grid" id="grid"></div>
   <section class="reviews" aria-labelledby="reviews-title">
    <h2 id="reviews-title">★ Trustpirate reviews</h2>
-   <div class="review"><span class="stars">★★★★★</span><p>Only went on to have a look. Ended up accepting the cookies.</p><small>Cody S. · verified visitor · used a VPN</small></div>
+   <div class="review"><span class="stars">★★★★★</span><p>Only went on to have a look. Ended up accepting the cookies.</p><small class="who"><img class="avatar" src="driver-avatars/cody-slack-black-shirt.png" alt="">Cody S. · verified visitor · used a VPN</small></div>
    <div class="review"><span class="stars">★★★★☆</span><p>Asked for a spare pair of hands for second fix. Got two left ones. Still quicker than the apprentice.</p><small>Anonymous electrician</small></div>
    <div class="review"><span class="stars">★★★★★</span><p>Kidney arrived well packed. On ice. From Iceland.</p><small>Verified buyer</small></div>
    <div class="review"><span class="stars">★☆☆☆☆</span><p>Bought a new back for loft work. Still hurts. Seller said “sold as seen”.</p><small>Bad back Barry</small></div>
@@ -212,6 +264,10 @@ footer b{color:#bbb}
   <section class="badges" aria-labelledby="badges-title">
    <h2 id="badges-title">🏅 Your badges</h2>
    <ul class="badge-grid" id="badge-grid"></ul>
+   <div class="unlocks">
+    <button type="button" class="btn vanta-btn" id="vanta-btn" hidden>🕳 Enter the Vantablack Web</button>
+    <button type="button" class="btn" id="cert-btn" hidden>📜 Get your certificate</button>
+   </div>
   </section>
   <footer>
    <p><b>© The Black Web 2026.</b> Registered at Companies House (probably). Your IP address: <span id="ip">192.168.0.1</span> (hidden by VPN*)</p>
@@ -223,6 +279,7 @@ footer b{color:#bbb}
  </div>
 </main>
 
+<button type="button" class="bossbtn" id="boss-btn" hidden aria-label="Boss button: hide this quickly">👔 Boss</button>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
@@ -295,18 +352,28 @@ footer b{color:#bbb}
   ['ads','💾','Clicked a dodgy pop-up'],
   ['greggs','🥐','Paid in Greggs vouchers'],
   ['evri','📦','Parcel lost by Evri'],
+  ['valuation','💷','Got a valuation'],
+  ['auction','🔨','Outbid by Mum'],
+  ['boss','👔','Hid it from the boss'],
+  ['codyexe','💥','Crashed cody.exe'],
+  ['vanta','🕳','Escaped the Vantablack Web'],
  ];
  const BADGE_KEY='mds_blackweb_badges_v1';
  let earned=new Set(store.get(BADGE_KEY,[]));
  function renderBadges(){
   const grid=$('badge-grid');grid.replaceChildren();
-  BADGES.forEach(([id,icon,name])=>{const li=el('li',earned.has(id)?'got':'');li.append(el('b',null,icon),document.createTextNode(earned.has(id)?name:'???'));grid.append(li)});
-  $('badges-title').textContent='🏅 Your badges ('+earned.size+'/'+BADGES.length+')';
+  BADGES.forEach(([id,icon,name])=>{const li=el('li',earned.has(id)?'got':'');li.append(el('b',null,earned.has(id)||id!=='vanta'?icon:'🔒'),document.createTextNode(earned.has(id)?name:'???'));grid.append(li)});
+  const got=BADGES.filter(b=>earned.has(b[0])).length;
+  $('badges-title').textContent='🏅 Your badges ('+got+'/'+BADGES.length+')';
+  // The secret one unlocks once you've got every other badge; the certificate once you've got the lot.
+  $('vanta-btn').hidden=!BADGES.every(b=>b[0]==='vanta'||earned.has(b[0]));
+  $('cert-btn').hidden=got<BADGES.length;
  }
  function award(id){
   if(earned.has(id))return;earned.add(id);store.set(BADGE_KEY,[...earned]);renderBadges();
   const b=BADGES.find(x=>x[0]===id);setTimeout(()=>toast('🏅 Badge unlocked: '+b[2]),700);
-  if(earned.size===BADGES.length)setTimeout(()=>toast('🏆 All badges! You are officially as bad as Cody.'),4300);
+  if(BADGES.every(b=>earned.has(b[0])))setTimeout(()=>toast('🏆 All badges! You are officially as bad as Cody. Grab your certificate.'),4300);
+  else if(BADGES.every(b=>b[0]==='vanta'||earned.has(b[0])))setTimeout(()=>toast('🕳 Something has unlocked at the bottom of the page…'),4300);
  }
  renderBadges();
 
@@ -347,6 +414,7 @@ footer b{color:#bbb}
   await typeAddress('blackweb://bodyparts4u.onion.co.uk');
   $('tab-title').textContent='☠ THE BLACK WEB – Body Parts R Us';
   $('vpn-screen').hidden=true;$('site').hidden=false;window.scrollTo(0,0);onSite=true;
+  $('boss-btn').hidden=false;showClockLine();
   showCookies();
  }
 
@@ -575,12 +643,12 @@ footer b{color:#bbb}
  // ---------- Panels ----------
  let panel;
  function showPanel(cls,build){
-  if(panel)panel.remove();
+  if(panel)panel.remove();stopAuction();
   panel=el('div','panel');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
   const box=el('div','box '+(cls||''));build(box);panel.append(box);document.body.append(panel);
   box.querySelector('button,input')?.focus();
  }
- function closePanel(){if(panel){panel.remove();panel=null}}
+ function closePanel(){stopAuction();if(panel){panel.remove();panel=null}}
 
  // Cody's search history
  const HISTORY=[
@@ -609,6 +677,7 @@ footer b{color:#bbb}
    form.append(input,btn('btn','Go'));form.lastChild.type='submit';
    form.onsubmit=e=>{
     e.preventDefault();const v=input.value.trim().toLowerCase();if(!v)return;
+    if(/cody/.test(v)){codyExe();return}
     if(/dark/.test(v)){out.textContent='Amateur. You want the BLACK web.';award('amateur')}
     else if(/google/.test(v))out.textContent='Google can’t find you here. That’s the point.';
     else if(/greggs/.test(v))out.textContent='Greggs is closed. It’s 23:47, Cody.';
@@ -640,6 +709,7 @@ footer b{color:#bbb}
  }
  async function pay(method){
   if(/Greggs/.test(method))award('greggs');
+  paidWith=method.slice(2).trim();
   showPanel('',box=>{box.append(el('h2',null,'Processing…'),el('p',null,'Paying with '+method.slice(2).trim()+'. Do not close ShadowFox. Do not tell your mum.'))});
   await wait(1800);
   $('vpn-pill').textContent='VPN: off 😬 (trial ended)';
@@ -657,9 +727,221 @@ footer b{color:#bbb}
    box.append(el('p',null,'Sorry we missed you! We tried to deliver your '+(basket.length>1?basket.length+' items':first.n.toLowerCase())+' but nobody was in.'));
    box.append(el('p',null,'📦 Your parcel has been left with a neighbour. We’re not sure which one.'));
    box.append(el('p',null,'Photo of delivery: a blurry picture of someone else’s door.'));
+   box.append(btn('btn','📲 Share with the lads',shareReceipt));
    box.append(btn('btn','Start again',()=>location.reload()));
    box.append(btn('btn dark','Leave the Black Web',()=>{closePanel();basket.length=0;$('basket').textContent='🛒 Basket (0)';toast('History cleared. Mum will never know.')}));
   });
+ }
+
+ // ---------- Who's signed in to the timesheet (same phone, same app) ----------
+ function signedInName(){try{return localStorage.getItem('ts_auth_user')||''}catch(_){return ''}}
+ const firstName=()=>(signedInName().split(' ')[0]||'');
+ const isCody=()=>/cody/i.test(signedInName());
+ const pounds=n=>'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+ function seeded(text){let h=2166136261;for(const c of text){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return()=>{h=Math.imul(h^h>>>15,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
+
+ // ---------- Sharing (works in the Android app, in Chrome and anywhere else) ----------
+ const nativeApp=()=>window.MDSNative||(window.parent!==window&&window.parent.MDSNative)||null;
+ async function shareText(title,text){
+  const n=nativeApp();
+  if(n&&n.shareText){n.shareText(title,text);return}
+  if(navigator.share){try{await navigator.share({title,text});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text);toast('Copied. Paste it in the group chat.')}catch(_){prompt('Copy this and send it to the lads:',text)}
+ }
+ async function shareFile(bytes,name,title){
+  const blob=new Blob([bytes],{type:'application/pdf'}),n=nativeApp();
+  if(n&&n.shareFile){const b64=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(',')[1]);f.readAsDataURL(blob)});n.shareFile(name,'application/pdf',b64,title);return}
+  const file=new File([blob],name,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title});return}catch(e){if(e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
+  toast('Certificate downloaded.');
+ }
+
+ // ---------- When are you browsing? ----------
+ function showClockLine(){
+  const d=new Date(),h=d.getHours(),weekend=d.getDay()===0||d.getDay()===6;
+  let line;
+  if(h>=22||h<5)line='🌙 Mum’s asleep. Browse freely.';
+  else if(!weekend&&h>=7&&h<16)line='⏰ Is this on the company clock? We’ve added 15 minutes to your break.';
+  else if(weekend)line='🛋 Weekend browsing detected. Respect.';
+  else line='🍽 Tea’s nearly ready. Quick browse only.';
+  $('clockline').textContent=line;$('clockline').hidden=false;
+ }
+
+ // ---------- Sell your parts: a valuation for whoever's signed in ----------
+ const PARTS=[
+  ['Knees','Seen too many lofts',2,9],['Back','Carried too many cable drums',1,6],['Hands','Terminated 10,000 sockets',20,60],
+  ['Ears','Only know Ed Sheeran from the site radio',3,8],['Liver','Friday nights',1,4],['Brain','Barely used. Mostly thinks about lunch',0,3],
+  ['Lungs','Plaster dust and loft insulation',2,10],['Eyes','Can’t find the screwdriver that’s in their hand',5,15],
+  ['Thumbs','Hit with a hammer 400 times',1,5],['Patience','Used up by the apprentice',0,1],['Heart','Still good. Priceless (well, £12)',12,12],
+ ];
+ const CODY_PARTS=[
+  ['Stomach','Holds 9 Greggs at once. Industrial grade',40,90],['Liver','Sausage roll damage',1,3],['Brain','Full of VPN facts',0,2],
+  ['Thumbs','Worn out scrolling the Black Web',2,6],['Ears','Still ringing from Mum’s calls',3,7],
+ ];
+ $('valuation-btn').onclick=()=>{
+  if(!cookiesAccepted){showCookies();return}
+  const name=signedInName()||'You',rand=seeded(name.toLowerCase());
+  const list=isCody()?CODY_PARTS:PARTS.slice().sort(()=>rand()-.5).slice(0,5);
+  const offers=list.map(([part,why,lo,hi])=>[part,why,Math.round((lo+rand()*(hi-lo))*100)/100]);
+  let total=offers.reduce((s,o)=>s+o[2],0);
+  showPanel('',box=>{
+   box.append(el('h2',null,'💷 Your valuation'),el('p',null,'Valuation for: '+name+(isCody()?' (returning customer)':'')));
+   const ul=el('ul','value');
+   offers.forEach(([part,why,price])=>{const li=el('li'),left=el('div');left.append(el('strong',null,(name==='You'?'Your ':firstName()+'’s ')+part.toLowerCase()),el('small',null,why));li.append(left,el('b',null,pounds(price)));ul.append(li)});
+   const totalLine=el('p','total','Total offer: '+pounds(total));
+   box.append(ul,totalLine,el('p',null,'Take it or leave it.'));
+   const more=btn('btn dark','Ask for more',()=>{total=Math.max(0,total-.5);totalLine.textContent='Total offer: '+pounds(total);toast('Offer reduced by 50p for being cheeky.')});
+   box.append(btn('btn','Accept offer',()=>{closePanel();toast('Brilliant. Someone will be round in a van. Leave the back door open.')}),more,btn('btn dark','No thanks',closePanel));
+  });
+  award('valuation');
+ };
+
+ // ---------- Live auction (you always lose to Mum) ----------
+ let auctionTimer=null,daveTimer=null;
+ function stopAuction(){clearInterval(auctionTimer);clearTimeout(daveTimer);auctionTimer=daveTimer=null}
+ $('auction-btn').onclick=()=>{
+  if(!cookiesAccepted){showCookies();return}
+  let bid=250,leader='Big Dave',left=15,ended=false;
+  showPanel('',box=>{
+   const timer=el('span','timer','0:15');
+   const h=el('h2',null,'🔨 LIVE AUCTION');h.append(timer);
+   const item=el('div','auction-item'),img=el('img','avatar');img.src='driver-avatars/cody-slack-black-shirt.png';img.alt='';
+   const desc=el('div');desc.append(el('strong',null,'Cody’s left kidney'),el('small',null,'One careful owner. Mostly sausage rolls.'));desc.lastChild.style.display='block';desc.lastChild.style.color='#999';
+   item.append(img,desc);
+   const amount=el('div','bid',pounds(bid)),who=el('div','leader','Highest bid: Big Dave'),feed=el('ul','feed');feed.setAttribute('aria-live','polite');
+   const log=t=>{feed.prepend(el('li',null,t))};
+   const show=()=>{amount.textContent=pounds(bid);who.textContent='Highest bid: '+leader};
+   const bids=el('div','bids');
+   [10,50,500].forEach(n=>bids.append(btn('','+£'+n,()=>{
+    if(ended)return;bid+=n;leader='You';show();log('You bid '+pounds(bid));
+    clearTimeout(daveTimer);
+    daveTimer=setTimeout(()=>{if(ended||leader!=='You')return;bid+=5+Math.round(Math.random()*35);leader='Big Dave';show();log('Big Dave bid '+pounds(bid)+(Math.random()<.4?' 😤':''))},reduceMotion?200:900+Math.random()*1800);
+   })));
+   box.append(h,item,amount,who,bids,feed,btn('btn dark','Leave auction',closePanel));
+   log('Big Dave bid '+pounds(bid));
+   auctionTimer=setInterval(()=>{
+    left--;timer.textContent='0:'+String(Math.max(0,left)).padStart(2,'0');timer.classList.toggle('low',left<=5);
+    if(left>0)return;
+    ended=true;stopAuction();
+    bid=1000000;leader='Mum';show();log('📞 Mum bid £1,000,000.00');
+    bids.replaceChildren(el('p',null,'“He’s not selling his kidney. His tea’s ready.” – Mum'));bids.style.display='block';
+    who.textContent='SOLD to Mum. She’s keeping it safe.';award('auction');
+   },reduceMotion?150:1000);
+  });
+ };
+
+ // ---------- The boss button ----------
+ let sheet=null;
+ const ROWS=[['Ref','Circuit','Cable','Length (m)','Zs (Ω)','Status'],
+  ['DB1/1','Lighting – ground floor','1.5mm² T&E','34','1.12','Tested'],['DB1/2','Lighting – first floor','1.5mm² T&E','41','1.38','Tested'],
+  ['DB1/3','Ring – kitchen','2.5mm² T&E','52','0.44','Tested'],['DB1/4','Ring – lounge','2.5mm² T&E','47','0.51','Tested'],
+  ['DB1/5','Cooker','6mm² T&E','12','0.29','Tested'],['DB1/6','Shower','10mm² T&E','18','0.22','Tested'],
+  ['DB1/7','Immersion','2.5mm² HOFR','9','0.61','Tested'],['DB1/8','Smoke alarms','1.5mm² FP200','29','1.04','Tested'],
+  ['DB2/1','Garage sockets','4mm² SWA','25','0.73','Tested'],['DB2/2','Garage lighting','1.5mm² SWA','25','1.21','Tested'],
+  ['DB2/3','EV charger','6mm² SWA','21','0.35','Awaiting'],['DB2/4','Outside lights','1.5mm² SWA','16','1.09','Awaiting'],
+  ['','','','','',''],['','','Total','329','','']];
+ function bossOn(){
+  if(sheet)return;
+  sheet=el('div','sheet');sheet.setAttribute('role','dialog');sheet.setAttribute('aria-label','Spreadsheet');
+  sheet.append(el('div','xl','📗 Cable_Schedule_Q4_FINAL_v7 (2).xlsx – Excel'),el('div','ribbon','File   Home   Insert   Page Layout   Formulas   Data   Review   View'));
+  const fx=el('div','fx');fx.append(el('span',null,'D16'),el('span',null,'fx  =SUM(D2:D14)'));sheet.append(fx);
+  const wrap=el('div','cells'),t=el('table'),head=el('tr');head.append(el('th',null,''));'ABCDEFGH'.split('').forEach(c=>head.append(el('th',null,c)));t.append(head);
+  for(let r=0;r<30;r++){const tr=el('tr');tr.append(el('th',null,String(r+1)));const row=ROWS[r]||[];for(let c=0;c<8;c++)tr.append(el('td',null,row[c]||''));if(r===0)tr.style.fontWeight='700';t.append(tr)}
+  wrap.append(t);sheet.append(wrap);
+  const tabs=el('div','tabs2');tabs.append(btn('','Schedule'),btn('dim','Test results'),btn('dim','Sheet3',bossOff));tabs.lastChild.setAttribute('aria-label','Sheet3 (go back to the Black Web)');
+  sheet.append(tabs);document.body.append(sheet);
+  if(master)master.gain.value=0;
+  tabs.firstChild.focus();award('boss');
+ }
+ function bossOff(){if(!sheet)return;sheet.remove();sheet=null;if(master&&soundOn)master.gain.value=.14;$('boss-btn').focus()}
+ $('boss-btn').onclick=bossOn;
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&sheet)bossOff()});
+
+ // ---------- cody.exe ----------
+ function codyExe(){
+  let waits=0;
+  showPanel('winerr',box=>{
+   box.append(el('div','wt','cody.exe'));
+   const body=el('div','wb'),img=el('img','avatar');img.src='driver-avatars/cody-slack-black-shirt.png';img.alt='';
+   const text=el('div');text.append(el('strong',null,'cody.exe has stopped working'),el('p',null,'A problem caused the program to stop working correctly. Windows is checking for a solution. (It’s a sausage roll.)'));
+   text.lastChild.style.margin='6px 0 0';body.append(img,text);
+   const acts=el('div','wa');
+   acts.append(btn('','Wait for Cody to respond',()=>{
+    waits++;
+    text.lastChild.textContent=waits===1?'Still not responding. He’s eating.':waits===2?'Still not responding. He’s on the Black Web.':'Cody is now responding. He’d like a sausage roll.';
+   }),btn('','Close the program',()=>{closePanel();toast('Cody can’t be closed. He’s on his break.')}));
+   box.append(body,acts);
+  });
+  award('codyexe');
+ }
+
+ // ---------- The Vantablack Web ----------
+ $('vanta-btn').onclick=()=>{
+  const v=el('div','vanta');v.setAttribute('role','dialog');v.setAttribute('aria-label','The Vantablack Web');
+  const head=el('div','vhead');head.append(el('span',null,'🔦 Drag your finger to look around. Find the light switch.'),btn('','Give up',()=>{v.remove();toast('Scared of the dark? Cody isn’t.')}));
+  const FINDS=[['🥐','Cody’s lunch. Still warm.',12,30],['🪛','The screwdriver you borrowed in 2019.',72,22],['🧦','One sock. Don’t ask.',30,62],['📱','14 missed calls from Mum.',80,70],['🐀','Just Dave.',55,45],['💡','The light switch',18,84]];
+  FINDS.forEach(([icon,line,x,y])=>{
+   const f=btn('find',icon,()=>{
+    if(icon!=='💡'){toast(line);return}
+    v.classList.add('lit');head.firstChild.textContent='💡 Lights on! You escaped the Vantablack Web.';award('vanta');
+   });
+   f.setAttribute('aria-label',icon==='💡'?'Light switch':'Something in the dark');f.style.left=x+'%';f.style.top=y+'%';
+   f.addEventListener('focus',()=>{const r=f.getBoundingClientRect();v.style.setProperty('--x',r.left+r.width/2+'px');v.style.setProperty('--y',r.top+r.height/2+'px')});
+   v.append(f);
+  });
+  const dark=el('div','dark');v.append(dark,head);
+  const move=e=>{const t=e.touches?e.touches[0]:e;v.style.setProperty('--x',t.clientX+'px');v.style.setProperty('--y',t.clientY+'px')};
+  v.addEventListener('pointermove',move);v.addEventListener('touchmove',move,{passive:true});v.addEventListener('pointerdown',move);
+  document.body.append(v);head.lastChild.focus();
+ };
+
+ // ---------- Certificate of survival ----------
+ let pdfLib;
+ function loadPdfLib(){
+  if(window.PDFLib)return Promise.resolve(window.PDFLib);
+  return pdfLib=pdfLib||new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='pdf-lib.min.js';sc.onload=()=>resolve(window.PDFLib);sc.onerror=()=>{pdfLib=null;reject(new Error('no pdf'))};document.head.append(sc)});
+ }
+ async function certificate(name){
+  const {PDFDocument,StandardFonts,rgb,degrees}=await loadPdfLib();
+  const doc=await PDFDocument.create(),page=doc.addPage([841.89,595.28]),W=841.89,H=595.28;
+  const bold=await doc.embedFont(StandardFonts.HelveticaBold),reg=await doc.embedFont(StandardFonts.Helvetica),script=await doc.embedFont(StandardFonts.TimesRomanBoldItalic);
+  const red=rgb(.8,.1,.1),gold=rgb(.85,.65,.05),ink=rgb(.1,.1,.1);
+  page.drawRectangle({x:0,y:0,width:W,height:H,color:rgb(.07,.07,.07)});
+  page.drawRectangle({x:24,y:24,width:W-48,height:H-48,borderColor:gold,borderWidth:6,color:rgb(.99,.97,.9)});
+  page.drawRectangle({x:38,y:38,width:W-76,height:H-76,borderColor:red,borderWidth:1.5});
+  const centre=(text,y,font,size,color)=>page.drawText(text,{x:(W-font.widthOfTextAtSize(text,size))/2,y,size,font,color});
+  centre('THE BLACK WEB',H-110,bold,22,red);
+  centre('Certificate of Survival',H-160,script,46,ink);
+  centre('This certifies that',H-215,reg,16,ink);
+  centre(name,H-270,script,44,red);
+  centre('survived the Black Web, accepted every cookie, ignored Mum, lost an auction to Mum,',H-315,reg,14,ink);
+  centre('escaped the Vantablack Web and earned all '+BADGES.length+' badges.',H-335,reg,14,ink);
+  page.drawLine({start:{x:120,y:130},end:{x:340,y:130},thickness:1,color:ink});
+  page.drawText('Steve',{x:170,y:138,size:30,font:script,color:rgb(.1,.2,.6)});
+  page.drawText('Steve, Black Web Support',{x:150,y:112,size:12,font:reg,color:ink});
+  page.drawLine({start:{x:500,y:130},end:{x:720,y:130},thickness:1,color:ink});
+  page.drawText(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),{x:545,y:138,size:18,font:reg,color:ink});
+  page.drawText('Date (probably)',{x:565,y:112,size:12,font:reg,color:ink});
+  page.drawCircle({x:W/2,y:125,size:46,borderColor:red,borderWidth:3});
+  page.drawText('NOT THE',{x:W/2-28,y:128,size:13,font:bold,color:red,rotate:degrees(12)});
+  page.drawText('POLICE',{x:W/2-24,y:112,size:13,font:bold,color:red,rotate:degrees(12)});
+  centre('Nothing on this certificate is real. Witnessed by Cody (who also accepted the cookies).',56,reg,10,rgb(.4,.4,.4));
+  return doc.save();
+ }
+ $('cert-btn').onclick=async()=>{
+  const b=$('cert-btn'),label=b.textContent;b.disabled=true;b.textContent='Printing… (on a Black Web printer)';
+  try{const name=signedInName()||'An Anonymous Electrician';await shareFile(await certificate(name),'Black Web certificate - '+name+'.pdf','Black Web certificate')}
+  catch(_){toast('The printer’s jammed. Try again.')}
+  finally{b.disabled=false;b.textContent=label}
+ };
+
+ // ---------- Share the order with the lads ----------
+ let paidWith='Greggs vouchers';
+ function shareReceipt(){
+  const order='CODY-'+String(Math.floor(Math.random()*9000)+1000);
+  const lines=['🧾 THE BLACK WEB – Order #'+order,...basket.map(it=>'1× '+it.n+' – '+it.p),'Paid with: '+paidWith,'Delivery: Evri (lol)','Status: Left with a neighbour. Not sure which one.','','Ordered by '+(signedInName()||'someone')+' on ShadowFox Ultra 3000™'];
+  shareText('My Black Web order',lines.join('\n'));
  }
 })();
 </script>

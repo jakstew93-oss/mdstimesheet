@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v90';
+const CACHE_NAME = 'mdsmiths-timesheet-v91';
 const APP_SHELL = [
   './',
   './receipt-ocr.js?v=67',
@@ -39,8 +39,8 @@ const APP_SHELL = [
   './spark-town.html?v=62',
   './cody-snackagotchi.html?v=62',
   './spark-town.js?v=62',
-  './spark-town-launcher.js?v=77',
-  './black-web.html?v=2',
+  './spark-town-launcher.js?v=78',
+  './black-web.html?v=3',
   './cody-burger-chase.html?v=75',
   './cody-burger-chase.js?v=75',
   './pdf-lib.min.js',
