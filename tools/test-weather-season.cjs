@@ -37,6 +37,6 @@ test('only Jak Stewart sees it, and only in the pixel themes',()=>{
 });
 test('it is loaded by the app and cached offline',()=>{
  const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
- assert.match(template,/weather-season\.js\?v=77/);assert.match(template,/weather-season\.css\?v=77/);
- const sw=fs.readFileSync('sw.js','utf8');for(const f of ['weather-season.js?v=77','weather-season.css?v=77'])assert.ok(sw.includes(f),f);
+ assert.match(template,/weather-season\.js\?v=78/);assert.match(template,/weather-season\.css\?v=77/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const f of ['weather-season.js?v=78','weather-season.css?v=77'])assert.ok(sw.includes(f),f);
 });
