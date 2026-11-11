@@ -2,9 +2,15 @@
  <uses-permission android:name="android.permission.INTERNET"/>
  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+ <!-- For the Sunday reminder: on time, and still set after a restart. -->
+ <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+ <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32"/>
+ <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
  <!-- Only for the weather card on the Log page. -->
  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+ <!-- To name the app a timesheet was shared to. -->
+ <queries><intent><action android:name="android.intent.action.SEND"/><data android:mimeType="*/*"/></intent></queries>
  <application android:allowBackup="true" android:label="MDS Timesheet" android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
   <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask" android:theme="@style/WebTheme"
    android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"
@@ -16,6 +22,16 @@
    <meta-data android:name="android.appwidget.provider" android:resource="@xml/quick_widget_info"/>
   </receiver>
   <receiver android:name=".InstallReceiver" android:exported="false"/>
+  <receiver android:name=".ShareReceiver" android:exported="false"/>
+  <!-- The Sunday reminder's alarm, set again whenever Android drops it. -->
+  <receiver android:name=".ReminderReceiver" android:exported="false">
+   <intent-filter>
+    <action android:name="android.intent.action.BOOT_COMPLETED"/>
+    <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+    <action android:name="android.intent.action.TIME_SET"/>
+    <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+   </intent-filter>
+  </receiver>
   <!-- Receives sets logged on the watch. -->
   <service android:name=".WatchSyncService" android:exported="true">
    <intent-filter>

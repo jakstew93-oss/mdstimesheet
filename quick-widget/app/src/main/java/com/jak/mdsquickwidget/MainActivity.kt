@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ContentValues
 import android.content.Intent
@@ -95,6 +96,7 @@ class MainActivity : Activity() {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATIONS)
         Updater.check(this, manual = false)
+        Reminder.schedule(this)
     }
 
     @Suppress("DEPRECATION")
@@ -199,7 +201,10 @@ class MainActivity : Activity() {
             val uri = FileProvider.getUriForFile(this, "$packageName.files", file)
             val send = Intent(Intent.ACTION_SEND).setType(mime).putExtra(Intent.EXTRA_STREAM, uri)
                 .putExtra(Intent.EXTRA_SUBJECT, title).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(Intent.createChooser(send, title.ifBlank { "Share" }))
+            // Hear back once an app is picked, so a shared timesheet can be logged as sent.
+            val picked = PendingIntent.getBroadcast(this, 0, Intent(this, ShareReceiver::class.java).putExtra(ShareReceiver.NAME, name),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            startActivity(Intent.createChooser(send, title.ifBlank { "Share" }, picked.intentSender))
         } catch (_: Exception) { toast("Couldn’t share $name") }
     }
 
