@@ -50,6 +50,14 @@ class NativeBridge(private val activity: MainActivity) {
         activity.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("MDS Timesheet", text))
     }
 
+    /** Who gets the Sunday reminder and which weeks are already sent (see sunday-reminder.js). */
+    @JavascriptInterface fun setReminder(json: String) {
+        try { Reminder.save(activity, JSONObject(json)) } catch (_: Exception) { }
+    }
+
+    /** The last file shared from the app and the app it went to, as {name, app, at}, or an empty string. */
+    @JavascriptInterface fun lastShare(): String = ShareReceiver.last(activity)
+
     @JavascriptInterface fun appVersion(): String = Updater.versionCode(activity).toString()
 
     @JavascriptInterface fun checkForUpdates() = activity.runOnUiThread { Updater.check(activity, manual = true) }
