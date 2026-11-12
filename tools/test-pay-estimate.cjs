@@ -87,3 +87,12 @@ test('Jak, Martyn and Oliver each get the pay estimate with their own settings',
  assert.equal(settingsKey('Martyn Evans'),'mds_pay_settings_v1:Martyn Evans');
  assert.notEqual(settingsKey('Oliver Spicer'),settingsKey('Martyn Evans'));
 });
+test('Martyn and Oliver are asked for their own hourly rate first; Jak is not',()=>{
+ const {needsRate}=require('../pay-estimate.js');
+ assert.equal(needsRate('Jak Stewart',null),false);
+ assert.equal(needsRate('Martyn Evans',null),true,'nothing saved yet');
+ assert.equal(needsRate('Martyn Evans','{"taxCode":"1257L"}'),true,'settings but no rate');
+ assert.equal(needsRate('Oliver Spicer','{"rate":0}'),true);
+ assert.equal(needsRate('Oliver Spicer','not json'),true);
+ assert.equal(needsRate('Oliver Spicer','{"rate":14.5}'),false);
+});
