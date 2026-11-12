@@ -1,11 +1,18 @@
 // Pay estimate on the Export page: the selected week's hours turned into gross pay, deductions and take-home.
-// Only in the MDS Timesheet Android app and only for the people listed below, the same as the shift dial.
+// Only for the people listed below, on the website and in the MDS Timesheet Android app. Each of them keeps their own pay settings.
 // The tax, National Insurance and pension figures follow the standard UK weekly rules for 2026/27. Real PAYE
 // looks at the whole tax year so far, so this is an estimate, not a payslip.
 (function(root){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart'];
+ const ALLOWED_USERS=['Jak Stewart','Martyn Evans','Oliver Spicer'];
  const SETTINGS_KEY='mds_pay_settings_v1';
+ // Jak's settings from before stay where they were; everyone else gets their own, so people sharing a phone don't overwrite each other.
+ function settingsKey(user){return user==='Jak Stewart'?SETTINGS_KEY:SETTINGS_KEY+':'+user}
+ // Everyone but Jak puts their own hourly rate in before seeing any figures, rather than starting on his.
+ function needsRate(user,savedText){
+  if(user==='Jak Stewart')return false;
+  try{return !(Number((JSON.parse(savedText||'{}')||{}).rate)>0)}catch(_){return true}
+ }
  const DEFAULTS={rate:17,satX:1.5,sunX:1.5,night:20,nightTaxed:false,holidayHours:8,taxCode:'1257L',pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:true};
 
  // 2026/27, per week.
@@ -89,16 +96,16 @@
    total:pence(gross+untaxed),takeHome:pence(gross-tax-ni-pension+untaxed),settings:s};
  }
 
- const api={estimate,weeklyTax,weeklyNI,weeklyPension,readCode,clean,entryMins,DEFAULTS};
+ const api={estimate,weeklyTax,weeklyNI,weeklyPension,readCode,clean,entryMins,settingsKey,needsRate,ALLOWED_USERS,DEFAULTS};
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDSPay=api;
  if(!root.document)return;
 
  // ---------- The card ----------
  function read(key){try{return localStorage.getItem(key)}catch(_){return null}}
- function inApp(){return !!root.MDSNative||/\bMDSTimesheetApp\//.test(navigator.userAgent||'')}
- function eligible(){return inApp()&&ALLOWED_USERS.includes(read('ts_auth_user')||'')}
- function settings(){try{return clean(JSON.parse(read(SETTINGS_KEY)||'{}'))}catch(_){return clean({})}}
+ const user=()=>read('ts_auth_user')||'';
+ function eligible(){return ALLOWED_USERS.includes(user())}
+ function settings(){try{return clean(JSON.parse(read(settingsKey(user()))||'{}'))}catch(_){return clean({})}}
  const money=n=>'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
  const hours=m=>Math.floor(m/60)+'h'+(m%60?' '+String(m%60).padStart(2,'0')+'m':'');
 
@@ -145,7 +152,7 @@
    const input=e.target;if(!input.dataset||!input.dataset.key)return;
    const next={...settings()};
    next[input.dataset.key]=input.dataset.kind==='yesno'?input.value==='yes':input.dataset.kind==='number'?Number(input.value):input.value;
-   try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(clean(next)))}catch(_){}
+   try{localStorage.setItem(settingsKey(user()),JSON.stringify(clean(next)))}catch(_){}
    lastSig='';render();
   });
   (page.querySelector('.summary-card')||page.firstElementChild).after(card);
@@ -159,16 +166,43 @@
   });
  }
 
+ // First time in: ask for the hourly rate before showing anything.
+ function askForRate(card){
+  card.querySelector('details').hidden=true;
+  const box=card.querySelector('.pe-rows');box.textContent='';
+  const form=document.createElement('form');form.className='pe-ask';
+  const label=document.createElement('label');label.className='pe-field';
+  const text=document.createElement('span');text.textContent='Your hourly rate (£)';
+  const input=document.createElement('input');input.type='number';input.inputMode='decimal';input.step='any';input.min='0';input.placeholder='e.g. 16.50';input.required=true;
+  label.append(text,input);
+  const save=document.createElement('button');save.type='submit';save.className='btn btn-primary';save.textContent='Save my rate';save.style.marginTop='8px';
+  const error=document.createElement('p');error.className='pe-error';error.style.fontSize='12px';error.setAttribute('role','alert');error.style.color='var(--danger, #c0392b)';
+  form.append(label,save,error);box.append(form);
+  card.querySelector(':scope > .pe-note').textContent='Put your own hourly rate in to see your pay estimate. You can change it, and your tax code and pension, in Pay settings afterwards.';
+  form.addEventListener('submit',e=>{
+   e.preventDefault();
+   const rate=Number(input.value);
+   if(!(rate>0)){error.textContent='Enter your hourly rate, for example 16.50.';return}
+   try{localStorage.setItem(settingsKey(user()),JSON.stringify(clean({...settings(),rate})))}catch(_){error.textContent='Your rate couldn’t be saved. Try again.';return}
+   lastSig='';render();
+  });
+ }
+
  let lastSig='';
  function render(){
   const page=document.getElementById('page-export');if(!page)return;
   let card=document.getElementById('pay-est');
   if(!eligible()||typeof getEntries!=='function'||typeof getBreakMins!=='function'||typeof minsToStr!=='function'){if(card)card.hidden=true;lastSig='';return}
+  if(needsRate(user(),read(settingsKey(user())))){
+   if(card&&!card.hidden&&lastSig==='ask:'+user())return;
+   if(!card)card=buildCard(page);
+   card.hidden=false;lastSig='ask:'+user();askForRate(card);return;
+  }
   let entries;try{entries=getEntries()}catch(_){return}
-  const s=settings(),sig=JSON.stringify([entries,s]);
+  const s=settings(),sig=JSON.stringify([user(),entries,s]);
   if(card&&!card.hidden&&sig===lastSig)return;
   if(!card)card=buildCard(page);
-  card.hidden=false;lastSig=sig;
+  card.hidden=false;lastSig=sig;card.querySelector('details').hidden=false;
   const e=estimate(entries,s,m=>getBreakMins(minsToStr(m)));
   const rows=[];
   if(e.weekMins)rows.push(['Mon–Fri · '+hours(e.weekMins)+' × '+money(s.rate),money(e.weekPay)]);
@@ -187,7 +221,7 @@
   const take=document.createElement('div');take.className='pe-take';
   const a=document.createElement('span');a.textContent='Take-home, about';const b=document.createElement('span');b.textContent=money(e.takeHome);
   take.append(a,b);box.append(take);
-  card.querySelector('.pe-note').textContent='An estimate for the selected week, using hours after breaks. Only you see this. Each food allowance tick counts as one night away.';
+  card.querySelector(':scope > .pe-note').textContent='An estimate for the selected week, using hours after breaks. Only you see this. Each food allowance tick counts as one night away.';
   fillFields(card,s);
  }
 
