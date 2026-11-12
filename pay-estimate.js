@@ -1,11 +1,13 @@
 // Pay estimate on the Export page: the selected week's hours turned into gross pay, deductions and take-home.
-// Only in the MDS Timesheet Android app and only for the people listed below, the same as the shift dial.
+// Only for the people listed below, on the website and in the MDS Timesheet Android app. Each of them keeps their own pay settings.
 // The tax, National Insurance and pension figures follow the standard UK weekly rules for 2026/27. Real PAYE
 // looks at the whole tax year so far, so this is an estimate, not a payslip.
 (function(root){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart'];
+ const ALLOWED_USERS=['Jak Stewart','Martyn Evans','Oliver Spicer'];
  const SETTINGS_KEY='mds_pay_settings_v1';
+ // Jak's settings from before stay where they were; everyone else gets their own, so people sharing a phone don't overwrite each other.
+ function settingsKey(user){return user==='Jak Stewart'?SETTINGS_KEY:SETTINGS_KEY+':'+user}
  const DEFAULTS={rate:17,satX:1.5,sunX:1.5,night:20,nightTaxed:false,holidayHours:8,taxCode:'1257L',pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:true};
 
  // 2026/27, per week.
@@ -89,16 +91,16 @@
    total:pence(gross+untaxed),takeHome:pence(gross-tax-ni-pension+untaxed),settings:s};
  }
 
- const api={estimate,weeklyTax,weeklyNI,weeklyPension,readCode,clean,entryMins,DEFAULTS};
+ const api={estimate,weeklyTax,weeklyNI,weeklyPension,readCode,clean,entryMins,settingsKey,ALLOWED_USERS,DEFAULTS};
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDSPay=api;
  if(!root.document)return;
 
  // ---------- The card ----------
  function read(key){try{return localStorage.getItem(key)}catch(_){return null}}
- function inApp(){return !!root.MDSNative||/\bMDSTimesheetApp\//.test(navigator.userAgent||'')}
- function eligible(){return inApp()&&ALLOWED_USERS.includes(read('ts_auth_user')||'')}
- function settings(){try{return clean(JSON.parse(read(SETTINGS_KEY)||'{}'))}catch(_){return clean({})}}
+ const user=()=>read('ts_auth_user')||'';
+ function eligible(){return ALLOWED_USERS.includes(user())}
+ function settings(){try{return clean(JSON.parse(read(settingsKey(user()))||'{}'))}catch(_){return clean({})}}
  const money=n=>'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
  const hours=m=>Math.floor(m/60)+'h'+(m%60?' '+String(m%60).padStart(2,'0')+'m':'');
 
@@ -145,7 +147,7 @@
    const input=e.target;if(!input.dataset||!input.dataset.key)return;
    const next={...settings()};
    next[input.dataset.key]=input.dataset.kind==='yesno'?input.value==='yes':input.dataset.kind==='number'?Number(input.value):input.value;
-   try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(clean(next)))}catch(_){}
+   try{localStorage.setItem(settingsKey(user()),JSON.stringify(clean(next)))}catch(_){}
    lastSig='';render();
   });
   (page.querySelector('.summary-card')||page.firstElementChild).after(card);
@@ -165,7 +167,7 @@
   let card=document.getElementById('pay-est');
   if(!eligible()||typeof getEntries!=='function'||typeof getBreakMins!=='function'||typeof minsToStr!=='function'){if(card)card.hidden=true;lastSig='';return}
   let entries;try{entries=getEntries()}catch(_){return}
-  const s=settings(),sig=JSON.stringify([entries,s]);
+  const s=settings(),sig=JSON.stringify([user(),entries,s]);
   if(card&&!card.hidden&&sig===lastSig)return;
   if(!card)card=buildCard(page);
   card.hidden=false;lastSig=sig;
