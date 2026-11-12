@@ -5,7 +5,7 @@
  const selectors={qsDriverSel:'qsDriverOther',driverNameSelect:'driverName',editDriverNameSelect:'editDriverName'};
  const controls=new WeakMap();let currentSelect=null,dialog=null,returnFocus=null;
  function avatar(name){
-  const portraits={'Jak Stewart':'jak-stewart-black-shirt','Cody Slack':'cody-slack-black-shirt','Ash Kemp':'ash-kemp-black-shirt','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath-black-shirt','Luke Chambers':'luke-chambers-black-shirt','Oliver Spicer':'oliver-spicer-black-shirt'};
+  const portraits={'Jak Stewart':'jak-stewart-black-shirt','Cody Slack':'cody-slack-black-shirt','Ash Kemp':'ash-kemp-black-shirt','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath-black-shirt','Luke Chambers':'luke-chambers-black-shirt','Oliver Spicer':'oliver-spicer-black-shirt','Tobi Culver':'tobi-culver'};
   if(portraits[name]){
    const image=document.createElement('img');image.src='driver-avatars/'+portraits[name]+'.png';image.alt='';image.className='driver-avatar driver-avatar-portrait';image.setAttribute('aria-hidden','true');return image;
   }
