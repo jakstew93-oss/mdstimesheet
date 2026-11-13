@@ -80,9 +80,9 @@ test('bad saved settings fall back to the defaults',()=>{
  const s=pay.clean({rate:'abc',taxCode:'??',pensionPct:-3,satX:2});
  assert.equal(s.rate,17);assert.equal(s.taxCode,'1257L');assert.equal(s.pensionPct,5);assert.equal(s.satX,2);
 });
-test('Jak, Martyn and Oliver each get the pay estimate with their own settings',()=>{
+test('Jak, Martyn, Oliver and Ash each get the pay estimate with their own settings',()=>{
  const {ALLOWED_USERS,settingsKey}=require('../pay-estimate.js');
- assert.deepEqual(ALLOWED_USERS,['Jak Stewart','Martyn Evans','Oliver Spicer']);
+ assert.deepEqual(ALLOWED_USERS,['Jak Stewart','Martyn Evans','Oliver Spicer','Ash Kemp']);
  assert.equal(settingsKey('Jak Stewart'),'mds_pay_settings_v1','Jak keeps the settings he already saved');
  assert.equal(settingsKey('Martyn Evans'),'mds_pay_settings_v1:Martyn Evans');
  assert.notEqual(settingsKey('Oliver Spicer'),settingsKey('Martyn Evans'));
