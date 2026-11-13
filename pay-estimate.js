@@ -4,7 +4,7 @@
 // looks at the whole tax year so far, so this is an estimate, not a payslip.
 (function(root){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart','Martyn Evans','Oliver Spicer'];
+ const ALLOWED_USERS=['Jak Stewart','Martyn Evans','Oliver Spicer','Ash Kemp'];
  const SETTINGS_KEY='mds_pay_settings_v1';
  // Jak's settings from before stay where they were; everyone else gets their own, so people sharing a phone don't overwrite each other.
  function settingsKey(user){return user==='Jak Stewart'?SETTINGS_KEY:SETTINGS_KEY+':'+user}
