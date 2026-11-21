@@ -1,8 +1,10 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v101';
+const CACHE_NAME = 'mdsmiths-timesheet-v102';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
-  './drivers.js?v=2',
+  './drivers.js?v=3',
+  './admin.css?v=1',
+  './admin.js?v=1',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',
@@ -99,6 +101,7 @@ self.addEventListener('activate', event => {
 });
 
 function isStaticAsset(url) {
+  if (/\/drivers\.js$/i.test(url.pathname)) return false;
   return /\.(?:js|css|png|jpg|jpeg|svg|woff2|ttf|pdf|webmanifest)$/i.test(url.pathname);
 }
 

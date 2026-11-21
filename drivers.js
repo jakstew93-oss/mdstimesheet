@@ -1,8 +1,9 @@
 // Single source of truth for MDS drivers, login accounts and portraits.
-// To add a new driver or user, add one row to ROSTER below.
+// To add a new driver or user, add one row to ROSTER below (or use the Admin page as Jak Stewart).
 (function(root){
  'use strict';
- const ROSTER=[
+ const OVERRIDE_KEY='mds_drivers_override_v1';
+ const BASE_ROSTER=[
   {name:'Jak Stewart',     password:'js847', portrait:'jak-stewart-black-shirt'},
   {name:'Cody Slack',      password:'cs293', portrait:'cody-slack-black-shirt'},
   {name:'Ash Kemp',        password:'ak516', portrait:'ash-kemp-black-shirt'},
@@ -18,9 +19,53 @@
   {name:'Jody Wilson'},
  ];
 
- const names=ROSTER.map(d=>d.name);
- const passwords=Object.fromEntries(ROSTER.filter(d=>d.password).map(d=>[d.name,d.password]));
- const portraits=Object.fromEntries(ROSTER.filter(d=>d.portrait).map(d=>[d.name,d.portrait]));
+ function cleanRoster(list){
+  if(!Array.isArray(list)||!list.length)return null;
+  const seen=new Set(),out=[];
+  for(const item of list){
+   if(!item||typeof item.name!=='string')continue;
+   const name=item.name.trim();
+   if(!name||seen.has(name.toLowerCase()))continue;
+   seen.add(name.toLowerCase());
+   const row={name};
+   if(typeof item.password==='string'&&item.password.trim())row.password=item.password.trim();
+   if(typeof item.portrait==='string'&&item.portrait.trim())row.portrait=item.portrait.trim();
+   out.push(row);
+  }
+  return out.length?out:null;
+ }
+
+ function loadInitial(){
+  try{
+   const saved=typeof localStorage!=='undefined'&&localStorage.getItem(OVERRIDE_KEY);
+   if(saved){
+    const parsed=cleanRoster(JSON.parse(saved));
+    if(parsed)return parsed;
+   }
+  }catch(_){}
+  return BASE_ROSTER.map(r=>({...r}));
+ }
+
+ const ROSTER=[];
+ const names=[];
+ const passwords={};
+ const portraits={};
+
+ function applyRoster(list){
+  const cleaned=cleanRoster(list);
+  if(!cleaned)return false;
+  ROSTER.length=0;names.length=0;
+  for(const k of Object.keys(passwords))delete passwords[k];
+  for(const k of Object.keys(portraits))delete portraits[k];
+  for(const r of cleaned){
+   ROSTER.push(r);
+   names.push(r.name);
+   if(r.password)passwords[r.name]=r.password;
+   if(r.portrait)portraits[r.name]=r.portrait;
+  }
+  if(root.document)populateSelects(root.document);
+  return true;
+ }
 
  function fillSelect(select,list,opts){
   if(!select)return;
@@ -53,7 +98,9 @@
   fillSelect(d.getElementById('qsDriverSel'),names,{placeholder:'— Select name —',otherLabel:'Other…'});
  }
 
- const api={ROSTER,names,passwords,portraits,populateSelects};
+ applyRoster(loadInitial());
+
+ const api={ROSTER,BASE_ROSTER,OVERRIDE_KEY,names,passwords,portraits,cleanRoster,applyRoster,populateSelects};
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDS_DRIVERS=api;
  if(root.document){
