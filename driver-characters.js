@@ -2,7 +2,7 @@
  'use strict';
  const roster=window.MDS_DRIVERS;
  const names=roster?roster.names:['Jak Stewart','Cody Slack','Ash Kemp','Matthew Heath','Cameron Simpson','Martyn Evans','Antony Culver','Luke Chambers','Mark Smith','Jody Wilson','Tobi Culver','Oliver Spicer','Michael Simpson'];
- const portraits=roster?roster.portraits:{'Jak Stewart':'jak-stewart-black-shirt','Cody Slack':'cody-slack-black-shirt','Ash Kemp':'ash-kemp-black-shirt','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath-black-shirt','Luke Chambers':'luke-chambers-black-shirt','Oliver Spicer':'oliver-spicer-black-shirt'};
+ const portraits=roster?roster.portraits:{'Jak Stewart':'jak-stewart-black-shirt','Cody Slack':'cody-slack-black-shirt','Ash Kemp':'ash-kemp-black-shirt','Martyn Evans':'martyn-evans','Matthew Heath':'matthew-heath-black-shirt','Luke Chambers':'luke-chambers-black-shirt','Oliver Spicer':'oliver-spicer-black-shirt','Tobi Culver':'tobi-culver'};
  const colours=['#60b7ff','#a8ef6a','#ff8a65','#c49aff','#5ee3d0','#ffe16b','#ff9dcc','#8da8ff','#f3b56c','#e8edf5'];
  const selectors={qsDriverSel:'qsDriverOther',driverNameSelect:'driverName',editDriverNameSelect:'editDriverName'};
  const controls=new WeakMap();let currentSelect=null,dialog=null,returnFocus=null;

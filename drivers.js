@@ -10,7 +10,7 @@
   {name:'Cameron Simpson', password:'cs461'},
   {name:'Martyn Evans',    password:'me392', portrait:'martyn-evans'},
   {name:'Antony Culver',   password:'ac284'},
-  {name:'Tobi Culver',     password:'tc398'},
+  {name:'Tobi Culver',     password:'tc398', portrait:'tobi-culver'},
   {name:'Oliver Spicer',   password:'os733', portrait:'oliver-spicer-black-shirt'},
   {name:'Michael Simpson', password:'ms191'},
   {name:'Luke Chambers',                     portrait:'luke-chambers-black-shirt'},

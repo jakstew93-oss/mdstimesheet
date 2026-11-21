@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v96';
+const CACHE_NAME = 'mdsmiths-timesheet-v100';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -22,7 +22,7 @@ const APP_SHELL = [
   './shift-dial.js?v=2',
   './shift-status.css?v=1',
   './shift-status.js?v=1',
-  './pay-estimate.js?v=2',
+  './pay-estimate.js?v=5',
   './sunday-reminder.js?v=2',
   './Index.html',
   './index.html',
@@ -34,7 +34,7 @@ const APP_SHELL = [
   './timesheet-tools.js?v=62',
   './workflow-ui.js?v=63',
   './driver-characters.css?v=62',
-  './driver-characters.js?v=67',
+  './driver-characters.js?v=68',
   './driver-avatars/jak-stewart-black-shirt.png',
   './driver-avatars/cody-slack-black-shirt.png',
   './driver-avatars/ash-kemp-black-shirt.png',
@@ -42,6 +42,7 @@ const APP_SHELL = [
   './driver-avatars/matthew-heath-black-shirt.png',
   './driver-avatars/luke-chambers-black-shirt.png',
   './driver-avatars/oliver-spicer-black-shirt.png',
+  './driver-avatars/tobi-culver.png',
   './fonts/vt323.ttf',
   './fonts/bundled/f8bd5f78-38bb-43ca-9d00-40e125c4c602.woff2',
   './fonts/bundled/87bc95b0-ea1e-4bae-8f6e-3ecde09bf5e4.woff2',
