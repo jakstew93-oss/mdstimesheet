@@ -2,6 +2,7 @@
 (function(root){
  'use strict';
  const FLEET=[['LA68 GEU','Martyn’s Van'],['LD68 ULM','Jak’s Van'],['SK69 PWV','Matt’s Van'],['AY22 HTF','Ash’s Van'],['BX22 VXR','Big Van']];
+ const fleetList=()=>Array.isArray(root.MDS_CONFIG?.fleet)&&root.MDS_CONFIG.fleet.length?root.MDS_CONFIG.fleet:FLEET;
  const KEY='mds_vehicle_regs_v1',INPUT_IDS=['qsReg','vehicleReg','editVehicleReg','vanReg'],NEW='__new';
 
  function normalise(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9 ]/g,'').replace(/\s+/g,' ').trim()}
@@ -9,7 +10,7 @@
  function tidy(v){const r=normalise(v),compact=r.replace(/ /g,'');return /^[A-Z]{2}\d{2}[A-Z]{3}$/.test(compact)?compact.slice(0,4)+' '+compact.slice(4):r}
  const sameReg=(a,b)=>normalise(a).replace(/ /g,'')===normalise(b).replace(/ /g,'');
  function mergeList(saved){
-  const out=FLEET.map(([reg,label])=>({reg,label,fleet:true}));
+  const out=fleetList().map(([reg,label])=>({reg,label,fleet:true}));
   for(const s of saved||[]){const reg=tidy(s&&s.reg);if(reg&&!out.some(o=>sameReg(o.reg,reg)))out.push({reg,label:String(s.label||'').trim(),fleet:false})}
   return out;
  }
@@ -98,6 +99,7 @@
  function shorten(picker){for(const o of picker.select.options)if(o.dataset.full)o.textContent=o.selected?o.value:o.dataset.full}
  function escape(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
  function refreshAll(){for(const p of pickers){if(!p.input.isConnected){pickers.delete(p);continue}if(!p.adding)sync(p)}}
+ api.refreshAll=refreshAll;
  function scan(){for(const id of INPUT_IDS)enhance(document.getElementById(id))}
 
  new MutationObserver(scan).observe(document.documentElement,{childList:true,subtree:true});

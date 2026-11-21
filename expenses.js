@@ -8,7 +8,8 @@
     other:{title:'Other Expenditures', count:8, fields:[['date','Date','date'],['details','Details'],['reason','Reason'],['receipt','Receipt Y/N','receipt'],['amount','Amount Incl VAT (£)','number']]}
   };
   function pennies(value){ const n=Number(value); return Number.isFinite(n)&&n>=0?Math.round((n+Number.EPSILON)*100):0; }
-  function rowAmount(type,row){ return type==='mileage'?pennies(Number(row.miles||0)*Number(row.rate??0.25)):pennies(row.amount); }
+  function defaultMileageRate(){ const r=Number(root.MDS_CONFIG?.rates?.mileage); return Number.isFinite(r)&&r>=0?r:0.25; }
+  function rowAmount(type,row){ return type==='mileage'?pennies(Number(row.miles||0)*Number(row.rate??defaultMileageRate())):pennies(row.amount); }
   function totals(claim){ const result={}; for(const type of Object.keys(categories)) result[type]=(claim.rows[type]||[]).reduce((sum,row)=>sum+rowAmount(type,row),0); result.total=Object.values(result).reduce((a,b)=>a+b,0); return result; }
   function today(){ const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
   function fresh(name){return {id:root.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`,name,date:today(),signature:'',signedDate:'',paymentMethod:'',paidDate:'',authorisedSignature:'',authorised:{parking:'',mileage:'',purchases:'',other:''},rows:{parking:[],mileage:[],purchases:[],other:[]}};}

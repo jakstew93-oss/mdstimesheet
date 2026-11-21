@@ -19,7 +19,8 @@
   const pref=read(PREF_KEY);
   if(pref==='on')return true;
   if(pref==='off')return false;
-  return DEFAULT_ON_USERS.includes(read('ts_auth_user')||'');
+  const list=Array.isArray(window.MDS_CONFIG?.features?.shiftDial)?window.MDS_CONFIG.features.shiftDial:DEFAULT_ON_USERS;
+  return list.includes(read('ts_auth_user')||'');
  }
 
  function pad(n){return String(n).padStart(2,'0')}

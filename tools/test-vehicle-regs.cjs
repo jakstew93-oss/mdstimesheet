@@ -18,6 +18,6 @@ test('new regs can be added once and removed, but fleet vans stay',()=>{
 });
 test('the dropdown is loaded by the app and cached offline',()=>{
  const template=fs.readFileSync('index.html','utf8');
- assert.match(template,/vehicle-regs\.js\?v=81/);assert.match(template,/vehicle-regs\.css\?v=80/);
- const sw=fs.readFileSync('sw.js','utf8');for(const f of ['vehicle-regs.js?v=81','vehicle-regs.css?v=80'])assert.ok(sw.includes(f),f);
+ assert.match(template,/vehicle-regs\.js\?v=82/);assert.match(template,/vehicle-regs\.css\?v=80/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const f of ['vehicle-regs.js?v=82','vehicle-regs.css?v=80'])assert.ok(sw.includes(f),f);
 });

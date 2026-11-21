@@ -1,15 +1,17 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v102';
+const CACHE_NAME = 'mdsmiths-timesheet-v103';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
+  './site-config.css?v=1',
+  './site-config.js?v=1',
   './drivers.js?v=3',
-  './admin.css?v=1',
-  './admin.js?v=1',
+  './admin.css?v=2',
+  './admin.js?v=2',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',
   './expenses.css?v=70',
-  './expenses.js?v=70',
+  './expenses.js?v=71',
   './expense-template.js?v=70',
   './weather-season.css?v=77',
   './weather-season.js?v=78',
@@ -17,15 +19,15 @@ const APP_SHELL = [
   './pocket-tools.js?v=79',
   './test-results.js?v=79',
   './vehicle-regs.css?v=80',
-  './vehicle-regs.js?v=81',
+  './vehicle-regs.js?v=82',
   './data-backup.js?v=82',
   './native-bridge.js?v=84',
   './shift-dial.css?v=1',
-  './shift-dial.js?v=2',
+  './shift-dial.js?v=3',
   './shift-status.css?v=1',
   './shift-status.js?v=1',
-  './pay-estimate.js?v=5',
-  './sunday-reminder.js?v=2',
+  './pay-estimate.js?v=6',
+  './sunday-reminder.js?v=3',
   './Index.html',
   './index.html',
   './recent-regs.js',
@@ -101,7 +103,7 @@ self.addEventListener('activate', event => {
 });
 
 function isStaticAsset(url) {
-  if (/\/drivers\.js$/i.test(url.pathname)) return false;
+  if (/\/(drivers|site-config)\.js$/i.test(url.pathname)) return false;
   return /\.(?:js|css|png|jpg|jpeg|svg|woff2|ttf|pdf|webmanifest)$/i.test(url.pathname);
 }
 

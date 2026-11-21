@@ -1,0 +1,25 @@
+.mds-driver-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 8px 12px 0;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface, #141414));
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.mds-driver-notice[hidden] { display: none; }
+.mds-driver-notice .dn-icon { flex: none; font-size: 15px; }
+.mds-driver-notice .dn-text { flex: 1; min-width: 0; white-space: pre-wrap; }
+.mds-driver-notice .dn-close {
+  flex: none;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  font-size: 15px;
+  padding: 4px 6px;
+  cursor: pointer;
+}

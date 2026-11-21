@@ -50,7 +50,8 @@
   const pref=read(FEATURE_KEY);
   if(pref==='on')return true;
   if(pref==='off')return false;
-  return DEFAULT_ON_USERS.includes(u);
+  const list=Array.isArray(root.MDS_CONFIG?.features?.sundayReminder)?root.MDS_CONFIG.features.sundayReminder:DEFAULT_ON_USERS;
+  return list.includes(u);
  }
  function addPref(){
   const dialog=document.getElementById('app-theme-dialog');

@@ -46,19 +46,21 @@
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
 }
 .adm-user-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 0;
+  min-width: 120px;
+  flex: 1;
 }
 .adm-user-info strong { font-size: 14px; color: var(--text); }
 .adm-user-meta { font-size: 12px; color: var(--subtext); }
 .adm-user-actions {
   display: flex;
   gap: 6px;
-  flex: none;
+  flex-wrap: wrap;
 }
 .adm-sm {
   padding: 6px 10px !important;
@@ -103,6 +105,46 @@
   color: var(--accent);
   margin-bottom: 8px;
 }
+.adm-rollouts {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+.adm-rollout-row {
+  display: grid;
+  grid-template-columns: 1fr 48px 48px 48px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.adm-rollout-head {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--subtext);
+}
+.adm-rollout-head span:not(:first-child) { text-align: center; }
+.adm-chk {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+.adm-chk input { width: 18px; height: 18px; margin: 0; }
+.adm-rates-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.adm-rate-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.adm-rate-field input { width: 110px; flex: none; margin: 0; }
 .adm-diag {
   display: flex;
   flex-direction: column;

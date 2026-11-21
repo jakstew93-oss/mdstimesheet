@@ -60,12 +60,19 @@
   return pence(on*(Number(s.pensionPct)||0)/100);
  }
 
+ function defaultUsers(){return Array.isArray(root.MDS_CONFIG?.features?.payEstimate)?root.MDS_CONFIG.features.payEstimate:ALLOWED_USERS}
+ function effectiveDefaults(){
+  const r=root.MDS_CONFIG?.rates;
+  if(!r)return DEFAULTS;
+  return {...DEFAULTS,satX:r.satX??DEFAULTS.satX,sunX:r.sunX??DEFAULTS.sunX,night:r.night??DEFAULTS.night,holidayHours:r.holidayHours??DEFAULTS.holidayHours};
+ }
  function clean(saved){
-  const s={...DEFAULTS,...(saved||{})};
-  ['rate','satX','sunX','night','holidayHours','pensionPct'].forEach(k=>{const n=Number(s[k]);s[k]=Number.isFinite(n)&&n>=0?n:DEFAULTS[k]});
+  const base=effectiveDefaults();
+  const s={...base,...(saved||{})};
+  ['rate','satX','sunX','night','holidayHours','pensionPct'].forEach(k=>{const n=Number(s[k]);s[k]=Number.isFinite(n)&&n>=0?n:base[k]});
   s.nightTaxed=!!s.nightTaxed;s.pensionBeforeTax=!!s.pensionBeforeTax;
   s.pensionBasis=s.pensionBasis==='all'?'all':'qualifying';
-  s.taxCode=readCode(s.taxCode)?String(s.taxCode).toUpperCase().replace(/\s+/g,''):DEFAULTS.taxCode;
+  s.taxCode=readCode(s.taxCode)?String(s.taxCode).toUpperCase().replace(/\s+/g,''):base.taxCode;
   return s;
  }
 
@@ -111,7 +118,7 @@
   const pref=read(PREF_KEY);
   if(pref==='on')return true;
   if(pref==='off')return false;
-  return ALLOWED_USERS.includes(u);
+  return defaultUsers().includes(u);
  }
  function addPref(){
   const dialog=document.getElementById('app-theme-dialog');
