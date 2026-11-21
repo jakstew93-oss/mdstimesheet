@@ -17,7 +17,6 @@
   {name:"Luke Chambers", portrait:"luke-chambers-black-shirt"},
   {name:"Mark Smith"},
   {name:"Jody Wilson"},
-  {name:"Sam Taylor", password:"st859", portrait:"sam-taylor"},
  ];
 
  function cleanRoster(list){
