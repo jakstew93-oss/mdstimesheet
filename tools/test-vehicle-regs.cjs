@@ -17,7 +17,7 @@ test('new regs can be added once and removed, but fleet vans stay',()=>{
  assert.equal(r.mergeList(r.removeReg(saved,'LD68 ULM')).length,6);
 });
 test('the dropdown is loaded by the app and cached offline',()=>{
- const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
+ const template=fs.readFileSync('index.html','utf8');
  assert.match(template,/vehicle-regs\.js\?v=81/);assert.match(template,/vehicle-regs\.css\?v=80/);
  const sw=fs.readFileSync('sw.js','utf8');for(const f of ['vehicle-regs.js?v=81','vehicle-regs.css?v=80'])assert.ok(sw.includes(f),f);
 });

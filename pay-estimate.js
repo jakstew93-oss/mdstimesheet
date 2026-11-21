@@ -4,7 +4,8 @@
 // looks at the whole tax year so far, so this is an estimate, not a payslip.
 (function(root){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart'];
+ const DEFAULT_ON_USERS=['Jak Stewart'];
+ const PREF_KEY='mds_pay_estimate';           // 'on' or 'off'; when unset, on for DEFAULT_ON_USERS
  const SETTINGS_KEY='mds_pay_settings_v1';
  const DEFAULTS={rate:17,satX:1.5,sunX:1.5,night:20,nightTaxed:false,holidayHours:8,taxCode:'1257L',pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:true};
 
@@ -96,8 +97,31 @@
 
  // ---------- The card ----------
  function read(key){try{return localStorage.getItem(key)}catch(_){return null}}
- function inApp(){return !!root.MDSNative||/\bMDSTimesheetApp\//.test(navigator.userAgent||'')}
- function eligible(){return inApp()&&ALLOWED_USERS.includes(read('ts_auth_user')||'')}
+ function write(key,val){try{localStorage.setItem(key,val)}catch(_){}}
+ function user(){return read('ts_auth_user')||''}
+ function eligible(){
+  const u=user();if(!u)return false;
+  const pref=read(PREF_KEY);
+  if(pref==='on')return true;
+  if(pref==='off')return false;
+  return DEFAULT_ON_USERS.includes(u);
+ }
+ function addPref(){
+  const dialog=document.getElementById('app-theme-dialog');
+  if(!dialog)return;
+  let row=dialog.querySelector('.pe-pref');
+  if(!row){
+   row=document.createElement('div');row.className='sd-pref pe-pref';
+   row.innerHTML='<span>Pay estimate<small>Weekly take-home estimate on Export</small></span><button type="button" class="sd-switch" role="switch" aria-label="Show pay estimate on Export page"></button>';
+   dialog.append(row);
+   row.querySelector('.sd-switch').addEventListener('click',()=>{
+    write(PREF_KEY,eligible()?'off':'on');
+    lastSig='';render();
+   });
+  }
+  row.hidden=!user();
+  row.querySelector('.sd-switch').setAttribute('aria-checked',String(eligible()));
+ }
  function settings(){try{return clean(JSON.parse(read(SETTINGS_KEY)||'{}'))}catch(_){return clean({})}}
  const money=n=>'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
  const hours=m=>Math.floor(m/60)+'h'+(m%60?' '+String(m%60).padStart(2,'0')+'m':'');
@@ -161,6 +185,7 @@
 
  let lastSig='';
  function render(){
+  addPref();
   const page=document.getElementById('page-export');if(!page)return;
   let card=document.getElementById('pay-est');
   if(!eligible()||typeof getEntries!=='function'||typeof getBreakMins!=='function'||typeof minsToStr!=='function'){if(card)card.hidden=true;lastSig='';return}

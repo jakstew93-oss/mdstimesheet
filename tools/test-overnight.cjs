@@ -3,8 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 for(const file of ['index.html']){
- const source=fs.readFileSync(file,'utf8');
- const template=JSON.parse(source.match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
+ const template=fs.readFileSync(file,'utf8');
  const ctx={};ctx.window=ctx;vm.createContext(ctx);
  vm.runInContext(template.slice(template.indexOf('  const BREAK_TABLE'),template.indexOf('  function abbreviateName(')),ctx);
  vm.runInContext(fs.readFileSync('workflow-ui.js','utf8').split('(function(){')[0],ctx);

@@ -116,7 +116,36 @@ window.calcHours = function(start, end) {
   if($('export-checks-summary')){const count=api.checkEntries(getEntries(),week()).length;$('export-checks-summary').textContent=!getEntries().length?'No entries in this week yet.':count?count+' '+(count===1?'check needs':'checks need')+' your review before exporting.':'Ready to export — no missing details or duplicate entries found.';}
   refreshUndo();
  }
- window.MDSWorkflowUI={approveExport,refresh};
+ function showPostExportPrompt(){
+  const exportPage=$('page-export');if(!exportPage||!getEntries().length)return;
+  let banner=$('workflow-post-export');
+  if(!banner){
+   banner=element('div',undefined,'card workflow-post-export');banner.id='workflow-post-export';
+   const title=element('h2','Timesheet exported');
+   const note=element('p','Ready to archive this week and start the next one?');
+   note.style.cssText='font-size:13px;color:var(--subtext);margin-bottom:12px;';
+   const actions=element('div',undefined,'workflow-actions');
+   const archBtn=button('Archive week & start next',()=>{banner.hidden=true;archiveWeek()});
+   archBtn.className='btn btn-primary';
+   const dismissBtn=button('Not yet',()=>{banner.hidden=true});
+   dismissBtn.className='btn btn-outline';
+   actions.append(archBtn,dismissBtn);
+   banner.append(title,note,actions);
+   const pdfCard=$('pdfBtn')?.closest('.card');
+   if(pdfCard)pdfCard.after(banner);else exportPage.prepend(banner);
+  }
+  banner.hidden=false;
+ }
+ window.MDSWorkflowUI={approveExport,refresh,showPostExportPrompt};
+ const originalPdf=window.generatePDF;
+ if(typeof originalPdf==='function'){
+  window.generatePDF=async function(){
+   const hadEntries=getEntries().length>0;
+   const result=await originalPdf.apply(this,arguments);
+   if(hadEntries&&!bypassExport)setTimeout(showPostExportPrompt,400);
+   return result;
+  };
+ }
  const original=window.renderAll;window.renderAll=function(){original();refresh()};
  // Wait for the merged Log view, which is built on load.
  const observer=new MutationObserver(()=>{if(document.querySelector('.quickstart')&&!$('workflow-quick-actions'))refresh()});observer.observe($('mds-app'),{childList:true,subtree:true});

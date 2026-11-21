@@ -67,7 +67,7 @@ test('test result checks flag Zs over 80%, low insulation and slow RCDs',()=>{
  assert.deepEqual(t.checkCircuit({type:'',rating:'32',zs:'0.5'}),{});
 });
 test('Pocket Tools is loaded by the app and cached offline',()=>{
- const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
+ const template=fs.readFileSync('index.html','utf8');
  assert.match(template,/pocket-tools\.js\?v=79/);assert.match(template,/pocket-tools\.css\?v=79/);
  assert.match(template,/test-results\.js\?v=79/);
  const sw=fs.readFileSync('sw.js','utf8');for(const f of ['pocket-tools.js?v=79','pocket-tools.css?v=79','test-results.js?v=79'])assert.ok(sw.includes(f),f);

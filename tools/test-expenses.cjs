@@ -9,13 +9,9 @@ test('currency totals round each entry to pennies and mileage uses an editable r
  assert.equal(api.rowAmount('mileage',{miles:10}),250);assert.equal(api.rowAmount('mileage',{miles:10,rate:0}),0);
  assert.equal(api.pennies('1.005'),101);assert.equal(api.pennies(-1),0);assert.equal(api.pennies('oops'),0);
 });
-test('both entry points preserve packed resources and provide the Expenses section offline',()=>{
- const source=fs.readFileSync('index.html','utf8'),original=JSON.parse(source.match(/<script type="__bundler\/manifest">\s*([\s\S]*?)\s*<\/script>/)[1]);
- for(const file of ['index.html']){
-  const text=fs.readFileSync(file,'utf8'),template=JSON.parse(text.match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
-  assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=70/);assert.match(template,/expense-template.js\?v=70/);
-  assert.deepEqual(JSON.parse(text.match(/<script type="__bundler\/manifest">\s*([\s\S]*?)\s*<\/script>/)[1]),original);
- }
+test('entry point provides the Expenses section offline',()=>{
+ const template=fs.readFileSync('index.html','utf8');
+ assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=70/);assert.match(template,/expense-template.js\?v=70/);
  const sw=fs.readFileSync('sw.js','utf8');for(const file of ['expenses.js','expenses.css','expense-template.js'])assert.ok(sw.includes(file+'?v=70'));
 });
 function pdfContext(){

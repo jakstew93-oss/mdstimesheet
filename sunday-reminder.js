@@ -5,7 +5,8 @@
 // Android can't see whether Send was pressed in the email app, so a week can be un-marked by hand.
 (function(root){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart'];
+ const DEFAULT_ON_USERS=['Jak Stewart'];
+ const FEATURE_KEY='mds_sunday_feature';      // 'on' or 'off'; when unset, on for DEFAULT_ON_USERS
  const HOUR=9,MINUTE=0;
  const PREF_KEY='mds_sunday_reminder';        // 'off' turns the reminder off; anything else (or missing) leaves it on
  const PENDING_KEY='mds_sent_pending_v1';
@@ -44,7 +45,29 @@
  function write(key,value){try{value==null?localStorage.removeItem(key):localStorage.setItem(key,value)}catch(_){}}
  function json(key,fallback){try{return JSON.parse(read(key)||'null')||fallback}catch(_){return fallback}}
  function user(){return read('ts_auth_user')||''}
- function eligible(){return ALLOWED_USERS.includes(user())}
+ function eligible(){
+  const u=user();if(!u)return false;
+  const pref=read(FEATURE_KEY);
+  if(pref==='on')return true;
+  if(pref==='off')return false;
+  return DEFAULT_ON_USERS.includes(u);
+ }
+ function addPref(){
+  const dialog=document.getElementById('app-theme-dialog');
+  if(!dialog)return;
+  let row=dialog.querySelector('.su-pref');
+  if(!row){
+   row=document.createElement('div');row.className='sd-pref su-pref';
+   row.innerHTML='<span>Sent log &amp; Sunday reminder<small>Track sent timesheets in this app</small></span><button type="button" class="sd-switch" role="switch" aria-label="Show sent log and Sunday reminder"></button>';
+   dialog.append(row);
+   row.querySelector('.sd-switch').addEventListener('click',()=>{
+    write(FEATURE_KEY,eligible()?'off':'on');
+    lastSig='';refresh();
+   });
+  }
+  row.hidden=!user();
+  row.querySelector('.sd-switch').setAttribute('aria-checked',String(eligible()));
+ }
  function reminderOn(){return eligible()&&read(PREF_KEY)!=='off'}
  const logKey=()=>'mds_sent_weeks_v1_'+user().toLowerCase().replace(/\s+/g,'_');
  const log=()=>json(logKey(),{});
@@ -106,6 +129,7 @@
  }
  let lastSig='';
  function render(){
+  addPref();
   const page=document.getElementById('page-export');if(!page)return;
   let card=document.getElementById('sunday-card');
   if(!eligible()){if(card)card.hidden=true;lastSig='';return}

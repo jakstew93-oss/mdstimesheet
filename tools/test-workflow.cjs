@@ -31,7 +31,7 @@ test('undo restores removed entries without overwriting later changes or duplica
  assert.equal(data.weeks['2026-09-27'].entries.length,1);
 });
 function app(){
- const text=fs.readFileSync('index.html','utf8');const template=JSON.parse(text.split('<script type="__bundler/template">')[1].trimStart().split('\n')[0]);
+ const template=fs.readFileSync('index.html','utf8');
  const functions=template.slice(template.indexOf('  function empSuffix()'),template.indexOf('  function updateWeekLabel()'));
  const values=new Map([['timesheet_employee','Jak Stewart'],['timesheet_week_jak_stewart','2026-10-04'],['timesheet_entries_jak_stewart',JSON.stringify([full,{...full,id:2,date:'2026-09-27'}])]]);
  const ctx={Date,MDSTools:api,localStorage:{getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,String(v))},document:{getElementById:()=>({value:''})},updateWeekLabel:()=>{}};

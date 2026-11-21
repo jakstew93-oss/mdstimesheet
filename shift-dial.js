@@ -5,16 +5,22 @@
 // The dial only reads the Quick Start draft; recording and saving still go through the existing buttons.
 (function(){
  'use strict';
- const ALLOWED_USERS=['Jak Stewart'];
- const PREF_KEY='mds_shift_dial';            // 'off' hides it; anything else (or missing) shows it
+ const DEFAULT_ON_USERS=['Jak Stewart'];
+ const PREF_KEY='mds_shift_dial';            // 'on' or 'off'; when unset, on for DEFAULT_ON_USERS
  const STAGES=['startTime','timeOnSite','timeOffSite','endTime'];
  const root=document.documentElement;
 
  function store(){try{return window.localStorage}catch(_){return null}}
  function read(key){try{return store()?.getItem(key)}catch(_){return null}}
  function inApp(){return !!window.MDSNative||/\bMDSTimesheetApp\//.test(navigator.userAgent||'')}
- function eligible(){return inApp()&&ALLOWED_USERS.includes(read('ts_auth_user')||'')}
- function enabled(){return eligible()&&read(PREF_KEY)!=='off'}
+ function eligible(){return inApp()&&!!(read('ts_auth_user')||'')}
+ function enabled(){
+  if(!eligible())return false;
+  const pref=read(PREF_KEY);
+  if(pref==='on')return true;
+  if(pref==='off')return false;
+  return DEFAULT_ON_USERS.includes(read('ts_auth_user')||'');
+ }
 
  function pad(n){return String(n).padStart(2,'0')}
  function todayISO(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}

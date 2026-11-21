@@ -2,8 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const source=fs.readFileSync('index.html','utf8');
-const template=JSON.parse(source.split('<script type="__bundler/template">')[1].trimStart().split('\n')[0]);
+const template=fs.readFileSync('index.html','utf8');
 const functions=template.slice(template.indexOf('  function currentWeekEnding('),template.indexOf('  function updateWeekLabel()'));
 function setup(){
  const values=new Map();const input={value:''};

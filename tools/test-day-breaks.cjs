@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const template=JSON.parse(fs.readFileSync('index.html','utf8').match(/<script type="__bundler\/template">\s*([\s\S]*?)\s*<\/script>/)[1]);
+const template=fs.readFileSync('index.html','utf8');
 const slice=(from,to)=>template.slice(template.indexOf(from),template.indexOf(to));
 function setup(entries){
  let csv='',text='';
