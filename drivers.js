@@ -4,19 +4,20 @@
  'use strict';
  const OVERRIDE_KEY='mds_drivers_override_v1';
  const BASE_ROSTER=[
-  {name:'Jak Stewart',     password:'js847', portrait:'jak-stewart-black-shirt'},
-  {name:'Cody Slack',      password:'cs293', portrait:'cody-slack-black-shirt'},
-  {name:'Ash Kemp',        password:'ak516', portrait:'ash-kemp-black-shirt'},
-  {name:'Matthew Heath',   password:'mh738', portrait:'matthew-heath-black-shirt'},
-  {name:'Cameron Simpson', password:'cs461'},
-  {name:'Martyn Evans',    password:'me392', portrait:'martyn-evans'},
-  {name:'Antony Culver',   password:'ac284'},
-  {name:'Tobi Culver',     password:'tc398', portrait:'tobi-culver'},
-  {name:'Oliver Spicer',   password:'os733', portrait:'oliver-spicer-black-shirt'},
-  {name:'Michael Simpson', password:'ms191'},
-  {name:'Luke Chambers',                     portrait:'luke-chambers-black-shirt'},
-  {name:'Mark Smith'},
-  {name:'Jody Wilson'},
+  {name:"Jak Stewart", password:"js847", portrait:"jak-stewart-black-shirt"},
+  {name:"Cody Slack", password:"cs293", portrait:"cody-slack-black-shirt"},
+  {name:"Ash Kemp", password:"ak516", portrait:"ash-kemp-black-shirt"},
+  {name:"Matthew Heath", password:"mh738", portrait:"matthew-heath-black-shirt"},
+  {name:"Cameron Simpson", password:"cs461"},
+  {name:"Martyn Evans", password:"me392", portrait:"martyn-evans"},
+  {name:"Antony Culver", password:"ac284"},
+  {name:"Tobi Culver", password:"tc398", portrait:"tobi-culver"},
+  {name:"Oliver Spicer", password:"os733", portrait:"oliver-spicer-black-shirt"},
+  {name:"Michael Simpson", password:"ms191"},
+  {name:"Luke Chambers", portrait:"luke-chambers-black-shirt"},
+  {name:"Mark Smith"},
+  {name:"Jody Wilson"},
+  {name:"Sam Taylor", password:"st859", portrait:"sam-taylor"},
  ];
 
  function cleanRoster(list){
