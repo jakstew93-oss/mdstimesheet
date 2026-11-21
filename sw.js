@@ -1,8 +1,8 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v100';
+const CACHE_NAME = 'mdsmiths-timesheet-v101';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
-  './drivers.js?v=1',
+  './drivers.js?v=2',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',
@@ -34,7 +34,7 @@ const APP_SHELL = [
   './timesheet-tools.js?v=62',
   './workflow-ui.js?v=63',
   './driver-characters.css?v=62',
-  './driver-characters.js?v=68',
+  './driver-characters.js?v=69',
   './driver-avatars/jak-stewart-black-shirt.png',
   './driver-avatars/cody-slack-black-shirt.png',
   './driver-avatars/ash-kemp-black-shirt.png',

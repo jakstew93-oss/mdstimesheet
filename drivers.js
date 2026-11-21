@@ -24,6 +24,8 @@
 
  function fillSelect(select,list,opts){
   if(!select)return;
+  const sig=JSON.stringify([list,opts.placeholder||'',opts.otherLabel||'']);
+  if(select.dataset&&select.dataset.mdsRoster===sig)return;
   const current=select.value;
   const placeholder=opts.placeholder||'— Select name —';
   const frag=select.ownerDocument.createDocumentFragment();
@@ -38,6 +40,7 @@
    other.value='__other__';other.textContent=opts.otherLabel;frag.append(other);
   }
   select.replaceChildren(frag);
+  if(select.dataset)select.dataset.mdsRoster=sig;
   if(current&&Array.from(select.options).some(o=>o.value===current))select.value=current;
  }
 

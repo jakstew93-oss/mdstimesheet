@@ -19,7 +19,7 @@ test('driver roster is the single source of truth for names, passwords and portr
 test('drivers.js is loaded before the main app and cached offline',()=>{
  const html=fs.readFileSync('index.html','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
- assert.ok(html.includes('drivers.js?v=1'));
- assert.ok(html.indexOf('drivers.js?v=1')<html.indexOf('timesheet-tools.js?v=62'));
- assert.ok(sw.includes('./drivers.js?v=1'));
+ assert.ok(html.includes('drivers.js?v=2'));
+ assert.ok(html.indexOf('drivers.js?v=2')<html.indexOf('timesheet-tools.js?v=62'));
+ assert.ok(sw.includes('./drivers.js?v=2'));
 });

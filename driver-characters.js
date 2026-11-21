@@ -39,11 +39,11 @@
   dialog.showModal();list.querySelector('[aria-pressed=true]')?.focus();
  }
  function sync(){
-  if(roster)roster.populateSelects(document);
   for(const id of Object.keys(selectors)){
    const select=document.getElementById(id);if(!select)continue;
    let state=controls.get(select);
    if(!state){
+    if(roster)roster.populateSelects(document);
     const button=document.createElement('button');button.type='button';button.className='driver-character-select';button.id=id+'-characters';button.setAttribute('aria-haspopup','dialog');
     select.before(button);select.hidden=true;state={button,name:null};controls.set(select,state);
     button.addEventListener('click',()=>openPicker(select,button));select.addEventListener('change',sync);
