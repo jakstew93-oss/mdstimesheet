@@ -13,7 +13,7 @@
    ["BX22 VXR","Big Van"],
   ],
   features:{
-   payEstimate:["Martyn Evans","Oliver Spicer","Ash Kemp","Matthew Heath","Tobi Culver","Jak Stewart"],
+   payEstimate:["Martyn Evans","Oliver Spicer","Ash Kemp","Matthew Heath","Tobi Culver","Cody Slack","Michael Simpson","Cameron Simpson"],
    shiftDial:["Jak Stewart"],
    sundayReminder:["Jak Stewart"],
   },
