@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v103';
+const CACHE_NAME = 'mdsmiths-timesheet-v104';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -24,8 +24,6 @@ const APP_SHELL = [
   './native-bridge.js?v=84',
   './shift-dial.css?v=1',
   './shift-dial.js?v=3',
-  './shift-status.css?v=1',
-  './shift-status.js?v=1',
   './pay-estimate.js?v=6',
   './sunday-reminder.js?v=3',
   './Index.html',
