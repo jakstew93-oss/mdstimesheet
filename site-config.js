@@ -6,16 +6,16 @@
  const DISMISSED_KEY='mds_notice_dismissed_v1';
  const BASE_CONFIG={
   fleet:[
-   ['LA68 GEU','Martyn’s Van'],
-   ['LD68 ULM','Jak’s Van'],
-   ['SK69 PWV','Matt’s Van'],
-   ['AY22 HTF','Ash’s Van'],
-   ['BX22 VXR','Big Van'],
+   ["LA68 GEU","Martyn’s Van"],
+   ["LD68 ULM","Jak’s Van"],
+   ["SK69 PWV","Matt’s Van"],
+   ["AY22 HTF","Ash’s Van"],
+   ["BX22 VXR","Big Van"],
   ],
   features:{
-   payEstimate:['Jak Stewart','Martyn Evans','Oliver Spicer','Ash Kemp','Matthew Heath','Tobi Culver'],
-   shiftDial:['Jak Stewart'],
-   sundayReminder:['Jak Stewart'],
+   payEstimate:["Martyn Evans","Oliver Spicer","Ash Kemp","Matthew Heath","Tobi Culver","Jak Stewart"],
+   shiftDial:["Jak Stewart"],
+   sundayReminder:["Jak Stewart"],
   },
   rates:{
    mileage:0.25,
@@ -25,9 +25,9 @@
    sunX:1.5,
   },
   notice:{
-   id:'',
-   text:'',
-   expires:'',
+   id:"",
+   text:"",
+   expires:"",
   },
  };
 
