@@ -605,6 +605,7 @@
   switchActiveUserForPreview(person.name);
   const sel=$('sectionSelect');
   if(sel&&typeof root.switchSection==='function'){sel.value='timesheet';root.switchSection('timesheet')}
+  try{scrollTo(0,0)}catch(_){}
   toast('Previewing as '+person.name);
  }
  function exitPreviewAs(){
@@ -1135,7 +1136,10 @@
 
   syncVisibility();
   renderPreviewBanner();
-  if(read('ts_section')==='admin'&&isAdmin(currentUser())){
+  if(read('ts_section')==='ts'){
+   $('sectionSelect').value='timesheet';
+   root.switchSection('timesheet');
+  }else if(read('ts_section')==='admin'&&isAdmin(currentUser())){
    $('sectionSelect').value='admin';
    root.switchSection('admin');
   }

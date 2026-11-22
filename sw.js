@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v109';
+const CACHE_NAME = 'mdsmiths-timesheet-v110';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -6,7 +6,7 @@ const APP_SHELL = [
   './site-config.js?v=4',
   './drivers.js?v=3',
   './admin.css?v=5',
-  './admin.js?v=7',
+  './admin.js?v=8',
   './receipt-ocr.js?v=67',
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',

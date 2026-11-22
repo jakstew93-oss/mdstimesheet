@@ -108,7 +108,7 @@ test('admin and site-config assets are loaded by index.html and cached offline',
  const html=fs.readFileSync('index.html','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
  const adminSrc=fs.readFileSync('admin.js','utf8');
- for(const ref of ['site-config.css?v=2','site-config.js?v=4','admin.css?v=5','admin.js?v=7']){
+ for(const ref of ['site-config.css?v=2','site-config.js?v=4','admin.css?v=5','admin.js?v=8']){
   assert.ok(html.includes(ref),'index.html missing '+ref);
   assert.ok(sw.includes('./'+ref),'sw.js missing ./'+ref);
  }
