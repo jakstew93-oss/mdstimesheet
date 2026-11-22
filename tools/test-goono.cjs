@@ -192,3 +192,18 @@ test('Goono is in the secret arcade and cached for offline play',()=>{
  const sw=fs.readFileSync('sw.js','utf8');
  for(const f of ['goono.html','goono-engine.js','peerjs.min.js'])assert.ok(sw.includes('./'+f),f);
 });
+
+test('every phone is told what just happened, without giving away picked-up cards',()=>{
+ const s=rigged([[card('red','draw2',null,'d'),card('red','num',1)],[card('blue','num',2)],[card('green','num',3)]],card('red','num',5));
+ s.events=[];
+ G.apply(s,0,{type:'play',card:'d'},seeded(3));
+ const types=s.events.map(e=>e.type);
+ assert.deepEqual(types,['play','hit','draw']);
+ assert.equal(s.events[0].by,0);assert.equal(s.events[0].card.id,'d');
+ assert.deepEqual({by:s.events[2].by,n:s.events[2].n},{by:1,n:2});
+ assert.equal('card' in s.events[2],false,'picked-up cards stay secret');
+ assert.ok(s.events[1].id<s.events[2].id,'events are numbered in order');
+ const v=G.viewFor(s,2);assert.deepEqual(v.events.map(e=>e.type),types);
+ const s2=G.newGame([{name:'A'},{name:'B'}],{},seeded(4));
+ assert.equal(s2.events[0].type,'deal');
+});
