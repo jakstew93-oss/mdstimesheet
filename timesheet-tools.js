@@ -35,6 +35,7 @@
   return problems;
  }
  function restoreDeleted(data,items){for(const {week,entry} of items){const bucket=data.weeks[week]||(data.weeks[week]={entries:[],archived:false});if(!bucket.entries.some(e=>e.id===entry.id))bucket.entries.push(entry);bucket.entries.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.startTime||'').localeCompare(b.startTime||''))}return data}
- const api={timeFields,dateISO,validDate,weekFor,nextWeek,withinWeek,migrate,checkEntries,restoreDeleted};
+ function deleteWeek(data,week){if(data&&data.weeks&&Object.prototype.hasOwnProperty.call(data.weeks,week))delete data.weeks[week];return data}
+ const api={timeFields,dateISO,validDate,weekFor,nextWeek,withinWeek,migrate,checkEntries,restoreDeleted,deleteWeek};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.MDSTools=api;
 })(typeof window==='undefined'?globalThis:window);

@@ -34,15 +34,47 @@ window.calcHours = function(start, end) {
   localStorage.setItem(getWeekKey(),value);localStorage.setItem(getWeekKey()+'_mode','manual');
   resolveWeekEnding();updateWeekLabel();renderAll();return true;
  }
+ function deleteSavedWeek(key){
+  const data=readWeekStore();
+  const count=data.weeks[key]?.entries.length||0;
+  const msg='Delete saved week ending '+weekLabel(key)+' ('+count+' '+(count===1?'entry':'entries')+')? This cannot be undone.';
+  if(!confirm(msg))return false;
+  if(typeof api.deleteWeek==='function')api.deleteWeek(data,key);
+  else delete data.weeks[key];
+  writeWeekStore(data);
+  try{
+   const histKey='ts_payhist'+empSuffix();
+   const hist=JSON.parse(localStorage.getItem(histKey)||'[]').filter(x=>x.week!==key);
+   localStorage.setItem(histKey,JSON.stringify(hist));
+  }catch(_){}
+  if(key===week()){
+   localStorage.removeItem('mds_qs_draft');
+   localStorage.removeItem('mds_log_dayFilter');
+   localStorage.setItem(getWeekKey(),currentWeekEnding());
+   localStorage.setItem(getWeekKey()+'_mode','auto');
+   resolveWeekEnding();updateWeekLabel();
+  }
+  renderAll();
+  showToast('Deleted week ending '+weekLabel(key));
+  return true;
+ }
  function showWeeks(){
   const d=dialog('Saved weeks');
-  d.append(element('p','Open a week to view, edit or export its entries.'));
+  d.append(element('p','Open a week to view, edit or export its entries, or delete old weeks you no longer need.'));
   const data=readWeekStore();const keys=Array.from(new Set([week(),...Object.keys(data.weeks)])).sort().reverse();
   keys.forEach(key=>{
    const record=data.weeks[key];const count=record?.entries.length||0;
    const row=element('div',undefined,'workflow-week-row');
    row.append(element('span',weekLabel(key)+' · '+count+' '+(count===1?'entry':'entries')+(record?.archived?' · Archived':'')));
-   row.append(button(key===week()?'Selected':'Open',()=>{if(selectWeek(key))d.close()}));d.append(row);
+   const btns=element('div',undefined,'workflow-actions');
+   btns.append(button(key===week()?'Selected':'Open',()=>{if(selectWeek(key))d.close()}));
+   if(record){
+    const delBtn=button('Delete',()=>{if(deleteSavedWeek(key))showWeeks()});
+    delBtn.style.color='var(--danger, #ff6b6b)';
+    btns.append(delBtn);
+   }
+   row.append(btns);
+   d.append(row);
   });
   d.append(button('Close',()=>d.close()));
  }

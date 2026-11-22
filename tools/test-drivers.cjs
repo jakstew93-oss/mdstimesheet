@@ -20,6 +20,6 @@ test('drivers.js is loaded before the main app and cached offline',()=>{
  const html=fs.readFileSync('index.html','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
  assert.ok(html.includes('drivers.js?v=3'));
- assert.ok(html.indexOf('drivers.js?v=3')<html.indexOf('timesheet-tools.js?v=62'));
+ assert.ok(html.indexOf('drivers.js?v=3')<html.indexOf('timesheet-tools.js?v=63'));
  assert.ok(sw.includes('./drivers.js?v=3'));
 });

@@ -38,6 +38,12 @@ function app(){
  vm.createContext(ctx);vm.runInContext("const EMP_KEY='timesheet_employee',WEEK_KEY='timesheet_week',STORAGE_KEY='timesheet_entries';"+functions,ctx);
  return {ctx,values};
 }
+test('deleteWeek removes only the chosen week from the store',()=>{
+ const data={version:1,weeks:{'2026-10-04':{entries:[full],archived:false},'2026-09-27':{entries:[{...full,id:2}],archived:true}}};
+ api.deleteWeek(data,'2026-09-27');
+ assert.equal(data.weeks['2026-09-27'],undefined);
+ assert.equal(data.weeks['2026-10-04'].entries.length,1);
+});
 test('saving one week and remembering details does not alter another employee or week',()=>{
  const {ctx,values}=app();assert.equal(ctx.getEntries().length,1);
  ctx.saveEntries([{...full,jobNumber:'edited'}]);values.set('timesheet_week_jak_stewart','2026-09-27');assert.equal(ctx.getEntries()[0].jobNumber,'100');
