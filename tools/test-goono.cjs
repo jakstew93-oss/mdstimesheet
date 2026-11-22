@@ -207,3 +207,9 @@ test('every phone is told what just happened, without giving away picked-up card
  const s2=G.newGame([{name:'A'},{name:'B'}],{},seeded(4));
  assert.equal(s2.events[0].type,'deal');
 });
+
+test('every new round has its own id, so phones animate it from the start',()=>{
+ const a=G.newGame([{name:'A'},{name:'B'}],{},seeded(1)),b=G.newGame([{name:'A'},{name:'B'}],{},seeded(2));
+ assert.ok(a.gameId&&b.gameId);assert.notEqual(a.gameId,b.gameId);
+ assert.equal(G.viewFor(a,0).gameId,a.gameId);
+});
