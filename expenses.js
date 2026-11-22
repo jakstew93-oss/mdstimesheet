@@ -106,8 +106,9 @@
     };
   }
   function receiptControls(type,i,row){return `<p class="expense-note">Scan a receipt photo to fill its date and total, or enter them manually. Photos are included in your PDF.</p><div class="expense-actions"><button type="button" class="btn btn-secondary" data-camera="${type}" data-row="${i}">Take receipt photo</button><button type="button" class="btn btn-secondary" data-gallery="${type}" data-row="${i}">Choose receipt photos</button></div><div class="expense-receipts">${(row.receipts||[]).map((r,j)=>`<div class="expense-receipt"><a href="${r.data}" target="_blank" rel="noopener" aria-label="Open receipt ${j+1}"><img src="${r.data}" alt="Receipt ${j+1}"></a><button type="button" class="btn btn-secondary" data-receipt-scan="${type}" data-row="${i}" data-index="${j}">Scan date &amp; amount</button><button type="button" class="btn btn-secondary" data-receipt-remove="${type}" data-row="${i}" data-index="${j}">Remove photo ${j+1}</button></div>`).join('')}</div>`;}
-  let scannerPromise;
+  let scannerPromise,templatePromise;
   function scanner(){if(root.MDSReceiptOCR)return Promise.resolve(root.MDSReceiptOCR);if(!scannerPromise)scannerPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./receipt-ocr.js?v=67';s.onload=()=>resolve(root.MDSReceiptOCR);s.onerror=()=>{scannerPromise=null;reject(new Error('Unable to load receipt scanning. Check your connection and try again.'));};document.head.append(s);});return scannerPromise;}
+  function loadExpenseTemplate(){if(root.MDS_EXPENSE_TEMPLATE)return Promise.resolve(root.MDS_EXPENSE_TEMPLATE);if(!templatePromise)templatePromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='./expense-template.js?v=70';s.onload=()=>resolve(root.MDS_EXPENSE_TEMPLATE);s.onerror=()=>{templatePromise=null;reject(new Error('Unable to load the expense form template. Check your connection and try again.'));};document.head.append(s);});return templatePromise;}
   async function scannedEntry(photo,existing){
     const original=claim,employee=owner,ocr=await scanner();status('Scanning receipt…');const result=await ocr.scan(photo.data);
     if(original!==claim||employee!==activeOwner())throw new Error('Your account or claim changed. Scan the receipt again.');
@@ -157,7 +158,7 @@
   }
   function readableDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)?value.split('-').reverse().join('/'):value;}
   async function makePdf(snapshot){
-    await loadPdfLib();
+    await Promise.all([loadPdfLib(),loadExpenseTemplate()]);
     const {PDFDocument,StandardFonts,rgb}=PDFLib,pdf=await PDFDocument.load(Uint8Array.from(atob(root.MDS_EXPENSE_TEMPLATE),c=>c.charCodeAt(0))),font=await pdf.embedFont(StandardFonts.Courier),page=pdf.getPages()[0],h=page.getHeight();
     page.pushOperators(PDFLib.pushGraphicsState(),PDFLib.setCharacterSpacing(0),PDFLib.setWordSpacing(0),PDFLib.setCharacterSqueeze(100));
     // Coordinates are measured from the original form's top-left corner.

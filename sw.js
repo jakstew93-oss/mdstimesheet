@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v112';
+const CACHE_NAME = 'mdsmiths-timesheet-v113';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -11,7 +11,7 @@ const APP_SHELL = [
   './vendor/ocr/tesseract.min.js',
   './vendor/ocr/worker.min.js',
   './expenses.css?v=70',
-  './expenses.js?v=72',
+  './expenses.js?v=73',
   './expense-template.js?v=70',
   './weather-season.css?v=77',
   './weather-season.js?v=78',
