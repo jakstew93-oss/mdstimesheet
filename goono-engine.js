@@ -63,7 +63,7 @@
   const s={
    players:players.map(p=>({name:String(p.name).slice(0,40),bot:!!p.bot,hand:[],saidGoono:false,caughtable:false})),
    draw:shuffle(makeDeck(),rand),discard:[],colour:null,turn:0,dir:1,
-   pendingDraw:0,pendingKind:null,drewCard:null,phase:'play',winner:null,rules,log:[],seq:0,
+   pendingDraw:0,pendingKind:null,drewCard:null,phase:'play',winner:null,rules,log:[],seq:0,events:[],evId:0,
   };
   for(let i=0;i<rules.handSize;i++)for(const p of s.players)p.hand.push(s.draw.pop());
   // Start on a number card, so the first go is a normal one.
@@ -72,9 +72,12 @@
   s.discard.push(first);s.colour=first.colour;
   s.turn=Math.floor(rand()*s.players.length);
   log(s,'Game on. '+s.players[s.turn].name+' goes first.');
+  ev(s,{type:'deal',n:rules.handSize});
   return s;
  }
  function log(s,text){s.log.push(text);if(s.log.length>30)s.log.shift()}
+ // What just happened, so every phone can animate it. Played cards are public; picked-up cards are never named.
+ function ev(s,e){e.id=++s.evId;s.events.push(e);if(s.events.length>24)s.events.shift()}
  const top=s=>s.discard[s.discard.length-1];
  const next=(s,from=s.turn,steps=1)=>((from+s.dir*steps)%s.players.length+s.players.length)%s.players.length;
 
@@ -89,6 +92,7 @@
   for(let i=0;i<n;i++){refill(s,rand);const c=s.draw.pop();if(!c)break;s.players[p].hand.push(c);got.push(c)}
   if(s.players[p].hand.length>1){s.players[p].saidGoono=false}
   s.players[p].caughtable=false;
+  if(got.length)ev(s,{type:'draw',by:p,n:got.length});
   return got;
  }
 
@@ -124,13 +128,13 @@
   if(action.type==='goono'){
    if(me.hand.length>2)return fail('You can only shout Goono on your last two cards.');
    me.saidGoono=true;if(me.caughtable){me.caughtable=false}
-   log(s,me.name+': GOONO!');s.seq++;return ok();
+   log(s,me.name+': GOONO!');ev(s,{type:'goono',by:p});s.seq++;return ok();
   }
   if(action.type==='catch'){
    const t=Number(action.target),them=s.players[t];
    if(!them||t===p)return fail('Catch who?');
    if(!s.rules.goonoPenalty||!them.caughtable)return fail(them.name+' is safe.');
-   pickUp(s,t,2,rand);log(s,me.name+' caught '+them.name+' not saying Goono! +2');s.seq++;return ok();
+   ev(s,{type:'catch',by:p,target:t});pickUp(s,t,2,rand);log(s,me.name+' caught '+them.name+' not saying Goono! +2');s.seq++;return ok();
   }
   if(s.phase!=='play')return fail('The game’s over.');
   if(action.type==='play'){
@@ -148,30 +152,31 @@
    me.hand.splice(me.hand.indexOf(card),1);s.discard.push(card);s.drewCard=null;
    s.colour=card.colour||action.colour;
    log(s,me.name+' played '+cardName(card,s.colour)+'.');
+   ev(s,{type:'play',by:p,card:{...card},colour:s.colour,jump:jumping});
    if(me.hand.length===1){
     if(me.saidGoono)log(s,me.name+' is on Goono!');
     else me.caughtable=!!s.rules.goonoPenalty;
    }
-   if(me.hand.length===0){s.phase='over';s.winner=p;s.pendingDraw=0;log(s,me.name+' wins! 🏆');s.seq++;return ok()}
+   if(me.hand.length===0){s.phase='over';s.winner=p;s.pendingDraw=0;log(s,me.name+' wins! 🏆');ev(s,{type:'win',by:p});s.seq++;return ok()}
    if(me.hand.length>1)me.saidGoono=false;
    // Effects
    if(seven){
     const t=Number(action.target);[me.hand,s.players[t].hand]=[s.players[t].hand,me.hand];
-    log(s,me.name+' swapped hands with '+s.players[t].name+'.');
+    log(s,me.name+' swapped hands with '+s.players[t].name+'.');ev(s,{type:'swap',a:p,b:t});
     [me,s.players[t]].forEach(x=>{x.caughtable=false;if(x.hand.length>1)x.saidGoono=false});
    }
    if(s.rules.sevenZero&&card.kind==='num'&&card.value===0){
     const hands=s.players.map(x=>x.hand),n=hands.length;
     s.players.forEach((x,i)=>{x.hand=hands[((i-s.dir)%n+n)%n];x.caughtable=false;if(x.hand.length>1)x.saidGoono=false});
-    log(s,'Everyone passed their hand on!');
+    log(s,'Everyone passed their hand on!');ev(s,{type:'rotate'});
    }
    let steps=1;
-   if(card.kind==='skip'){steps=2}
-   else if(card.kind==='reverse'){s.dir*=-1;if(s.players.length===2)steps=2}
+   if(card.kind==='skip'){steps=2;ev(s,{type:'skip',who:next(s)})}
+   else if(card.kind==='reverse'){s.dir*=-1;if(s.players.length===2)steps=2;ev(s,{type:'reverse',dir:s.dir})}
    else if(card.kind==='draw2'||card.kind==='wild4'){
     const n=card.kind==='draw2'?2:4;
-    if(s.rules.stacking){s.pendingDraw+=n;s.pendingKind=card.kind}
-    else{const v=next(s);pickUp(s,v,n,rand);log(s,s.players[v].name+' picks up '+n+' and misses a go.');steps=2}
+    if(s.rules.stacking){s.pendingDraw+=n;s.pendingKind=card.kind;ev(s,{type:'stack',who:next(s),total:s.pendingDraw})}
+    else{const v=next(s);ev(s,{type:'hit',who:v,n});pickUp(s,v,n,rand);log(s,s.players[v].name+' picks up '+n+' and misses a go.');steps=2}
    }
    s.turn=next(s,s.turn,steps);s.seq++;return ok();
   }
@@ -207,7 +212,7 @@
    you:p,seq:s.seq,hand:s.players[p]?s.players[p].hand.slice():[],
    players:s.players.map((x,i)=>({name:x.name,bot:x.bot,count:x.hand.length,saidGoono:x.saidGoono,caughtable:x.caughtable})),
    top:top(s),colour:s.colour,turn:s.turn,dir:s.dir,pendingDraw:s.pendingDraw,pendingKind:s.pendingKind,
-   drewCard:s.drewCard,phase:s.phase,winner:s.winner,rules:s.rules,log:s.log.slice(-8),drawLeft:s.draw.length,
+   drewCard:s.drewCard,phase:s.phase,winner:s.winner,rules:s.rules,log:s.log.slice(-8),drawLeft:s.draw.length,events:s.events.slice(),
    playable:p===s.turn?playable(s,p):s.players[p]?s.players[p].hand.filter(c=>canJumpIn(s,p,c)).map(c=>c.id):[],
   };
  }
