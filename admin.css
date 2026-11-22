@@ -109,12 +109,13 @@
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--border);
+  overflow-x: auto;
 }
 .adm-rollout-row {
   display: grid;
-  grid-template-columns: 1fr 48px 48px 48px;
+  grid-template-columns: minmax(110px, 1fr) repeat(5, 42px);
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
   font-size: 13px;
@@ -160,3 +161,80 @@
 }
 .adm-diag-row span { color: var(--subtext); }
 .adm-diag-row strong { color: var(--text); text-align: right; }
+
+.adm-qr-dialog {
+  box-sizing: border-box;
+  width: min(360px, calc(100% - 28px));
+  margin: auto;
+  padding: 20px;
+  border: 1.5px solid var(--accent);
+  border-radius: 14px;
+  background: var(--surface, #141414);
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+}
+.adm-qr-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+.adm-qr-dialog h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.adm-qr-frame {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  margin: 8px auto 12px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+.adm-qr-frame canvas {
+  display: block;
+  width: min(240px, 65vw);
+  height: auto;
+  image-rendering: pixelated;
+}
+.adm-qr-creds {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-bottom: 14px;
+  word-break: break-word;
+}
+.adm-qr-actions .btn {
+  flex: 1 1 120px;
+}
+
+.adm-diff {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+}
+.adm-diff[hidden] { display: none; }
+
+.adm-preview-bar {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: #111;
+  font-size: 13px;
+  font-weight: 700;
+}
+.adm-preview-bar[hidden] { display: none; }
+.adm-preview-bar .adm-pv-exit {
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #111 !important;
+}

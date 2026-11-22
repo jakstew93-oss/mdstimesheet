@@ -97,10 +97,52 @@ window.calcHours = function(start, end) {
   if(saved&&saved.expires>Date.now()&&localStorage.getItem('ts_auth_user')){bar.hidden=false;$('entry-undo-text').textContent=saved.items.length+' '+(saved.items.length===1?'entry deleted':'entries deleted')+' · Undo available for '+Math.ceil((saved.expires-Date.now())/1000)+'s';}
   else {bar.hidden=true;if(saved&&saved.expires<=Date.now())localStorage.removeItem(storageKey('timesheet_undo_v1'))}
  }
+ function buildNextJobDraft(prev){
+  const vehicleReg=String(prev.vehicleReg||'').trim().toUpperCase();
+  const driverName=String(prev.driverName||'').trim();
+  return {
+   date:prev.date||'',
+   startTime:prev.endTime||'',
+   vehicleReg,
+   driverName,
+   _blankVehicle:!vehicleReg,
+   _blankDriver:!driverName,
+   _savedAt:new Date().toISOString(),
+  };
+ }
+ function splitDayNextJob(){
+  const d=draft();
+  const date=($('qsDate')?.value||d.date||'').trim();
+  const startTime=d.startTime||'';
+  const endTime=d.endTime||'';
+  if(!startTime||!endTime){showToast('Enter Start and Finish times first to start the next job');return}
+  const vehicleReg=($('qsReg')?.value||d.vehicleReg||'').trim().toUpperCase();
+  const driverSel=$('qsDriverSel'),driverOther=$('qsDriverOther');
+  const driverName=driverSel?(driverSel.value==='__other__'?(driverOther?.value||'').trim():driverSel.value):(d.driverName||'');
+  const beforeCount=getEntries().length;
+  const saveBtn=$('qsSaveBtn');
+  if(!saveBtn){showToast('Save button unavailable');return}
+  saveBtn.click();
+  if(getEntries().length<=beforeCount)return;
+  const next=buildNextJobDraft({date,endTime,vehicleReg,driverName});
+  localStorage.setItem('mds_qs_draft',JSON.stringify(next));
+  renderAll();
+  showToast('Job saved · Next job started at '+endTime);
+  const jobInput=$('qsJob');
+  if(jobInput){jobInput.focus();jobInput.scrollIntoView({block:'center',behavior:'smooth'})}
+ }
+ function splitDayEnabled(){
+  let u='';try{u=localStorage.getItem('ts_auth_user')||''}catch(_){}
+  if(!u)return false;
+  const list=Array.isArray(window.MDS_CONFIG?.features?.splitDay)?window.MDS_CONFIG.features.splitDay:['Jak Stewart'];
+  return list.includes(u);
+ }
  function refresh(){
   const quick=document.querySelector('.quickstart');
   if(quick&&!$('workflow-quick-actions')){
-   const row=element('div',undefined,'workflow-actions');row.id='workflow-quick-actions';row.append(button('Copy previous job',showJobs));
+   const row=element('div',undefined,'workflow-actions');row.id='workflow-quick-actions';
+   const splitBtn=button('Save & next job',splitDayNextJob);splitBtn.id='workflow-split-day';
+   row.append(button('Copy previous job',showJobs),splitBtn);
    const label=element('label',undefined,'remember-details');const checkbox=element('input');checkbox.type='checkbox';checkbox.id='remember-usual-details';
    label.append(checkbox,document.createTextNode('Remember vehicle & driver'));row.append(label);quick.append(row);
    checkbox.addEventListener('change',()=>{
@@ -108,6 +150,7 @@ window.calcHours = function(start, end) {
     localStorage.setItem(storageKey('timesheet_usual_v1'),JSON.stringify(checkbox.checked?{enabled:true,vehicleReg:$('qsReg').value.trim().toUpperCase(),driverName:driver}:{...old,enabled:false}));renderAll();
    });
   }
+  if($('workflow-split-day'))$('workflow-split-day').hidden=!splitDayEnabled();
   if($('remember-usual-details'))$('remember-usual-details').checked=usualDetails().enabled!==false;
   const bar=document.querySelector('.week-ending-bar');
   if(bar&&!$('workflow-week-actions')){const row=element('div',undefined,'workflow-actions');row.id='workflow-week-actions';row.append(button('Saved weeks',showWeeks),button('Save week & start next',archiveWeek));bar.after(row)}
@@ -136,7 +179,7 @@ window.calcHours = function(start, end) {
   }
   banner.hidden=false;
  }
- window.MDSWorkflowUI={approveExport,refresh,showPostExportPrompt};
+ window.MDSWorkflowUI={approveExport,refresh,showPostExportPrompt,buildNextJobDraft};
  const originalPdf=window.generatePDF;
  if(typeof originalPdf==='function'){
   window.generatePDF=async function(){

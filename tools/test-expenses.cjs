@@ -11,8 +11,8 @@ test('currency totals round each entry to pennies and mileage uses an editable r
 });
 test('entry point provides the Expenses section offline',()=>{
  const template=fs.readFileSync('index.html','utf8');
- assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=71/);assert.match(template,/expense-template.js\?v=70/);
- const sw=fs.readFileSync('sw.js','utf8');for(const file of ['expenses.js?v=71','expenses.css?v=70','expense-template.js?v=70'])assert.ok(sw.includes(file));
+ assert.match(template,/<option value="expenses">Expenses<\/option>/);assert.match(template,/expenses.js\?v=72/);assert.match(template,/expense-template.js\?v=70/);
+ const sw=fs.readFileSync('sw.js','utf8');for(const file of ['expenses.js?v=72','expenses.css?v=70','expense-template.js?v=70'])assert.ok(sw.includes(file));
 });
 function pdfContext(){
  const ctx={loadPdfLib:async()=>true,Uint8Array,ArrayBuffer,atob,structuredClone,console,setTimeout,clearTimeout,document:{readyState:'loading',addEventListener(){}},crypto:require('node:crypto').webcrypto};ctx.window=ctx;

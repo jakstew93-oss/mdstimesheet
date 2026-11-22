@@ -8,6 +8,7 @@
  const GH_REPO='jakstew93-oss/mdstimesheet';
  const GH_BRANCH='main';
  const TOKEN_KEY='mds_admin_gh_token';
+ const PREVIEW_KEY='mds_admin_preview_return';
 
  function isAdmin(user){return user===ADMIN_USER}
 
@@ -24,6 +25,201 @@
 
  function shareLoginText(name,password){
   return 'MDS Timesheet\n'+APP_URL+'\n\nName: '+name+'\nPassword: '+password;
+ }
+
+ function loginUrl(name,password){
+  const hash=root.MDS_CONFIG&&typeof root.MDS_CONFIG.encodeLoginHash==='function'
+   ?root.MDS_CONFIG.encodeLoginHash(name,password)
+   :'';
+  if(hash)return APP_URL+hash;
+  const bytes=new TextEncoder().encode(JSON.stringify({n:String(name||'').trim(),p:String(password||'').trim()}));
+  let bin='';
+  for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+  return APP_URL+'#login='+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ }
+
+ // Minimal ISO/IEC 18004 QR Code encoder (Versions 1-9, ECC Level L, Byte mode).
+ // Works 100% offline with zero external dependencies.
+ const QR_GF_EXP=new Uint8Array(512),QR_GF_LOG=new Uint8Array(256);
+ (function initQrGf(){
+  let x=1;
+  for(let i=0;i<255;i++){QR_GF_EXP[i]=x;QR_GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11d}
+  for(let i=255;i<512;i++)QR_GF_EXP[i]=QR_GF_EXP[i-255];
+ })();
+ function qrGfMul(a,b){return a&&b?QR_GF_EXP[QR_GF_LOG[a]+QR_GF_LOG[b]]:0}
+ function qrRsPoly(ecCount){
+  let p=[1];
+  for(let i=0;i<ecCount;i++){
+   const next=new Array(p.length+1).fill(0);
+   const factor=QR_GF_EXP[i];
+   for(let j=0;j<p.length;j++){next[j]^=p[j];next[j+1]^=qrGfMul(p[j],factor)}
+   p=next;
+  }
+  return p;
+ }
+ function qrRsRemainder(data,ecCount){
+  const gen=qrRsPoly(ecCount);
+  const res=new Uint8Array(ecCount);
+  for(let i=0;i<data.length;i++){
+   const factor=data[i]^res[0];
+   for(let j=0;j<ecCount-1;j++)res[j]=res[j+1]^qrGfMul(gen[j+1],factor);
+   res[ecCount-1]=qrGfMul(gen[ecCount],factor);
+  }
+  return res;
+ }
+ const QR_VERSIONS=[
+  null,
+  {v:1,size:21,blocks:1,dataPerBlock:19,ecPerBlock:7,align:[]},
+  {v:2,size:25,blocks:1,dataPerBlock:34,ecPerBlock:10,align:[6,18]},
+  {v:3,size:29,blocks:1,dataPerBlock:55,ecPerBlock:15,align:[6,22]},
+  {v:4,size:33,blocks:1,dataPerBlock:80,ecPerBlock:20,align:[6,26]},
+  {v:5,size:37,blocks:1,dataPerBlock:108,ecPerBlock:26,align:[6,30]},
+  {v:6,size:41,blocks:2,dataPerBlock:68,ecPerBlock:18,align:[6,34]},
+  {v:7,size:45,blocks:2,dataPerBlock:78,ecPerBlock:20,align:[6,22,38],verBits:0x07c94},
+  {v:8,size:49,blocks:2,dataPerBlock:97,ecPerBlock:24,align:[6,24,42],verBits:0x085bc},
+  {v:9,size:53,blocks:2,dataPerBlock:116,ecPerBlock:30,align:[6,26,46],verBits:0x09a99},
+ ];
+ function qrFormatBits(mask){
+  const data=(0b01<<3)|mask; // ECC Level L = 01
+  let rem=data<<10;
+  for(let i=14;i>=10;i--)if((rem>>i)&1)rem^=(0x537<<(i-10));
+  return ((data<<10)|rem)^0x5412;
+ }
+ function encodeQR(text){
+  const bytes=new TextEncoder().encode(String(text||''));
+  const spec=QR_VERSIONS.find(s=>s&&(bytes.length+2)<=s.blocks*s.dataPerBlock);
+  if(!spec)throw new Error('Text too long for QR code');
+  const totalData=spec.blocks*spec.dataPerBlock;
+  const bits=[];
+  const pushBits=(val,len)=>{for(let i=len-1;i>=0;i--)bits.push((val>>i)&1)};
+  pushBits(0b0100,4); // Byte mode
+  pushBits(bytes.length,8); // V1-V9 byte count is 8 bits
+  for(const b of bytes)pushBits(b,8);
+  const maxBits=totalData*8;
+  for(let i=0;i<4&&bits.length<maxBits;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  const dataBytes=new Uint8Array(totalData);
+  for(let i=0;i<bits.length;i+=8){
+   let byte=0;
+   for(let j=0;j<8;j++)byte=(byte<<1)|bits[i+j];
+   dataBytes[i>>3]=byte;
+  }
+  const padBytes=[0xec,0x11];
+  for(let i=bits.length>>3,p=0;i<totalData;i++,p^=1)dataBytes[i]=padBytes[p];
+
+  const dBlocks=[],eBlocks=[];
+  for(let b=0;b<spec.blocks;b++){
+   const slice=dataBytes.subarray(b*spec.dataPerBlock,(b+1)*spec.dataPerBlock);
+   dBlocks.push(slice);
+   eBlocks.push(qrRsRemainder(slice,spec.ecPerBlock));
+  }
+  const codewords=[];
+  for(let i=0;i<spec.dataPerBlock;i++)for(let b=0;b<spec.blocks;b++)codewords.push(dBlocks[b][i]);
+  for(let i=0;i<spec.ecPerBlock;i++)for(let b=0;b<spec.blocks;b++)codewords.push(eBlocks[b][i]);
+
+  const n=spec.size;
+  const grid=Array.from({length:n},()=>new Int8Array(n)); // 0=empty, 1=light, 2=dark
+  const func=Array.from({length:n},()=>new Uint8Array(n));
+  const setFunc=(r,c,dark)=>{if(r>=0&&r<n&&c>=0&&c<n){grid[r][c]=dark?2:1;func[r][c]=1}};
+  const finder=(tr,tc)=>{
+   for(let dr=-1;dr<=7;dr++)for(let dc=-1;dc<=7;dc++){
+    const r=tr+dr,c=tc+dc;
+    if(r<0||r>=n||c<0||c>=n)continue;
+    const inBox=dr>=0&&dr<=6&&dc>=0&&dc<=6;
+    const dark=inBox&&(dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4));
+    setFunc(r,c,dark);
+   }
+  };
+  finder(0,0);finder(0,n-7);finder(n-7,0);
+  for(let i=8;i<n-8;i++){setFunc(6,i,i%2===0);setFunc(i,6,i%2===0)}
+  for(const ar of spec.align)for(const ac of spec.align){
+   if(func[ar][ac])continue;
+   for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){
+    setFunc(ar+dr,ac+dc,Math.max(Math.abs(dr),Math.abs(dc))!==1);
+   }
+  }
+  setFunc(n-8,8,true); // Dark module
+  // Reserve format info cells
+  for(let i=0;i<9;i++){if(i!==6){func[8][i]=1;func[i][8]=1}}
+  for(let i=0;i<8;i++){func[8][n-1-i]=1;func[n-1-i][8]=1}
+  // Version info (V7+)
+  if(spec.verBits){
+   for(let i=0;i<18;i++){
+    const dark=!!((spec.verBits>>i)&1);
+    const r=Math.floor(i/3),c=n-11+(i%3);
+    setFunc(r,c,dark);setFunc(c,r,dark);
+   }
+  }
+  // Place data bits in upward/downward 2-column zig-zag
+  let bitIdx=0,up=true;
+  for(let col=n-1;col>=1;col-=2){
+   if(col===6)col=5;
+   for(let step=0;step<n;step++){
+    const row=up?n-1-step:step;
+    for(const dc of [0,-1]){
+     const c=col+dc;
+     if(!func[row][c]){
+      const byte=codewords[bitIdx>>3]||0;
+      const bit=(byte>>(7-(bitIdx&7)))&1;
+      grid[row][c]=bit?2:1;
+      bitIdx++;
+     }
+    }
+   }
+   up=!up;
+  }
+  const maskFns=[
+   (r,c)=>(r+c)%2===0,
+   (r)=>r%2===0,
+   (_,c)=>c%3===0,
+   (r,c)=>(r+c)%3===0,
+   (r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,
+   (r,c)=>((r*c)%2)+((r*c)%3)===0,
+   (r,c)=>(((r*c)%2)+((r*c)%3))%2===0,
+   (r,c)=>(((r+c)%2)+((r*c)%3))%2===0,
+  ];
+  const applyMask=(m)=>{
+   const out=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>{
+    let dark=grid[r][c]===2;
+    if(!func[r][c]&&maskFns[m](r,c))dark=!dark;
+    return dark;
+   }));
+   const fmt=qrFormatBits(m);
+   for(let i=0;i<15;i++){
+    const dark=!!((fmt>>(14-i))&1);
+    // Primary copy around top-left finder (bits 14..0)
+    if(i<6)out[8][i]=dark;
+    else if(i<8)out[8][i+1]=dark;
+    else if(i===8)out[7][8]=dark;
+    else out[14-i][8]=dark;
+    // Secondary copy along bottom-left & top-right (bits 14..0)
+    if(i<7)out[n-1-i][8]=dark;
+    else out[8][n-15+i]=dark;
+   }
+   return out;
+  };
+  const penalty=(mat)=>{
+   let score=0,darks=0;
+   for(let r=0;r<n;r++){
+    let runR=1,runC=1;
+    for(let c=0;c<n;c++){
+     if(mat[r][c])darks++;
+     if(c>0){if(mat[r][c]===mat[r][c-1])runR++;else{if(runR>=5)score+=runR-2;runR=1}}
+     if(c>0){if(mat[c][r]===mat[c-1][r])runC++;else{if(runC>=5)score+=runC-2;runC=1}}
+     if(r>0&&c>0&&mat[r][c]===mat[r-1][c]&&mat[r][c]===mat[r][c-1]&&mat[r][c]===mat[r-1][c-1])score+=3;
+    }
+    if(runR>=5)score+=runR-2;
+    if(runC>=5)score+=runC-2;
+   }
+   score+=Math.abs(Math.round((darks*100)/(n*n))-50)*2;
+   return score;
+  };
+  let best=null,bestScore=Infinity;
+  for(let m=0;m<8;m++){
+   const mat=applyMask(m),s=penalty(mat);
+   if(s<bestScore){bestScore=s;best=mat}
+  }
+  return best;
  }
 
  function formatRosterLines(roster){
@@ -50,6 +246,8 @@
   lines.push('   payEstimate:'+JSON.stringify(cfg.features.payEstimate)+',');
   lines.push('   shiftDial:'+JSON.stringify(cfg.features.shiftDial)+',');
   lines.push('   sundayReminder:'+JSON.stringify(cfg.features.sundayReminder)+',');
+  lines.push('   whatIfBreak:'+JSON.stringify(cfg.features.whatIfBreak||['Jak Stewart'])+',');
+  lines.push('   splitDay:'+JSON.stringify(cfg.features.splitDay||['Jak Stewart'])+',');
   lines.push('  },');
   lines.push('  rates:{');
   lines.push('   mileage:'+cfg.rates.mileage+',');
@@ -63,7 +261,78 @@
   lines.push('   text:'+JSON.stringify(cfg.notice.text)+',');
   lines.push('   expires:'+JSON.stringify(cfg.notice.expires)+',');
   lines.push('  },');
+  const cl=cfg.changelog||{id:'',title:'',items:[]};
+  lines.push('  changelog:{');
+  lines.push('   id:'+JSON.stringify(cl.id||'')+',');
+  lines.push('   title:'+JSON.stringify(cl.title||'')+',');
+  lines.push('   items:'+JSON.stringify(Array.isArray(cl.items)?cl.items:[])+',');
+  lines.push('  },');
   return lines.join('\n');
+ }
+
+ function formatSize(bytes){
+  const n=Number(bytes)||0;
+  return n>=1024*1024?(n/(1024*1024)).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+ }
+
+ function draftChangelogFromChanges(baseRoster,nextRoster,baseCfg,nextCfg){
+  const items=[];
+  const oldDrivers=new Set((baseRoster||[]).map(r=>r.name));
+  const addedDrivers=(nextRoster||[]).filter(r=>!oldDrivers.has(r.name)).map(r=>r.name);
+  if(addedDrivers.length)items.push('Added '+addedDrivers.join(', ')+' to the driver list.');
+
+  const oldVans=new Set((baseCfg?.fleet||[]).map(([r])=>r));
+  const addedVans=(nextCfg?.fleet||[]).filter(([r])=>!oldVans.has(r)).map(([r,l])=>l?r+' ('+l+')':r);
+  if(addedVans.length)items.push('New company van'+(addedVans.length>1?'s':'')+': '+addedVans.join(', ')+'.');
+
+  const featLabels={payEstimate:'Pay Estimate',shiftDial:'Shift Dial',sundayReminder:'Sunday Reminder',whatIfBreak:'Break-cliff What-If',splitDay:'Save & Next Job'};
+  for(const [k,label] of Object.entries(featLabels)){
+   const before=new Set(baseCfg?.features?.[k]||[]);
+   const added=(nextCfg?.features?.[k]||[]).filter(u=>!before.has(u));
+   if(added.length)items.push(label+' enabled by default for '+added.join(', ')+'.');
+  }
+
+  const r0=baseCfg?.rates||{},r1=nextCfg?.rates||{};
+  if(r0.mileage!==r1.mileage)items.push('Default mileage rate updated to £'+Number(r1.mileage).toFixed(2)+'/mile.');
+  if(r0.night!==r1.night)items.push('Night away allowance updated to £'+r1.night+'.');
+  if(r0.holidayHours!==r1.holidayHours)items.push('Holiday day hours updated to '+r1.holidayHours+'h.');
+  if(r0.satX!==r1.satX||r0.sunX!==r1.sunX)items.push('Weekend multipliers updated (Sat '+r1.satX+'×, Sun '+r1.sunX+'×).');
+  return items;
+ }
+
+ function publishSummary(baseRoster,nextRoster,baseCfg,nextCfg,pendingPortraits){
+  const lines=[];
+  const portraits=Object.keys(pendingPortraits||{});
+  if(portraits.length)lines.push(portraits.length+' portrait'+(portraits.length===1?'':'s')+' ('+portraits.join(', ')+')');
+
+  const oldMap=new Map((baseRoster||[]).map(r=>[r.name,r]));
+  const newMap=new Map((nextRoster||[]).map(r=>[r.name,r]));
+  const addedDrivers=[],removedDrivers=[],editedDrivers=[];
+  for(const [name,r] of newMap){
+   if(!oldMap.has(name))addedDrivers.push(name);
+   else if(JSON.stringify(oldMap.get(name))!==JSON.stringify(r))editedDrivers.push(name);
+  }
+  for(const name of oldMap.keys())if(!newMap.has(name))removedDrivers.push(name);
+  if(addedDrivers.length)lines.push('+'+addedDrivers.length+' driver'+(addedDrivers.length===1?'':'s')+': '+addedDrivers.join(', '));
+  if(removedDrivers.length)lines.push('-'+removedDrivers.length+' driver'+(removedDrivers.length===1?'':'s')+': '+removedDrivers.join(', '));
+  if(editedDrivers.length)lines.push('Updated '+editedDrivers.length+' driver'+(editedDrivers.length===1?'':'s')+': '+editedDrivers.join(', '));
+
+  const oldFleet=JSON.stringify(baseCfg?.fleet||[]),newFleet=JSON.stringify(nextCfg?.fleet||[]);
+  if(oldFleet!==newFleet)lines.push('Company fleet updated ('+(nextCfg?.fleet?.length||0)+' vans)');
+
+  const oldFeats=JSON.stringify(baseCfg?.features||{}),newFeats=JSON.stringify(nextCfg?.features||{});
+  if(oldFeats!==newFeats)lines.push('Feature rollout defaults updated');
+
+  const oldRates=JSON.stringify(baseCfg?.rates||{}),newRates=JSON.stringify(nextCfg?.rates||{});
+  if(oldRates!==newRates)lines.push('Company rate defaults updated');
+
+  const oldNotice=JSON.stringify(baseCfg?.notice||{}),newNotice=JSON.stringify(nextCfg?.notice||{});
+  if(oldNotice!==newNotice)lines.push(nextCfg?.notice?.text?'Driver notice updated':'Driver notice cleared');
+
+  const oldCl=JSON.stringify(baseCfg?.changelog||{}),newCl=JSON.stringify(nextCfg?.changelog||{});
+  if(oldCl!==newCl)lines.push(nextCfg?.changelog?.items?.length?'What’s New updated ('+nextCfg.changelog.items.length+' items)':'What’s New cleared');
+
+  return lines;
  }
 
  function updateSiteConfigSource(currentSource,cfg){
@@ -88,9 +357,10 @@
 
  const api={
   ADMIN_USER,APP_URL,GH_REPO,GH_BRANCH,
-  isAdmin,slugify,generatePassword,shareLoginText,
+  isAdmin,slugify,generatePassword,shareLoginText,loginUrl,encodeQR,
   formatRosterLines,updateDriversSource,
   formatSiteConfigBody,updateSiteConfigSource,
+  formatSize,draftChangelogFromChanges,publishSummary,
  };
  if(typeof module!=='undefined'&&module.exports){module.exports=api;return}
  root.MDSAdmin=api;
@@ -112,9 +382,16 @@
     payEstimate:[...(src?.features?.payEstimate||[])],
     shiftDial:[...(src?.features?.shiftDial||[])],
     sundayReminder:[...(src?.features?.sundayReminder||[])],
+    whatIfBreak:[...(src?.features?.whatIfBreak||['Jak Stewart'])],
+    splitDay:[...(src?.features?.splitDay||['Jak Stewart'])],
    },
    rates:{...(src?.rates||{mileage:0.25,night:20,holidayHours:8,satX:1.5,sunX:1.5})},
    notice:{...(src?.notice||{id:'',text:'',expires:''})},
+   changelog:{
+    id:src?.changelog?.id||'',
+    title:src?.changelog?.title||'',
+    items:[...(src?.changelog?.items||[])],
+   },
   };
  }
 
@@ -176,7 +453,9 @@
     const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
     canvas.getContext('2d').drawImage(img,0,0,w,h);
     const dataUrl=canvas.toDataURL('image/png');
-    resolve(dataUrl.split(',')[1]||'');
+    const base64=dataUrl.split(',')[1]||'';
+    const bytes=Math.round(base64.length*3/4);
+    resolve({base64,bytes,origBytes:file.size||0});
    };
    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not read that image'))};
    img.src=url;
@@ -215,6 +494,8 @@
   const token=(read(TOKEN_KEY)||'').trim();
   if(!token){toast('Add a GitHub token below first');return}
   if(busy)return;
+  const changes=publishSummary(root.MDS_DRIVERS?.BASE_ROSTER,workingRoster,root.MDS_CONFIG?.BASE_CONFIG,workingConfig,pendingPortraits);
+  if(changes.length&&!confirm('Publish these changes to all phones?\n\n• '+changes.join('\n• ')))return;
   busy=true;setStatus('Publishing changes to GitHub…');
   try{
    const published=[];
@@ -284,6 +565,93 @@
   }
  }
 
+ function previewReturnUser(){
+  try{return sessionStorage.getItem(PREVIEW_KEY)||''}catch(_){return ''}
+ }
+ function setPreviewReturnUser(name){
+  try{name?sessionStorage.setItem(PREVIEW_KEY,name):sessionStorage.removeItem(PREVIEW_KEY)}catch(_){}
+ }
+ function renderPreviewBanner(){
+  const app=$('mds-app');if(!app)return;
+  const ret=previewReturnUser(),cur=currentUser();
+  let bar=$('adm-preview-bar');
+  if(!ret||ret===cur){if(bar)bar.hidden=true;return}
+  if(!bar){
+   bar=document.createElement('div');bar.id='adm-preview-bar';bar.className='adm-preview-bar';bar.setAttribute('role','status');
+   bar.innerHTML='<span class="adm-pv-text"></span><button type="button" class="btn btn-outline adm-sm adm-pv-exit">Exit preview</button>';
+   bar.querySelector('.adm-pv-exit').addEventListener('click',exitPreviewAs);
+   app.prepend(bar);
+  }
+  bar.querySelector('.adm-pv-text').textContent='Previewing as '+cur;
+  bar.hidden=false;
+ }
+ function switchActiveUserForPreview(name){
+  write('ts_auth_user',name);
+  write('ts_emp_name',name);
+  const he=$('headerEngineer');
+  if(he&&typeof root.abbreviateName==='function')he.textContent=root.abbreviateName(name);
+  const emp=$('employeeName');
+  if(emp)emp.value=name;
+  if(typeof root.resolveWeekEnding==='function')root.resolveWeekEnding();
+  if(typeof root.updateWeekLabel==='function')root.updateWeekLabel();
+  if(typeof root.renderAll==='function')root.renderAll();
+  syncVisibility();
+  renderPreviewBanner();
+ }
+ function previewAs(person){
+  if(!isAdmin(currentUser())||person.name===ADMIN_USER)return;
+  setPreviewReturnUser(ADMIN_USER);
+  switchActiveUserForPreview(person.name);
+  const sel=$('sectionSelect');
+  if(sel&&typeof root.switchSection==='function'){sel.value='ts';root.switchSection('ts')}
+  toast('Previewing as '+person.name);
+ }
+ function exitPreviewAs(){
+  const ret=previewReturnUser();
+  if(!ret)return;
+  setPreviewReturnUser('');
+  switchActiveUserForPreview(ret);
+  const sel=$('sectionSelect');
+  if(sel&&typeof root.switchSection==='function'){sel.value='admin';root.switchSection('admin')}
+  toast('Returned to '+ret);
+ }
+
+ function showLoginQR(person){
+  const url=loginUrl(person.name,person.password);
+  let matrix;
+  try{matrix=encodeQR(url)}catch(err){toast(err.message||'Could not generate QR code');return}
+  let dlg=$('adm-qr-dialog');
+  if(!dlg){
+   dlg=document.createElement('dialog');
+   dlg.id='adm-qr-dialog';
+   dlg.className='adm-qr-dialog';
+   dlg.setAttribute('aria-labelledby','adm-qr-title');
+   dlg.innerHTML='<h2 id="adm-qr-title"></h2><p class="adm-sub">Point the driver’s camera at this code to open MDS Timesheet and sign straight in.</p><div class="adm-qr-frame"><canvas id="adm-qr-canvas"></canvas></div><div class="adm-qr-creds" id="adm-qr-creds"></div><div class="adm-actions adm-qr-actions"><button type="button" class="btn btn-outline" id="adm-qr-copy">Copy login link</button><button type="button" class="btn btn-primary" id="adm-qr-close">Close</button></div>';
+   dlg.querySelector('#adm-qr-close').addEventListener('click',()=>dlg.close());
+   document.body.append(dlg);
+  }
+  dlg.querySelector('#adm-qr-title').textContent='QR Login — '+person.name;
+  dlg.querySelector('#adm-qr-creds').textContent='Name: '+person.name+' · Password: '+person.password;
+  const copyBtn=dlg.querySelector('#adm-qr-copy');
+  copyBtn.onclick=async()=>{
+   try{await navigator.clipboard.writeText(url);toast('Login link copied')}
+   catch(_){prompt('Copy login link:',url)}
+  };
+  const canvas=dlg.querySelector('#adm-qr-canvas');
+  const quiet=4,size=matrix.length,scale=6,px=(size+quiet*2)*scale;
+  canvas.width=px;canvas.height=px;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,px,px);
+  ctx.fillStyle='#000000';
+  for(let r=0;r<size;r++){
+   for(let c=0;c<size;c++){
+    if(matrix[r][c])ctx.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
+   }
+  }
+  if(!dlg.open)dlg.showModal();
+ }
+
  async function copyLogins(){
   const lines=workingRoster.filter(r=>r.password).map(r=>r.name+': '+r.password).join('\n');
   try{await navigator.clipboard.writeText(lines);toast('Login list copied to clipboard')}
@@ -338,9 +706,16 @@
 
    const actions=document.createElement('div');actions.className='adm-user-actions';
    if(person.password){
+    const qrBtn=document.createElement('button');qrBtn.type='button';qrBtn.className='btn btn-outline adm-sm';qrBtn.textContent='QR';
+    qrBtn.addEventListener('click',()=>showLoginQR(person));
     const shareBtn=document.createElement('button');shareBtn.type='button';shareBtn.className='btn btn-outline adm-sm';shareBtn.textContent='Share';
     shareBtn.addEventListener('click',()=>shareLogin(person));
-    actions.append(shareBtn);
+    actions.append(qrBtn,shareBtn);
+    if(person.name!==ADMIN_USER){
+     const pvBtn=document.createElement('button');pvBtn.type='button';pvBtn.className='btn btn-outline adm-sm';pvBtn.textContent='Preview';
+     pvBtn.addEventListener('click',()=>previewAs(person));
+     actions.append(pvBtn);
+    }
    }
    const photoBtn=document.createElement('button');photoBtn.type='button';photoBtn.className='btn btn-outline adm-sm';photoBtn.textContent='Photo';
    photoBtn.addEventListener('click',()=>{
@@ -348,12 +723,13 @@
     inp.addEventListener('change',async()=>{
      const file=inp.files&&inp.files[0];if(!file)return;
      try{
-      const b64=await resizePortraitToPngBase64(file);
+      const res=await resizePortraitToPngBase64(file);
       const slug=person.portrait||slugify(person.name);
-      pendingPortraits[slug]=b64;
+      pendingPortraits[slug]=res.base64;
       workingRoster[idx].portrait=slug;
       saveLocalRoster(workingRoster);
-      setStatus('Portrait ready for '+person.name+' ('+slug+'.png). Tap "Publish all changes to GitHub" to upload.');
+      const sizeNote=res.origBytes>res.bytes?formatSize(res.bytes)+', down from '+formatSize(res.origBytes):formatSize(res.bytes);
+      setStatus('Portrait ready for '+person.name+' ('+slug+'.png · '+sizeNote+'). Tap "Publish all changes to GitHub" to upload.');
       render();
      }catch(err){toast(err.message||'Could not load image')}
     });
@@ -428,7 +804,7 @@
   const box=$('adm-rollouts');if(!box)return;
   box.replaceChildren();
   const loginUsers=workingRoster.filter(r=>r.password);
-  const feats=[['payEstimate','Pay'],['shiftDial','Dial'],['sundayReminder','Sun']];
+  const feats=[['payEstimate','Pay'],['shiftDial','Dial'],['sundayReminder','Sun'],['whatIfBreak','Break'],['splitDay','Split']];
   const head=document.createElement('div');head.className='adm-rollout-row adm-rollout-head';
   head.innerHTML='<span>Driver</span>'+feats.map(([,l])=>'<span>'+l+'</span>').join('');
   box.append(head);
@@ -452,6 +828,13 @@
   const textInp=$('adm-notice-text'),expInp=$('adm-notice-exp');
   if(textInp&&document.activeElement!==textInp)textInp.value=workingConfig.notice.text||'';
   if(expInp&&document.activeElement!==expInp)expInp.value=workingConfig.notice.expires||'';
+ }
+
+ function renderChangelogForm(){
+  const titleInp=$('adm-cl-title'),itemsInp=$('adm-cl-items');
+  const cl=workingConfig.changelog||{id:'',title:'',items:[]};
+  if(titleInp&&document.activeElement!==titleInp)titleInp.value=cl.title||'';
+  if(itemsInp&&document.activeElement!==itemsInp)itemsInp.value=(cl.items||[]).join('\n');
  }
 
  function renderRatesForm(){
@@ -487,8 +870,20 @@
   renderFleet();
   renderRollouts();
   renderNoticeForm();
+  renderChangelogForm();
   renderRatesForm();
   renderDiagnostics();
+  const diffBox=$('adm-publish-diff');
+  if(diffBox){
+   const changes=publishSummary(root.MDS_DRIVERS?.BASE_ROSTER,workingRoster,root.MDS_CONFIG?.BASE_CONFIG,workingConfig,pendingPortraits);
+   if(changes.length){
+    diffBox.textContent='Ready to publish: '+changes.join(' · ');
+    diffBox.hidden=false;
+   }else{
+    diffBox.textContent='';
+    diffBox.hidden=true;
+   }
+  }
   const resetBtn=$('adm-reset-local');
   if(resetBtn)resetBtn.hidden=!hasLocalOverrides();
   const tokenState=$('adm-token-state');
@@ -503,6 +898,7 @@
    '<div class="card">'
     +'<h2>Publish to all phones</h2>'
     +'<p id="adm-status" class="adm-status" role="status" hidden></p>'
+    +'<p id="adm-publish-diff" class="adm-diff" hidden></p>'
     +'<p class="adm-sub">All edits below apply immediately on this phone. Tap Publish to push roster, vans, portraits, notices, feature defaults and rates to GitHub for everyone.</p>'
     +'<div class="adm-actions">'
      +'<button type="button" class="btn btn-primary" id="adm-publish">Publish all changes to GitHub</button>'
@@ -541,6 +937,18 @@
    +'</div>'
 
    +'<div class="card">'
+    +'<h2>What’s New (App Updates)</h2>'
+    +'<p class="adm-sub">Show a one-time “What’s new” popup when drivers open the app after you publish updates.</p>'
+    +'<div class="field"><label for="adm-cl-title">Title</label><input id="adm-cl-title" type="text" placeholder="e.g. New in MDS Timesheet"></div>'
+    +'<div class="field"><label for="adm-cl-items">Highlights <small>(one bullet point per line)</small></label><textarea id="adm-cl-items" rows="3" placeholder="Faster loading with compressed portraits&#10;New van added to the fleet"></textarea></div>'
+    +'<div class="adm-actions">'
+     +'<button type="button" class="btn btn-outline" id="adm-cl-draft">Auto-draft from edits</button>'
+     +'<button type="button" class="btn btn-primary" id="adm-cl-save">Save &amp; preview</button>'
+     +'<button type="button" class="btn btn-outline" id="adm-cl-clear">Clear</button>'
+    +'</div>'
+   +'</div>'
+
+   +'<div class="card">'
     +'<h2>Company Vans</h2>'
     +'<p class="adm-sub">Fleet vans shown in every driver’s vehicle dropdown.</p>'
     +'<div id="adm-fleet" class="adm-roster"></div>'
@@ -556,7 +964,7 @@
 
    +'<div class="card">'
     +'<h2>Feature Rollouts (Defaults)</h2>'
-    +'<p class="adm-sub">Choose who gets Pay Estimate, Shift Dial, and Sunday Reminder turned on by default. Drivers can still toggle them in Appearance.</p>'
+    +'<p class="adm-sub">Choose who gets Pay Estimate, Shift Dial, Sunday Reminder, Break-cliff What-If, and Save &amp; Next Job.</p>'
     +'<div id="adm-rollouts" class="adm-rollouts"></div>'
    +'</div>'
 
@@ -634,6 +1042,30 @@
    render();
   });
 
+  sec.querySelector('#adm-cl-draft').addEventListener('click',()=>{
+   const drafted=draftChangelogFromChanges(root.MDS_DRIVERS?.BASE_ROSTER,workingRoster,root.MDS_CONFIG?.BASE_CONFIG,workingConfig);
+   if(!drafted.length){toast('No unpublished roster, van, feature or rate changes to draft from');return}
+   const titleInp=sec.querySelector('#adm-cl-title'),itemsInp=sec.querySelector('#adm-cl-items');
+   if(!titleInp.value.trim())titleInp.value='What’s new in MDS Timesheet';
+   itemsInp.value=drafted.join('\n');
+   toast('Drafted '+drafted.length+' update note'+(drafted.length===1?'':'s'));
+  });
+  sec.querySelector('#adm-cl-save').addEventListener('click',()=>{
+   const title=sec.querySelector('#adm-cl-title').value.trim()||'What’s new';
+   const items=sec.querySelector('#adm-cl-items').value.split(/\r?\n/).map(s=>s.replace(/^[-•*]\s*/,'').trim()).filter(Boolean).slice(0,8);
+   workingConfig.changelog={id:items.length?'cl-'+Date.now().toString(36):'',title:items.length?title:'',items};
+   saveLocalConfig(workingConfig);
+   setStatus(items.length?'What’s New saved locally. Tap "Publish all changes to GitHub" to show it to all drivers.':'What’s New cleared locally.');
+   render();
+   if(items.length&&root.MDS_CONFIG?.showChangelog)root.MDS_CONFIG.showChangelog(true);
+  });
+  sec.querySelector('#adm-cl-clear').addEventListener('click',()=>{
+   workingConfig.changelog={id:'',title:'',items:[]};
+   saveLocalConfig(workingConfig);
+   setStatus('What’s New cleared locally. Tap "Publish all changes to GitHub" to clear it on all phones.');
+   render();
+  });
+
   sec.querySelector('#adm-van-form').addEventListener('submit',e=>{
    e.preventDefault();
    const regInp=sec.querySelector('#adm-van-reg'),lblInp=sec.querySelector('#adm-van-label');
@@ -701,6 +1133,7 @@
   if(typeof origLogin==='function')root.doLogin=function(){origLogin();syncVisibility()};
 
   syncVisibility();
+  renderPreviewBanner();
   if(read('ts_section')==='admin'&&isAdmin(currentUser())){
    $('sectionSelect').value='admin';
    root.switchSection('admin');
