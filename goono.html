@@ -1,0 +1,629 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Goono</title><style>
+@font-face{font-family:Pixel;src:url('fonts/vt323.ttf')}
+*{box-sizing:border-box}
+:root{--bg:#141826;--panel:#1f2538;--line:#343c58;--ink:#eef2ff;--muted:#9aa4c4;--accent:#ffd84d;--red:#e53935;--yellow:#fbc02d;--green:#43a047;--blue:#1e88e5}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100dvh}
+button,input,select{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+main{max-width:640px;margin:0 auto;padding:14px 14px 90px}
+h1,h2,h3{margin:0}
+.logo{font:64px/1 Pixel,monospace;letter-spacing:4px;text-align:center;margin:10px 0 2px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(3px 3px 0 #000)}
+.tagline{text-align:center;color:var(--muted);margin:0 0 18px;font-size:14px}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.panel h2{font:26px Pixel,monospace;color:var(--accent);margin-bottom:8px}
+.me{display:flex;align-items:center;gap:12px}
+.me .who{font-weight:700;font-size:18px}
+.small{font-size:13px;color:var(--muted)}
+.btn{display:block;width:100%;padding:13px;border-radius:12px;border:2px solid var(--line);background:#2a3150;color:var(--ink);font-weight:700;font-size:16px;margin-top:10px}
+.btn.primary{background:var(--accent);color:#231d00;border-color:var(--accent)}
+.btn.danger{background:none;color:#ff8a80;border-color:#7a3535}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+input.code{width:100%;padding:12px;border-radius:12px;border:2px solid var(--line);background:#0f1320;color:var(--ink);font:34px Pixel,monospace;letter-spacing:8px;text-align:center;text-transform:uppercase}
+.error{color:#ff8a80;min-height:1.2em;margin:8px 0 0;font-size:14px}
+/* Avatars from the driver picker */
+.av{width:40px;height:40px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#0f1320;border-radius:10px;overflow:hidden}
+.av .driver-avatar{width:36px;height:36px;image-rendering:pixelated}
+.av.big{width:64px;height:64px;border-radius:14px}.av.big .driver-avatar{width:60px;height:60px}
+.av.tiny{width:22px;height:22px;border-radius:6px}.av.tiny .driver-avatar{width:20px;height:20px}
+/* Lobby */
+.code-big{font:56px/1 Pixel,monospace;letter-spacing:10px;text-align:center;color:var(--accent);margin:4px 0}
+.seats{list-style:none;margin:0;padding:0}
+.seats li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.seats li:last-child{border-bottom:0}
+.seats .name{flex:1;font-weight:600}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#2a3150;color:var(--muted)}
+.tag.host{background:var(--accent);color:#231d00}
+.x{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 8px}
+.rules label{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.rules label:last-child{border-bottom:0}
+.rules label span small{display:block;color:var(--muted);font-size:12px}
+.rules input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);flex-shrink:0}
+.rules select{background:#0f1320;color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:6px}
+.presets{display:flex;gap:8px;margin-bottom:6px}
+.presets button{flex:1;padding:8px;border-radius:10px;border:2px solid var(--line);background:#2a3150;color:var(--ink);font-weight:700}
+.presets button[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
+.rules.readonly label{opacity:.85}
+/* Game */
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.topbar .room{flex:1;font:22px Pixel,monospace;color:var(--muted)}
+.iconbtn{position:relative;background:#2a3150;border:2px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 10px;font-weight:700}
+.dot{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border-radius:999px;font-size:11px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 4px}
+.opps{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}
+.opp{flex-shrink:0;width:86px;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;position:relative}
+.opp.turn{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.opp .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.opp .cnt{font:20px Pixel,monospace;color:var(--accent)}
+.opp .goono{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font:14px Pixel,monospace;padding:0 6px;border-radius:6px;white-space:nowrap}
+.opp .catch{margin-top:4px;width:100%;background:var(--red);color:#fff;border:0;border-radius:8px;font-size:12px;font-weight:800;padding:5px 0;animation:pulse .8s infinite}
+.opp .away{font-size:10px;color:var(--muted)}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.table{display:flex;align-items:center;justify-content:center;gap:22px;margin:14px 0 6px}
+.pile{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pile .small{text-align:center}
+.drawbtn{border:0;padding:0;background:none}
+.ring{width:22px;height:22px;border-radius:50%;border:3px solid #fff}
+.status{text-align:center;font:24px Pixel,monospace;min-height:28px;margin:4px 0}
+.status.mine{color:var(--accent)}
+.log{list-style:none;padding:0;margin:0 0 8px;font-size:12px;color:var(--muted);text-align:center;min-height:32px}
+.hand{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px 0 4px}
+.actions{display:flex;gap:8px;margin-top:6px}
+.actions .btn{margin-top:0}
+.goonobtn{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important;font:26px Pixel,monospace!important;letter-spacing:2px}
+/* Cards */
+.card{--c:#555;position:relative;width:58px;height:86px;border-radius:10px;border:3px solid #fff;background:var(--c);color:#fff;display:inline-flex;align-items:center;justify-content:center;padding:0;box-shadow:0 3px 0 #0006;flex-shrink:0;font-family:Impact,"Arial Black",sans-serif;transition:transform .12s}
+.card.big{width:84px;height:124px;border-width:4px}
+.card .oval{position:absolute;inset:14% 10%;border-radius:50%;background:#fff;transform:rotate(-22deg)}
+.card .val{position:relative;color:var(--c);font-size:28px;line-height:1;text-shadow:1px 1px 0 #0003}
+.card.big .val{font-size:42px}
+.card .corner{position:absolute;top:3px;left:5px;font-size:12px;line-height:1;text-shadow:1px 1px 0 #0006}
+.card .corner.br{top:auto;left:auto;bottom:3px;right:5px;transform:rotate(180deg)}
+.card .cap{position:absolute;bottom:3px;left:0;right:0;font:9px Arial,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.3px;text-shadow:1px 1px 0 #0008}
+.card.big .cap{font-size:11px;bottom:5px}
+.card.red{--c:var(--red)}.card.yellow{--c:var(--yellow)}.card.green{--c:var(--green)}.card.blue{--c:var(--blue)}
+.card.wild{--c:#222;background:conic-gradient(var(--red) 0 25%,var(--yellow) 0 50%,var(--green) 0 75%,var(--blue) 0)}
+.card.wild .oval{background:#111}.card.wild .val{color:#fff}
+.card.back{background:repeating-linear-gradient(45deg,#2a3150 0 6px,#1f2538 6px 12px);border-color:#ddd}
+.card.back .val{color:var(--accent);font:20px Pixel,monospace}
+.hand .card.can{transform:translateY(-8px);box-shadow:0 6px 0 #0006,0 0 0 3px var(--accent)}
+.hand.myturn .card:not(.can){filter:brightness(.55)}
+.card:focus-visible,.btn:focus-visible,.iconbtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* Pickers, end of game */
+.sheet{position:fixed;inset:0;z-index:20;background:#000a;display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.sheet .box{width:100%;max-width:480px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:16px;max-height:88dvh;overflow:auto}
+.sheet h2{font:26px Pixel,monospace;color:var(--accent);margin-bottom:10px}
+.colours{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.colours button{height:70px;border-radius:12px;border:3px solid #fff;color:#fff;font-weight:800;font-size:18px;text-shadow:1px 1px 0 #0008}
+.targets button{display:flex;align-items:center;gap:10px;width:100%;padding:10px;margin-bottom:8px;border-radius:12px;border:2px solid var(--line);background:#2a3150;color:var(--ink);font-weight:700}
+.winner{text-align:center}
+.winner .av{margin:6px auto}
+.winner h2{font-size:34px}
+/* Chat */
+.chat{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--panel);border-top:2px solid var(--line);display:flex;flex-direction:column;height:min(60dvh,440px);max-width:640px;margin:0 auto;border-radius:16px 16px 0 0}
+.chat header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.chat header h2{font:24px Pixel,monospace;color:var(--accent)}
+.msgs{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.msg{display:flex;gap:8px;align-items:flex-start}
+.msg .body{background:#2a3150;border-radius:12px;padding:6px 10px;max-width:80%;word-wrap:break-word;overflow-wrap:anywhere}
+.msg .body b{display:block;font-size:12px;color:var(--accent)}
+.msg.mine{flex-direction:row-reverse}
+.msg.mine .body{background:#3a4470}
+.msg.sys{justify-content:center;font-size:12px;color:var(--muted);font-style:italic}
+.quick{display:flex;gap:6px;overflow-x:auto;padding:6px 10px;border-top:1px solid var(--line);scrollbar-width:none}
+.quick button{flex-shrink:0;background:#2a3150;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 10px;font-size:14px}
+.chat form{display:flex;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.chat form input{flex:1;min-width:0;padding:10px 12px;border-radius:999px;border:2px solid var(--line);background:#0f1320;color:var(--ink)}
+.chat form button{background:var(--accent);color:#231d00;border:0;border-radius:999px;padding:0 16px;font-weight:800}
+.chatfab{position:fixed;left:14px;bottom:16px;z-index:12;background:var(--accent);color:#231d00;border:0;border-radius:999px;padding:12px 16px;font-weight:800;box-shadow:0 6px 18px #0008}
+.toast{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:40;background:var(--accent);color:#231d00;font-weight:700;padding:10px 16px;border-radius:12px;box-shadow:0 6px 20px #0008;max-width:calc(100% - 24px);text-align:center}
+@media (prefers-reduced-motion:reduce){.opp .catch{animation:none}.card{transition:none}}
+</style></head><body>
+
+<main>
+ <!-- Menu -->
+ <section id="menu">
+  <h1 class="logo">GOONO</h1>
+  <p class="tagline">The crew’s card game. Match the colour or number. First to get rid of their cards wins.</p>
+  <div class="panel me"><span class="av big" id="me-av"></span><div><div class="who" id="me-name"></div><div class="small">You play as yourself, with your driver avatar.</div></div></div>
+  <div class="panel">
+   <h2>Play together</h2>
+   <p class="small">One phone hosts and gets a code. Everyone else types the code in. Phones can be on Wi-Fi or mobile data.</p>
+   <button type="button" class="btn primary" id="host-btn">Host a game</button>
+   <form id="join-form">
+    <input class="code" id="join-code" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="CODE" aria-label="Game code">
+    <button type="submit" class="btn">Join with code</button>
+   </form>
+   <p class="error" id="menu-error" role="alert"></p>
+  </div>
+  <div class="panel">
+   <h2>Play the crew</h2>
+   <p class="small">No signal? Play against computer players from the crew.</p>
+   <button type="button" class="btn" id="solo-btn">Play against the crew</button>
+  </div>
+  <details class="panel">
+   <summary><b>How to play</b></summary>
+   <p class="small">Play a card that matches the top card’s colour or number. Can’t go? Pick one up. <b>Tea Break</b> skips the next player, <b>Wrong Way Van</b> reverses, <b>Snag List</b> makes the next player pick up 2. <b>Goono</b> cards change the colour, and <b>Mum’s Calling</b> changes it and makes the next player pick up 4. Down to your last card? Tap <b>GOONO!</b> before someone catches you.</p>
+  </details>
+ </section>
+
+ <!-- Lobby -->
+ <section id="lobby" hidden>
+  <div class="panel">
+   <p class="small" style="text-align:center">Game code</p>
+   <div class="code-big" id="lobby-code"></div>
+   <p class="small" style="text-align:center" id="lobby-hint"></p>
+   <button type="button" class="btn" id="share-btn">Share the code</button>
+  </div>
+  <div class="panel">
+   <h2>Players</h2>
+   <ul class="seats" id="seats"></ul>
+   <button type="button" class="btn" id="add-bot">Add a computer player</button>
+  </div>
+  <div class="panel rules" id="rules"></div>
+  <button type="button" class="btn primary" id="start-btn">Start game</button>
+  <p class="small" id="waiting" style="text-align:center;margin-top:12px" hidden>Waiting for the host to start…</p>
+  <button type="button" class="btn danger" id="leave-lobby">Leave</button>
+ </section>
+
+ <!-- Game -->
+ <section id="game" hidden>
+  <div class="topbar"><span class="room" id="room"></span><button type="button" class="iconbtn" id="rules-btn">Rules</button><button type="button" class="iconbtn" id="leave-game">Leave</button></div>
+  <div class="opps" id="opps"></div>
+  <div class="table">
+   <div class="pile"><button type="button" class="drawbtn" id="draw-btn" aria-label="Pick up a card"><span class="card big back"><span class="val">GOONO</span></span></button><span class="small" id="draw-label">Pick up</span></div>
+   <div class="pile"><span id="top-card"></span><span class="small" style="display:flex;align-items:center;gap:6px"><span class="ring" id="colour-ring"></span><span id="dir"></span></span></div>
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+  <ul class="log" id="log"></ul>
+  <div class="hand" id="hand" aria-label="Your cards"></div>
+  <div class="actions"><button type="button" class="btn goonobtn" id="goono-btn">GOONO!</button><button type="button" class="btn" id="pass-btn" hidden>Pass</button></div>
+ </section>
+</main>
+
+<button type="button" class="chatfab" id="chat-fab" hidden>💬 Chat<span class="dot" id="unread" hidden></span></button>
+<section class="chat" id="chat" hidden aria-label="Chat">
+ <header><h2>Chat</h2><button type="button" class="iconbtn" id="chat-close">Close</button></header>
+ <div class="msgs" id="msgs" aria-live="polite"></div>
+ <div class="quick" id="quick"></div>
+ <form id="chat-form"><input id="chat-input" maxlength="200" autocomplete="off" placeholder="Say something…" aria-label="Chat message"><button type="submit">Send</button></form>
+</section>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="drivers.js?v=3"></script>
+<script src="driver-characters.js?v=70"></script>
+<script src="goono-engine.js?v=1"></script>
+<script src="peerjs.min.js?v=1"></script>
+<script>
+(function(){
+ 'use strict';
+ const G=window.Goono;
+ const $=id=>document.getElementById(id);
+ const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+ const btn=(cls,text,fn)=>{const b=el('button',cls,text);b.type='button';if(fn)b.onclick=fn;return b};
+ const PREFIX='mds-goono-',CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',MAX_SEATS=8;
+ const peerOptions=Object.assign({debug:0},window.GOONO_PEER_OPTIONS||{});
+ let myName='Guest';try{myName=localStorage.getItem('ts_auth_user')||'Guest'}catch(_){}
+ const firstName=n=>String(n||'').split(' ')[0];
+
+ let toastTimer;
+ function toast(t){const x=$('toast');x.textContent=t;x.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{x.hidden=true},2800)}
+ function avatar(name,size){
+  const box=el('span','av'+(size?' '+size:''));
+  try{if(window.MDSDriverAvatar)box.append(window.MDSDriverAvatar(name))}catch(_){}
+  if(!box.firstChild)box.textContent=firstName(name).slice(0,1);
+  return box;
+ }
+ function show(id){['menu','lobby','game'].forEach(s=>{$(s).hidden=s!==id});$('chat-fab').hidden=id==='menu';if(id==='menu'){$('chat').hidden=true}window.scrollTo(0,0)}
+ $('me-av').replaceWith(Object.assign(avatar(myName,'big'),{id:'me-av'}));$('me-name').textContent=myName;
+
+ // ---------- Cards ----------
+ const VALUE={skip:'⛔',reverse:'⇄',draw2:'+2',wild:'★',wild4:'+4'};
+ function cardEl(card,big){
+  const c=el('span','card '+(card.colour||'wild')+(big?' big':''));
+  c.append(el('span','oval'),el('span','val',card.kind==='num'?String(card.value):VALUE[card.kind]));
+  const corner=card.kind==='num'?String(card.value):VALUE[card.kind];
+  c.append(el('span','corner',corner),el('span','corner br',corner));
+  if(card.kind!=='num')c.append(el('span','cap',G.KINDS[card.kind].label));
+  c.setAttribute('aria-label',G.cardName(card));
+  return c;
+ }
+
+ // ---------- Shared state ----------
+ let role=null;          // 'host' | 'guest' | 'solo'
+ let peer=null,conn=null,code='';
+ let lobby=null,view=null,chat=[],unread=0,lastSeq=-1;
+ // Host only:
+ let seats=[],rules=G.cleanRules(G.PRESETS.classic),game=null,botTimer=null,catchTimer=null,beat=null,hostSeen=0;
+
+ function reset(){
+  clearTimeout(botTimer);clearTimeout(catchTimer);clearInterval(beat);
+  try{conn&&conn.close()}catch(_){}try{peer&&peer.destroy()}catch(_){}
+  role=null;peer=null;conn=null;code='';lobby=null;view=null;chat=[];unread=0;lastSeq=-1;seats=[];game=null;
+  $('msgs').replaceChildren();releaseWake();
+ }
+ function leave(){reset();show('menu')}
+
+ // Keep the screen on during a game, so the host's phone doesn't sleep and drop everyone.
+ let wake=null;
+ async function keepAwake(){try{if('wakeLock' in navigator&&!wake){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null})}}catch(_){}}
+ function releaseWake(){try{wake&&wake.release()}catch(_){}wake=null}
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view&&view.phase==='play')keepAwake()});
+
+ // ---------- Sending and receiving ----------
+ // Everything the host decides goes to each seat as a message; the host's own screen gets them directly.
+ function deliver(i,msg){
+  const s=seats[i];if(!s)return;
+  if(s.kind==='host')receive(msg);
+  else if(s.kind==='peer'&&s.conn&&s.conn.open&&!s.away){try{s.conn.send(msg)}catch(_){}}
+ }
+ function send(msg){ // from this phone to the host
+  if(role==='guest'){if(conn&&conn.open)conn.send(msg);else toast('Not connected to the host.')}
+  else hostReceive(0,msg);
+ }
+ function receive(msg){
+  if(!msg||typeof msg!=='object')return;
+  if(msg.t==='lobby'){lobby=msg;renderLobby();if(!msg.started&&$('game').hidden)show('lobby');else if(view&&!$('game').hidden)renderGame()}
+  else if(msg.t==='state'){const first=!view||$('game').hidden;view=msg.view;if(first)show('game');renderGame();if(view.phase==='play')keepAwake()}
+  else if(msg.t==='chat'){(msg.msgs||[msg.msg]).forEach(addChat)}
+  else if(msg.t==='error'){toast(msg.text)}
+  else if(msg.t==='lobbyback'){view=null;show('lobby');renderLobby()}
+  else if(msg.t==='reject'){$('menu-error').textContent=msg.text;leave();$('menu-error').textContent=msg.text}
+ }
+
+ // ---------- Hosting ----------
+ function makeCode(){let c='';for(let i=0;i<4;i++)c+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return c}
+ function startHost(solo){
+  reset();role=solo?'solo':'host';
+  seats=[{name:myName,kind:'host'}];
+  if(solo){
+   code='SOLO';
+   const crew=crewNames();for(let i=0;i<3&&i<crew.length;i++)seats.push({name:crew[i],kind:'bot'});
+   broadcastLobby();show('lobby');return;
+  }
+  if(!window.Peer){$('menu-error').textContent='Online play needs a signal. Try “Play against the crew”.';role=null;return}
+  $('menu-error').textContent='Setting up…';
+  const tryOpen=(attempt)=>{
+   code=makeCode();
+   peer=new Peer(PREFIX+code.toLowerCase(),peerOptions);
+   peer.on('open',()=>{$('menu-error').textContent='';broadcastLobby();show('lobby');sysChat(firstName(myName)+' started a game. Code '+code+'.')});
+   peer.on('connection',c=>{
+    c.on('data',d=>{const i=seats.findIndex(s=>s.conn===c);if(i<0){if(d&&d.t==='hello')hello(c,d)}else{seats[i].seen=Date.now();hostReceive(i,d)}});
+    c.on('close',()=>dropped(c));c.on('error',()=>dropped(c));
+    c.on('iceStateChanged',st=>{if(st==='failed'||st==='closed')dropped(c)});
+   });
+   clearInterval(beat);
+   beat=setInterval(()=>{
+    const now=Date.now();
+    seats.forEach((s,i)=>{if(s.kind!=='peer'||s.away)return;if(now-(s.seen||now)>12000)dropped(s.conn);else deliver(i,{t:'ping'})});
+   },3000);
+   peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
+   peer.on('error',e=>{
+    if(e.type==='unavailable-id'&&attempt<4){try{peer.destroy()}catch(_){}tryOpen(attempt+1);return}
+    if(!$('menu').hidden||!lobby)$('menu-error').textContent=netError(e);else toast(netError(e));
+   });
+  };
+  tryOpen(0);
+ }
+ function netError(e){
+  if(!navigator.onLine)return 'No signal. Try “Play against the crew”.';
+  if(e&&e.type==='peer-unavailable')return 'No game with that code. Check it with the host.';
+  if(e&&(e.type==='network'||e.type==='server-error'||e.type==='socket-error'))return 'Couldn’t reach the Goono server. Check your signal and try again.';
+  return 'Connection problem. Try again.';
+ }
+ function crewNames(){
+  const all=(window.MDS_DRIVERS&&window.MDS_DRIVERS.names)||['Cody Slack','Ash Kemp','Martyn Evans','Matthew Heath','Oliver Spicer','Tobi Culver'];
+  const taken=new Set(seats.map(s=>s.name));
+  return all.filter(n=>!taken.has(n));
+ }
+ function cleanName(n){return String(n||'Guest').replace(/[\u0000-\u001f]/g,'').trim().slice(0,40)||'Guest'}
+ function hello(c,d){
+  const name=cleanName(d.name);
+  if(game&&game.phase==='play'){
+   // Someone who dropped out (or whose old connection hasn't timed out yet) takes their seat back.
+   const i=seats.findIndex(s=>s.kind==='peer'&&s.name===name);
+   if(i<0){try{c.send({t:'reject',text:'That game has already started.'})}catch(_){}setTimeout(()=>c.close(),500);return}
+   const old=seats[i].conn;seats[i].conn=c;seats[i].away=false;seats[i].seen=Date.now();game.players[i].bot=false;
+   if(old&&old!==c){try{old.close()}catch(_){}}
+   sysChat(firstName(name)+' is back.');
+   deliver(i,{t:'chat',msgs:chat});broadcastLobby();broadcastState();return;
+  }
+  if(seats.length>=MAX_SEATS){try{c.send({t:'reject',text:'That game is full.'})}catch(_){}setTimeout(()=>c.close(),500);return}
+  seats.push({name,kind:'peer',conn:c,away:false,seen:Date.now()});
+  const i=seats.length-1;
+  deliver(i,{t:'chat',msgs:chat});
+  sysChat(firstName(name)+' joined.');broadcastLobby();
+ }
+ function dropped(c){
+  const i=seats.findIndex(s=>s.conn===c);if(i<0||seats[i].away)return;
+  const name=seats[i].name;
+  if(game&&game.phase==='play'){seats[i].away=true;game.players[i].bot=true;sysChat(firstName(name)+' lost connection. A computer player is covering until they’re back.');broadcastLobby();scheduleBots()}
+  else{seats.splice(i,1);sysChat(firstName(name)+' left.');broadcastLobby()}
+  try{c.close()}catch(_){}   // after the seat is updated, so the close event finds nothing to do
+ }
+ function broadcastLobby(){
+  const base={t:'lobby',code,solo:role==='solo',rules,started:!!(game&&game.phase==='play'),seats:seats.map(s=>({name:s.name,kind:s.kind,away:!!s.away}))};
+  seats.forEach((s,i)=>deliver(i,{...base,you:i}));
+ }
+ function broadcastState(){
+  if(!game)return;
+  seats.forEach((s,i)=>deliver(i,{t:'state',view:G.viewFor(game,i)}));
+  scheduleBots();
+ }
+ let chatTimes={};
+ function sysChat(text){pushChat({sys:true,text})}
+ function pushChat(m){m.at=Date.now();chat.push(m);if(chat.length>60)chat.shift();seats.forEach((s,i)=>deliver(i,{t:'chat',msg:m}))}
+ function hostReceive(i,d){
+  if(!d||typeof d!=='object')return;
+  const seat=seats[i];if(!seat)return;
+  if(d.t==='pong')return;
+  if(d.t==='chat'){
+   const text=String(d.text||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,200);if(!text)return;
+   const now=Date.now();if(now-(chatTimes[i]||0)<600)return;chatTimes[i]=now;
+   pushChat({from:seat.name,text});return;
+  }
+  if(d.t==='act'){
+   if(!game){deliver(i,{t:'error',text:'The game hasn’t started.'});return}
+   const a=d.a||{};
+   const move={type:String(a.type||''),card:a.card==null?undefined:String(a.card),colour:a.colour==null?undefined:String(a.colour),target:a.target==null?undefined:Number(a.target)};
+   const before=game.players[i].hand.length;
+   const r=G.apply(game,i,move);
+   if(!r.ok){deliver(i,{t:'error',text:r.error});return}
+   announce(i,move,before);
+   broadcastState();return;
+  }
+ }
+ // A few lines in the chat when something big happens.
+ function announce(i,move,before){
+  if(!game)return;
+  const name=firstName(game.players[i].name),top=game.discard[game.discard.length-1];
+  if(move.type==='play'&&top.kind==='wild4')sysChat('📞 '+name+' played Mum’s Calling!');
+  if(game.phase==='over')sysChat('🏆 '+game.players[game.winner].name+' wins!');
+ }
+ function startGame(again){
+  if(seats.length<2){toast('You need at least 2 players. Add a computer player.');return}
+  game=G.newGame(seats.map(s=>({name:s.name,bot:s.kind==='bot'||!!s.away})),rules);
+  sysChat(again?'New round! Same players.':'Game on!');
+  broadcastLobby();broadcastState();
+ }
+ // Computer players (and anyone who dropped out) take their go after a short pause.
+ const BOT_LINES=['Get in!','Sorry not sorry','😂','That’s for the sausage roll','Hurry up then','Ooh you’re in trouble','Snag list incoming'];
+ function scheduleBots(){
+  clearTimeout(botTimer);clearTimeout(catchTimer);
+  if(!game||game.phase!=='play')return;
+  const p=game.turn;
+  if(game.players[p].bot){
+   botTimer=setTimeout(()=>{
+    if(!game||game.phase!=='play'||game.turn!==p)return;
+    let move=G.botMove(game,p);
+    if(move&&move.type==='goono'){G.apply(game,p,move);move=G.botMove(game,p)}
+    if(!move)return;
+    const before=game.players[p].hand.length;
+    if(G.apply(game,p,move).ok){
+     announce(p,move,before);
+     if(move.type==='play'&&Math.random()<0.12)pushChat({from:game.players[p].name,text:BOT_LINES[Math.floor(Math.random()*BOT_LINES.length)]});
+    }
+    broadcastState();
+   },900+Math.random()*700);
+  }
+  // Computer players sometimes catch someone who forgot to shout Goono.
+  const forgot=game.players.findIndex(x=>x.caughtable);
+  const catcher=game.players.findIndex((x,i)=>x.bot&&i!==forgot);
+  if(forgot>=0&&catcher>=0){
+   catchTimer=setTimeout(()=>{if(game&&game.players[forgot]&&game.players[forgot].caughtable&&Math.random()<0.6){G.apply(game,catcher,{type:'catch',target:forgot});broadcastState()}},1600+Math.random()*1800);
+  }
+ }
+
+ // ---------- Joining ----------
+ function join(c){
+  reset();role='guest';code=c;
+  if(!window.Peer){$('menu-error').textContent='Online play needs a signal.';role=null;return}
+  $('menu-error').textContent='Connecting…';
+  peer=new Peer(peerOptions);
+  peer.on('open',()=>{
+   conn=peer.connect(PREFIX+c.toLowerCase(),{reliable:true});
+   conn.on('open',()=>{$('menu-error').textContent='';conn.send({t:'hello',name:myName,v:1})});
+   conn.on('data',d=>{hostSeen=Date.now();if(d&&d.t==='ping'){try{conn.send({t:'pong'})}catch(_){}return}receive(d)});
+   hostSeen=Date.now();clearInterval(beat);
+   beat=setInterval(()=>{if(role==='guest'&&lobby&&Date.now()-hostSeen>15000){toast('Lost connection to the host. Join again with the same code to carry on.');leave()}},3000);
+   conn.on('close',()=>{if(role==='guest'){toast('The host has left the game.');leave()}});
+  });
+  peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
+  peer.on('error',e=>{if(role!=='guest')return;$('menu-error').textContent=netError(e);if(!lobby){const msg=netError(e);reset();show('menu');$('menu-error').textContent=msg}});
+ }
+
+ // ---------- Lobby screen ----------
+ const RULE_INFO=[
+  ['stacking','Stack +2s and +4s','Put a +2 on a +2 (or a +4 on either) to pass the pick-up on.'],
+  ['drawUntilPlayable','Pick up until you can go','Keep picking up until you get a card you can play.'],
+  ['jumpIn','Jump in','Got the exact same card? Play it out of turn.'],
+  ['sevenZero','7s and 0s','7 swaps hands with someone. 0 passes every hand on.'],
+  ['wild4Anytime','+4 any time','Normally only when you’ve no card of the current colour.'],
+  ['goonoPenalty','Goono catch','Forget to shout Goono and get caught: pick up 2.'],
+ ];
+ function renderLobby(){
+  if(!lobby)return;
+  const host=role==='host'||role==='solo';
+  $('lobby-code').textContent=lobby.solo?'SOLO':lobby.code;
+  $('lobby-hint').textContent=lobby.solo?'Just you and the crew.':host?'Tell the others to open Goono and type this code in.':'You’re in. Chat while you wait.';
+  $('share-btn').hidden=!host||lobby.solo;
+  const list=$('seats');list.replaceChildren();
+  lobby.seats.forEach((s,i)=>{
+   const li=el('li');li.append(avatar(s.name),el('span','name',s.name+(i===lobby.you?' (you)':'')));
+   if(s.kind==='host')li.append(el('span','tag host','HOST'));
+   if(s.kind==='bot')li.append(el('span','tag','COMPUTER'));
+   if(s.away)li.append(el('span','tag','AWAY'));
+   if(host&&s.kind!=='host'&&!lobby.started)li.append(btn('x','✕',()=>removeSeat(i)));
+   list.append(li);
+  });
+  $('add-bot').hidden=!host||lobby.seats.length>=MAX_SEATS;
+  $('start-btn').hidden=!host;$('waiting').hidden=host;
+  renderRules($('rules'),lobby.rules,host&&!lobby.started);
+ }
+ function renderRules(box,r,editable){
+  box.replaceChildren(el('h2',null,'Rules'));
+  box.classList.toggle('readonly',!editable);
+  if(editable){
+   const pre=el('div','presets');
+   const isClassic=JSON.stringify(r)===JSON.stringify(G.cleanRules(G.PRESETS.classic));
+   const isChaos=JSON.stringify(r)===JSON.stringify(G.cleanRules(G.PRESETS.chaos));
+   [['Normal rules',G.PRESETS.classic,isClassic],['Chaos',G.PRESETS.chaos,isChaos]].forEach(([n,p,on])=>{const b=btn('',n,()=>setRules(G.cleanRules(p)));b.setAttribute('aria-pressed',String(on));pre.append(b)});
+   box.append(pre);
+  }
+  const size=el('label');const t=el('span');t.append('Cards each');
+  const sel=el('select');[5,7,10].forEach(n=>sel.append(new Option(String(n),String(n))));sel.value=String(r.handSize);sel.disabled=!editable;
+  sel.onchange=()=>setRules(G.cleanRules({...rules,handSize:Number(sel.value)}));
+  size.append(t,sel);box.append(size);
+  RULE_INFO.forEach(([k,name,help])=>{
+   const l=el('label'),txt=el('span');txt.append(name,el('small',null,help));
+   const cb=el('input');cb.type='checkbox';cb.checked=!!r[k];cb.disabled=!editable;
+   cb.onchange=()=>setRules(G.cleanRules({...rules,[k]:cb.checked}));
+   l.append(txt,cb);box.append(l);
+  });
+ }
+ function setRules(r){rules=r;broadcastLobby()}
+ function removeSeat(i){if(seats[i]&&seats[i].kind!=='host'){const s=seats[i];seats.splice(i,1);if(s.conn){try{s.conn.send({t:'reject',text:'The host removed you from the game.'})}catch(_){}setTimeout(()=>{try{s.conn.close()}catch(_){}},300)}sysChat(firstName(s.name)+' was removed.');broadcastLobby()}}
+ $('add-bot').onclick=()=>{const n=crewNames()[0];if(!n){toast('No more crew to add.');return}seats.push({name:n,kind:'bot'});sysChat(firstName(n)+' (computer) joined.');broadcastLobby()};
+ $('start-btn').onclick=()=>startGame(false);
+ $('share-btn').onclick=()=>shareCode();
+ $('leave-lobby').onclick=leave;
+ async function shareCode(){
+  const text='Join my Goono game in the MDS app. Code: '+code+' (Arcade → Goono → Join with code)';
+  const n=window.MDSNative||(window.parent!==window&&window.parent.MDSNative);
+  if(n&&n.shareText){n.shareText('Goono',text);return}
+  if(navigator.share){try{await navigator.share({title:'Goono',text});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text);toast('Copied. Paste it in the group chat.')}catch(_){prompt('Send this to the others:',text)}
+ }
+
+ // ---------- Game screen ----------
+ function renderGame(){
+  if(!view)return;
+  const v=view,mine=v.turn===v.you&&v.phase==='play';
+  $('room').textContent=(lobby&&lobby.solo)?'Goono · solo':'Goono · '+code;
+  // Other players, in turn order from you.
+  const opps=$('opps');opps.replaceChildren();
+  const n=v.players.length;
+  for(let k=1;k<n;k++){
+   const i=(v.you+k*v.dir+n*k)%n,pl=v.players[i];
+   const box=el('div','opp'+(v.turn===i&&v.phase==='play'?' turn':''));
+   if(pl.count===1&&pl.saidGoono)box.append(el('span','goono','GOONO!'));
+   box.append(avatar(pl.name),el('div','nm',firstName(pl.name)),el('div','cnt',pl.count+(pl.count===1?' card':' cards')));
+   const seat=lobby&&lobby.seats[i];if(seat&&seat.away)box.append(el('div','away','away (computer covering)'));
+   if(pl.caughtable&&v.rules.goonoPenalty)box.append(btn('catch','Catch!',()=>send({t:'act',a:{type:'catch',target:i}})));
+   opps.append(box);
+  }
+  // Table
+  $('top-card').replaceChildren(cardEl(v.top,true));
+  const ring=$('colour-ring');ring.style.background='var(--'+v.colour+')';ring.title=G.COLOUR_NAMES[v.colour];
+  $('dir').textContent=(v.dir===1?'↻':'↺')+' '+G.COLOUR_NAMES[v.colour];
+  const label=$('draw-label');
+  label.textContent=v.pendingDraw?(mine?'Pick up '+v.pendingDraw:'+'+v.pendingDraw+' waiting'):'Pick up';
+  $('draw-btn').disabled=!mine||!!v.drewCard;
+  // Status
+  const st=$('status');st.classList.toggle('mine',mine);
+  if(v.phase==='over'){st.textContent=v.winner===v.you?'You win! 🏆':firstName(v.players[v.winner].name)+' wins!'}
+  else if(mine){st.textContent=v.pendingDraw?(v.playable.length?'Stack it or pick up '+v.pendingDraw:'Pick up '+v.pendingDraw):v.drewCard?'Play it or pass':'Your go'}
+  else st.textContent=firstName(v.players[v.turn].name)+'’s go';
+  const log=$('log');log.replaceChildren();v.log.slice(-2).forEach(t=>log.append(el('li',null,t)));
+  // Your hand
+  const hand=$('hand');hand.replaceChildren();hand.classList.toggle('myturn',mine);
+  const can=new Set(v.playable);
+  const order={red:0,yellow:1,green:2,blue:3,null:4};
+  v.hand.slice().sort((a,b)=>(order[a.colour]-order[b.colour])||((a.value??20)-(b.value??20))||a.kind.localeCompare(b.kind)).forEach(c=>{
+   const b=document.createElement('button');b.type='button';b.className='drawbtn';
+   const face=cardEl(c);if(can.has(c.id))face.classList.add('can');b.append(face);
+   b.setAttribute('aria-label',G.cardName(c)+(can.has(c.id)?' (can play)':''));
+   b.onclick=()=>tryPlay(c,can.has(c.id));
+   hand.append(b);
+  });
+  const me=v.players[v.you];
+  const gb=$('goono-btn');gb.disabled=v.phase!=='play'||me.count>2||me.saidGoono;gb.textContent=me.saidGoono&&me.count<=2?'GOONO! ✓':'GOONO!';
+  $('pass-btn').hidden=!(mine&&v.drewCard);
+  if(v.phase==='over'&&lastSeq!==v.seq)setTimeout(showWinner,700);
+  if(mine&&lastSeq!==v.seq&&navigator.vibrate)try{navigator.vibrate(40)}catch(_){}
+  lastSeq=v.seq;
+ }
+ function tryPlay(c,ok){
+  const v=view;if(!v||v.phase!=='play')return;
+  if(!ok){toast(v.turn===v.you?'You can’t play that one.':'It’s not your go.');return}
+  const move={type:'play',card:c.id};
+  const go=()=>{
+   if(v.rules.sevenZero&&c.kind==='num'&&c.value===7&&v.players[v.you].count>1){pickTarget(t=>{move.target=t;send({t:'act',a:move})});return}
+   send({t:'act',a:move});
+  };
+  if(!c.colour)pickColour(col=>{move.colour=col;go()});else go();
+ }
+ function sheet(build){
+  const s=el('div','sheet');s.setAttribute('role','dialog');s.setAttribute('aria-modal','true');
+  const box=el('div','box');build(box,()=>s.remove());s.append(box);
+  s.addEventListener('click',e=>{if(e.target===s)s.remove()});
+  document.body.append(s);box.querySelector('button')?.focus();return s;
+ }
+ function pickColour(done){
+  sheet((box,close)=>{
+   box.append(el('h2',null,'Pick a colour'));
+   const g=el('div','colours');
+   G.COLOURS.forEach(c=>{const b=btn('',G.COLOUR_NAMES[c],()=>{close();done(c)});b.style.background='var(--'+c+')';g.append(b)});
+   box.append(g,btn('btn','Cancel',close));
+  });
+ }
+ function pickTarget(done){
+  sheet((box,close)=>{
+   box.append(el('h2',null,'Swap hands with…'));
+   const t=el('div','targets');
+   view.players.forEach((p,i)=>{if(i===view.you)return;const b=btn('','',()=>{close();done(i)});b.append(avatar(p.name),document.createTextNode(p.name+' · '+p.count+' cards'));t.append(b)});
+   box.append(t,btn('btn','Cancel',close));
+  });
+ }
+ function showWinner(){
+  if(!view||view.phase!=='over'||document.querySelector('.sheet'))return;
+  const w=view.players[view.winner],host=role==='host'||role==='solo';
+  sheet((box,close)=>{
+   const d=el('div','winner');d.append(el('h2',null,view.winner===view.you?'You win!':firstName(w.name)+' wins!'),avatar(w.name,'big'),el('p','small',view.winner===view.you?'Get in. Tell the group chat.':'Better luck next round.'));
+   box.append(d);
+   if(host){box.append(btn('btn primary','Play again',()=>{close();startGame(true)}),btn('btn','Change players or rules',()=>{close();game=null;seats.forEach((s,i)=>deliver(i,{t:'lobbyback'}));broadcastLobby()}))}
+   else box.append(el('p','small','Waiting for the host to start another round…'));
+   box.append(btn('btn danger','Leave',()=>{close();leave()}));
+  });
+ }
+ $('draw-btn').onclick=()=>send({t:'act',a:{type:'draw'}});
+ $('pass-btn').onclick=()=>send({t:'act',a:{type:'pass'}});
+ $('goono-btn').onclick=()=>{send({t:'act',a:{type:'goono'}});if(navigator.vibrate)try{navigator.vibrate([30,40,30])}catch(_){}};
+ $('leave-game').onclick=()=>{if(confirm(role==='guest'?'Leave this game?':'End the game for everyone?'))leave()};
+ $('rules-btn').onclick=()=>sheet((box,close)=>{const r=el('div','rules');renderRules(r,view?view.rules:rules,false);box.append(r,btn('btn','Close',close))});
+
+ // ---------- Chat ----------
+ const QUICK=['😂','🔥','GG','😤 Hurry up!','🥐','Unlucky','📞 Mum’s calling'];
+ QUICK.forEach(q=>$('quick').append(btn('',q,()=>sendChat(q))));
+ function sendChat(text){text=String(text).trim();if(!text)return;send({t:'chat',text})}
+ $('chat-form').onsubmit=e=>{e.preventDefault();const i=$('chat-input');sendChat(i.value);i.value=''};
+ function addChat(m){
+  if(!m)return;
+  const box=$('msgs');let row;
+  if(m.sys){row=el('div','msg sys',m.text)}
+  else{
+   row=el('div','msg'+(m.from===myName?' mine':''));
+   const body=el('div','body');body.append(el('b',null,firstName(m.from)),document.createTextNode(m.text));
+   row.append(avatar(m.from,'tiny'),body);
+   if($('chat').hidden&&m.from!==myName){unread++;showUnread();toast(firstName(m.from)+': '+m.text)}
+  }
+  box.append(row);box.scrollTop=box.scrollHeight;
+ }
+ function showUnread(){const d=$('unread');d.hidden=!unread;d.textContent=String(unread)}
+ $('chat-fab').onclick=()=>{$('chat').hidden=false;$('chat-fab').hidden=true;unread=0;showUnread();$('msgs').scrollTop=$('msgs').scrollHeight};
+ $('chat-close').onclick=()=>{$('chat').hidden=true;$('chat-fab').hidden=false};
+
+ // ---------- Menu ----------
+ $('host-btn').onclick=()=>startHost(false);
+ $('solo-btn').onclick=()=>startHost(true);
+ $('join-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4)});
+ $('join-form').onsubmit=e=>{
+  e.preventDefault();const c=$('join-code').value.trim().toUpperCase();
+  if(!/^[A-Z0-9]{4}$/.test(c)){$('menu-error').textContent='Codes are 4 letters or numbers.';return}
+  join(c);
+ };
+ addEventListener('pagehide',()=>{try{peer&&peer.destroy()}catch(_){}});
+})();
+</script>
+</body></html>
