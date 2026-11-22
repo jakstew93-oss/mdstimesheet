@@ -64,6 +64,8 @@
    players:players.map(p=>({name:String(p.name).slice(0,40),bot:!!p.bot,hand:[],saidGoono:false,caughtable:false})),
    draw:shuffle(makeDeck(),rand),discard:[],colour:null,turn:0,dir:1,
    pendingDraw:0,pendingKind:null,drewCard:null,phase:'play',winner:null,rules,log:[],seq:0,events:[],evId:0,
+   // Each game gets its own id, so phones know a new round has started and its events are new.
+   gameId:Math.floor(rand()*1e9).toString(36)+Date.now().toString(36),
   };
   for(let i=0;i<rules.handSize;i++)for(const p of s.players)p.hand.push(s.draw.pop());
   // Start on a number card, so the first go is a normal one.
@@ -209,7 +211,7 @@
  // What one player is allowed to see.
  function viewFor(s,p){
   return {
-   you:p,seq:s.seq,hand:s.players[p]?s.players[p].hand.slice():[],
+   you:p,seq:s.seq,gameId:s.gameId,hand:s.players[p]?s.players[p].hand.slice():[],
    players:s.players.map((x,i)=>({name:x.name,bot:x.bot,count:x.hand.length,saidGoono:x.saidGoono,caughtable:x.caughtable})),
    top:top(s),colour:s.colour,turn:s.turn,dir:s.dir,pendingDraw:s.pendingDraw,pendingKind:s.pendingKind,
    drewCard:s.drewCard,phase:s.phase,winner:s.winner,rules:s.rules,log:s.log.slice(-8),drawLeft:s.draw.length,events:s.events.slice(),

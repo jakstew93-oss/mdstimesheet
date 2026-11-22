@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v115';
+const CACHE_NAME = 'mdsmiths-timesheet-v116';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -67,9 +67,9 @@ const APP_SHELL = [
   './spark-town.html?v=62',
   './cody-snackagotchi.html?v=62',
   './spark-town.js?v=62',
-  './spark-town-launcher.js?v=80',
-  './goono.html?v=2',
-  './goono-engine.js?v=2',
+  './spark-town-launcher.js?v=81',
+  './goono.html?v=3',
+  './goono-engine.js?v=3',
   './peerjs.min.js?v=1',
   './black-web.html?v=3',
   './cody-burger-chase.html?v=75',

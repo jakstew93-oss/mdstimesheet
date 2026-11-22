@@ -243,7 +243,7 @@ input.code{width:100%;padding:12px;border-radius:12px;border:2px solid var(--lin
 
 <script src="drivers.js?v=3"></script>
 <script src="driver-characters.js?v=70"></script>
-<script src="goono-engine.js?v=2"></script>
+<script src="goono-engine.js?v=3"></script>
 <script src="peerjs.min.js?v=1"></script>
 <script>
 (function(){
@@ -319,6 +319,8 @@ input.code{width:100%;padding:12px;border-radius:12px;border:2px solid var(--lin
    const first=!view||$('game').hidden;
    const before={},had=new Set(view?view.hand.map(c=>c.id):[]);
    document.querySelectorAll('#hand [data-id]').forEach(b=>{before[b.dataset.id]=b.getBoundingClientRect()});
+   // A new round (Play again) numbers its events from the start again.
+   if(view&&msg.view.gameId!==view.gameId){lastEv=0;pile=[]}
    const fresh=(msg.view.events||[]).filter(e=>e.id>lastEv);
    if(fresh.some(e=>e.type==='deal')){pile=[];had.clear()}
    view=msg.view;if(first)show('game');renderGame();
