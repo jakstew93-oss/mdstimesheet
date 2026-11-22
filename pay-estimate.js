@@ -14,7 +14,7 @@
   if(user==='Jak Stewart')return false;
   try{return !(Number((JSON.parse(savedText||'{}')||{}).rate)>0)}catch(_){return true}
  }
- const DEFAULTS={rate:17,satX:1.5,sunX:1.5,night:20,nightTaxed:false,holidayHours:8,taxCode:'1257L',pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:true};
+ const DEFAULTS={rate:17,satX:1.5,sunX:1.5,night:20,nightTaxed:false,holidayHours:8,taxCode:'1257L',pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:false};
 
  // 2026/27, per week.
  const TAX={basicBand:37700/52,higherLimit:125140/52};
@@ -57,7 +57,9 @@
  }
  function weeklyPension(pay,s){
   const on=s.pensionBasis==='all'?pay:Math.max(0,Math.min(pay,PENSION.to)-PENSION.from);
-  return pence(on*(Number(s.pensionPct)||0)/100);
+  // Relief at Source (pensionBeforeTax === false): employee pays 80% of the headline % from net pay; scheme claims 20% tax relief.
+  const factor=s.pensionBeforeTax===false?0.8:1;
+  return pence(on*(Number(s.pensionPct)||0)/100*factor);
  }
 
  function defaultUsers(){return Array.isArray(root.MDS_CONFIG?.features?.payEstimate)?root.MDS_CONFIG.features.payEstimate:ALLOWED_USERS}
@@ -93,7 +95,7 @@
    if(d.hol&&!d.mins)holidayDays++;
    if(d.food)nights++;                       // one night away per day, however many jobs were ticked
   });
-  const weekPay=pence(weekMins/60*s.rate),satPay=pence(satMins/60*s.rate*s.satX),sunPay=pence(sunMins/60*s.rate*s.sunX);
+  const weekPay=pence(pence(weekMins/60)*s.rate),satPay=pence(pence(satMins/60)*s.rate*s.satX),sunPay=pence(pence(sunMins/60)*s.rate*s.sunX);
   const holidayPay=pence(holidayDays*s.holidayHours*s.rate),nightPay=pence(nights*s.night);
   const gross=pence(weekPay+satPay+sunPay+holidayPay+(s.nightTaxed?nightPay:0));
   const pension=weeklyPension(gross,s);
@@ -136,7 +138,19 @@
   row.hidden=!user();
   row.querySelector('.sd-switch').setAttribute('aria-checked',String(eligible()));
  }
- function settings(){try{return clean(JSON.parse(read(settingsKey(user()))||'{}'))}catch(_){return clean({})}}
+ function settings(){
+  const key=settingsKey(user());
+  try{
+   const raw=JSON.parse(read(key)||'{}');
+   if(raw&&typeof raw==='object'&&!raw._rasV2){
+    // Migrate earlier saved settings to Relief at Source (matching M D Smiths payroll); user can still switch back.
+    if(raw.pensionBeforeTax===true)raw.pensionBeforeTax=false;
+    raw._rasV2=true;
+    if(Object.keys(raw).length>1)write(key,JSON.stringify(raw));
+   }
+   return clean(raw);
+  }catch(_){return clean({})}
+ }
  const money=n=>'£'+n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
  const hours=m=>Math.floor(m/60)+'h'+(m%60?' '+String(m%60).padStart(2,'0')+'m':'');
 
@@ -158,7 +172,7 @@
   ['night','Night away (£)','number'],['nightTaxed','Night away is taxed','yesno'],['holidayHours','Paid hours for a holiday day','number'],
   ['taxCode','Tax code','text'],['pensionPct','Pension (%)','number'],
   ['pensionBasis','Pension is worked out on','choice',[['qualifying','Pay over £120'],['all','All pay']]],
-  ['pensionBeforeTax','Pension comes off before tax','yesno'],
+  ['pensionBeforeTax','Pension before tax (No = Relief at Source)','yesno'],
  ];
  function buildCard(page){
   addStyles();
@@ -183,7 +197,7 @@
    const input=e.target;if(!input.dataset||!input.dataset.key)return;
    const next={...settings()};
    next[input.dataset.key]=input.dataset.kind==='yesno'?input.value==='yes':input.dataset.kind==='number'?Number(input.value):input.value;
-   try{localStorage.setItem(settingsKey(user()),JSON.stringify(clean(next)))}catch(_){}
+   try{localStorage.setItem(settingsKey(user()),JSON.stringify({...clean(next),_rasV2:true}))}catch(_){}
    lastSig='';render();
   });
   (page.querySelector('.summary-card')||page.firstElementChild).after(card);

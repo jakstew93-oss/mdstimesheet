@@ -14,12 +14,31 @@ test('weekdays are paid at the hourly rate on hours after breaks',()=>{
  assert.equal(e.weekPay,722.5);
  assert.equal(e.gross,722.5);
 });
-test('tax, National Insurance and pension follow the weekly 2026/27 rules',()=>{
+test('tax, National Insurance and pension follow the weekly 2026/27 Relief at Source rules',()=>{
  const e=pay.estimate(WEEK,{},breakFor);
- assert.equal(e.pension,30.13);                    // 5% of 722.50 - 120
- assert.equal(e.tax,90);                           // 20% of floor(722.50 - 30.13 - 241.90) = 450
+ assert.equal(e.pension,24.1);                     // 4% net (5% Relief at Source) of 722.50 - 120
+ assert.equal(e.tax,96);                           // 20% of floor(722.50 - 241.90) = 480
  assert.equal(e.ni,38.44);                         // 8% of 722.50 - 242
- assert.equal(e.takeHome,563.93);
+ assert.equal(e.takeHome,563.96);
+});
+test('matches real M D Smiths payslip (54h 25m @ £17 + 3 nights away) to the penny',()=>{
+ // 54h 25m after breaks = 3265 mins -> 54.42 decimal hours * £17 = £925.14
+ const entries=[
+  day('2026-11-16','07:00','18:45',{food:true}), // 11h45m - 45m = 11h00m (660m)
+  day('2026-11-17','07:00','18:45',{food:true}), // 11h00m (660m)
+  day('2026-11-18','07:00','18:45',{food:true}), // 11h00m (660m)
+  day('2026-11-19','07:00','18:45'),             // 11h00m (660m)
+  day('2026-11-20','07:00','18:10'),             // 11h10m - 45m = 10h25m (625m) -> total 3265m
+ ];
+ const e=pay.estimate(entries,{},breakFor);
+ assert.equal(e.weekMins,3265);
+ assert.equal(e.weekPay,925.14);
+ assert.equal(e.nightPay,60);
+ assert.equal(e.total,985.14);
+ assert.equal(e.tax,136.60);
+ assert.equal(e.ni,54.65);
+ assert.equal(e.pension,32.21);
+ assert.equal(e.takeHome,761.68);
 });
 test('Saturday is time and a half and breaks come off that day too',()=>{
  const e=pay.estimate([day('2026-11-14','08:00','13:00')],{},breakFor);
@@ -70,11 +89,13 @@ test('National Insurance is 8% between £242 and £967 and 2% above',()=>{
  assert.equal(pay.weeklyNI(342),8);
  assert.equal(pay.weeklyNI(1067),60);
 });
-test('pension can be on all pay, and can come off after tax',()=>{
- assert.equal(pay.weeklyPension(700,{pensionPct:5,pensionBasis:'all'}),35);
- assert.equal(pay.weeklyPension(100,{pensionPct:5,pensionBasis:'qualifying'}),0);
+test('pension can be on all pay, and can use Net Pay (before tax) or Relief at Source',()=>{
+ assert.equal(pay.weeklyPension(700,{pensionPct:5,pensionBasis:'all',pensionBeforeTax:true}),35);
+ assert.equal(pay.weeklyPension(700,{pensionPct:5,pensionBasis:'all',pensionBeforeTax:false}),28);
+ assert.equal(pay.weeklyPension(100,{pensionPct:5,pensionBasis:'qualifying',pensionBeforeTax:false}),0);
  const before=pay.estimate(WEEK,{pensionBeforeTax:true},breakFor),after=pay.estimate(WEEK,{pensionBeforeTax:false},breakFor);
- assert.equal(after.tax,96);assert.ok(after.takeHome<before.takeHome);
+ assert.equal(before.tax,90);assert.equal(before.pension,30.13);
+ assert.equal(after.tax,96);assert.equal(after.pension,24.1);
 });
 test('bad saved settings fall back to the defaults',()=>{
  const s=pay.clean({rate:'abc',taxCode:'??',pensionPct:-3,satX:2});
