@@ -53,6 +53,9 @@
   }
   document.querySelectorAll('.chip-drv').forEach(chip=>{if(!chip.querySelector('.driver-avatar'))chip.prepend(avatar(chip.textContent.trim()))});
  }
+ // Other pages (such as the Goono game) use the same avatars.
+ window.MDSDriverAvatar=avatar;
  sync();
- new MutationObserver(sync).observe(document.getElementById('mds-app'),{childList:true,subtree:true,attributes:true,attributeFilter:['style']});
+ const app=document.getElementById('mds-app');
+ if(app)new MutationObserver(sync).observe(app,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});
 })();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mdsmiths-timesheet-v113';
+const CACHE_NAME = 'mdsmiths-timesheet-v114';
 const NAV_TIMEOUT_MS = 2500;
 const APP_SHELL = [
   './',
@@ -38,7 +38,7 @@ const APP_SHELL = [
   './timesheet-tools.js?v=63',
   './workflow-ui.js?v=66',
   './driver-characters.css?v=62',
-  './driver-characters.js?v=69',
+  './driver-characters.js?v=70',
   './driver-avatars/jak-stewart-black-shirt.png',
   './driver-avatars/cody-slack-black-shirt.png',
   './driver-avatars/ash-kemp-black-shirt.png',
@@ -67,7 +67,10 @@ const APP_SHELL = [
   './spark-town.html?v=62',
   './cody-snackagotchi.html?v=62',
   './spark-town.js?v=62',
-  './spark-town-launcher.js?v=78',
+  './spark-town-launcher.js?v=79',
+  './goono.html?v=1',
+  './goono-engine.js?v=1',
+  './peerjs.min.js?v=1',
   './black-web.html?v=3',
   './cody-burger-chase.html?v=75',
   './cody-burger-chase.js?v=75',
