@@ -587,7 +587,7 @@
  }
  function switchActiveUserForPreview(name){
   write('ts_auth_user',name);
-  write('ts_emp_name',name);
+  write('timesheet_employee',name);
   const he=$('headerEngineer');
   if(he&&typeof root.abbreviateName==='function')he.textContent=root.abbreviateName(name);
   const emp=$('employeeName');
@@ -597,13 +597,14 @@
   if(typeof root.renderAll==='function')root.renderAll();
   syncVisibility();
   renderPreviewBanner();
+  try{document.dispatchEvent(new Event('mds-entry-saved'))}catch(_){}
  }
  function previewAs(person){
   if(!isAdmin(currentUser())||person.name===ADMIN_USER)return;
   setPreviewReturnUser(ADMIN_USER);
   switchActiveUserForPreview(person.name);
   const sel=$('sectionSelect');
-  if(sel&&typeof root.switchSection==='function'){sel.value='ts';root.switchSection('ts')}
+  if(sel&&typeof root.switchSection==='function'){sel.value='timesheet';root.switchSection('timesheet')}
   toast('Previewing as '+person.name);
  }
  function exitPreviewAs(){
@@ -1109,7 +1110,7 @@
    if(option&&option.isConnected)option.remove();
    panel.hidden=true;
    if(sel.value==='admin'&&typeof root.switchSection==='function'){
-    sel.value='ts';root.switchSection('ts');
+    sel.value='timesheet';root.switchSection('timesheet');
    }
   }
  }
@@ -1122,13 +1123,13 @@
 
   const origSwitch=root.switchSection;
   root.switchSection=function(section){
-   if(section==='admin'&&!isAdmin(currentUser()))section='ts';
+   if(section==='admin'&&!isAdmin(currentUser()))section='timesheet';
    origSwitch(section);
    panel.hidden=section!=='admin';
    if(section==='admin'){syncWorkingFromLive();render();scrollTo(0,0)}
   };
   const origLogout=root.doLogout;
-  if(typeof origLogout==='function')root.doLogout=function(){origLogout();syncVisibility()};
+  if(typeof origLogout==='function')root.doLogout=function(){setPreviewReturnUser('');origLogout();syncVisibility();renderPreviewBanner()};
   const origLogin=root.doLogin;
   if(typeof origLogin==='function')root.doLogin=function(){origLogin();syncVisibility()};
 

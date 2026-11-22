@@ -107,11 +107,14 @@ test('publishSummary reports portraits, drivers, fleet, notices and changelog di
 test('admin and site-config assets are loaded by index.html and cached offline',()=>{
  const html=fs.readFileSync('index.html','utf8');
  const sw=fs.readFileSync('sw.js','utf8');
- for(const ref of ['site-config.css?v=2','site-config.js?v=4','admin.css?v=5','admin.js?v=6']){
+ const adminSrc=fs.readFileSync('admin.js','utf8');
+ for(const ref of ['site-config.css?v=2','site-config.js?v=4','admin.css?v=5','admin.js?v=7']){
   assert.ok(html.includes(ref),'index.html missing '+ref);
   assert.ok(sw.includes('./'+ref),'sw.js missing ./'+ref);
  }
  assert.ok(html.indexOf('site-config.js?v=4')<html.indexOf('drivers.js?v=3'));
+ assert.ok(!adminSrc.includes("switchSection('ts')"),'admin.js must switch to timesheet, not ts');
+ assert.ok(adminSrc.includes("write('timesheet_employee'"),'preview must update timesheet_employee');
  assert.deepEqual(siteConfig.BASE_CONFIG.features.whatIfBreak,['Jak Stewart']);
  assert.deepEqual(siteConfig.BASE_CONFIG.features.splitDay,['Jak Stewart']);
 });
